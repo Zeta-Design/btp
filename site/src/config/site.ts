@@ -18,6 +18,13 @@ export interface Brand {
   /** social links shown in the footer */
   social?: { label: string; href: string }[];
   /**
+   * Base location for local SEO. Service-area business — no street address.
+   * Keep in sync with your Google Business Profile (NAP consistency).
+   */
+  location?: { locality: string; region: string; postalCode: string; country: string };
+  /** cities/areas served, for local-SEO structured data */
+  areaServed?: string[];
+  /**
    * Dubsado lead-capture form share/embed link for THIS brand.
    * Get it in Dubsado → Forms → your lead-capture form → Share.
    * Leave empty until you have it; the Inquire page shows a placeholder.
@@ -34,6 +41,15 @@ export const BRANDS: Record<string, Brand> = {
     social: [
       { label: 'Instagram', href: 'https://www.instagram.com/thebtphotography/' },
       { label: 'VSCO', href: 'https://vsco.co/benjammin-visuals/gallery' },
+    ],
+    location: { locality: 'Georgetown', region: 'TX', postalCode: '78628', country: 'US' },
+    areaServed: [
+      'Austin',
+      'Georgetown',
+      'Round Rock',
+      'Cedar Park',
+      'Pflugerville',
+      'Leander',
     ],
     dubsadoFormUrl: 'https://hello.dubsado.com/public/form/view/6a2489c3971b89d2159a3901',
   },

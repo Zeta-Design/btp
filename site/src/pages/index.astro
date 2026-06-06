@@ -5,11 +5,29 @@ import { SITE } from '../config/site';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
+  '@id': Astro.site?.href,
   name: SITE.name,
   description: SITE.tagline,
   url: Astro.site?.href,
   ...(SITE.email && { email: SITE.email }),
-  areaServed: 'Austin, TX',
+  ...(SITE.location && {
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: SITE.location.locality,
+      addressRegion: SITE.location.region,
+      postalCode: SITE.location.postalCode,
+      addressCountry: SITE.location.country,
+    },
+  }),
+  ...(SITE.areaServed && {
+    areaServed: SITE.areaServed.map((name) => ({ '@type': 'City', name })),
+  }),
+  knowsAbout: [
+    'Real estate photography',
+    'Short-term rental photography',
+    'Airbnb photography',
+    'Architectural photography',
+  ],
 };
 
 // TEMPORARY realty placeholder photos (LoremFlickr, keyword-based, locked for
