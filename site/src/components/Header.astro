@@ -4,9 +4,10 @@ import { SITE } from '../config/site';
 // Temporary logo — swap src/assets/logo.jpg for the final mark when ready.
 import logo from '../assets/logo.jpg';
 
-const links = [
+const links: { href: string; label: string; newTab?: boolean }[] = [
   { href: '/about/', label: 'About' },
   { href: '/portfolio/', label: 'Portfolio' },
+  { href: '/gallery-lab/', label: '3D Gallery', newTab: true },
   { href: '/blog/', label: 'Blog' },
   { href: '/contact/', label: 'Contact' },
 ];
@@ -27,7 +28,9 @@ const isActive = (href: string) => path === href || path.startsWith(href);
           <li>
             <a
               href={l.href}
-              aria-current={isActive(l.href) ? 'page' : undefined}
+              target={l.newTab ? '_blank' : undefined}
+              rel={l.newTab ? 'noopener noreferrer' : undefined}
+              aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
               class:list={[
                 'inline-flex min-h-[44px] items-center text-stone-600 transition-colors hover:text-stone-900',
                 isActive(l.href) && 'font-medium text-stone-900',
@@ -66,7 +69,9 @@ const isActive = (href: string) => path === href || path.startsWith(href);
           <li>
             <a
               href={l.href}
-              aria-current={isActive(l.href) ? 'page' : undefined}
+              target={l.newTab ? '_blank' : undefined}
+              rel={l.newTab ? 'noopener noreferrer' : undefined}
+              aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
               class:list={[
                 'flex min-h-[52px] items-center border-b border-stone-100 text-base text-stone-700',
                 isActive(l.href) && 'font-medium text-stone-900',

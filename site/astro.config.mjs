@@ -27,7 +27,7 @@ const site = resolveSite(process.env.SITE_URL);
 // https://astro.build/config
 export default defineConfig({
   site,
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/gallery-lab') })],
   vite: {
     plugins: [tailwindcss()],
   },

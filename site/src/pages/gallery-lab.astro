@@ -1,0 +1,259 @@
+---
+import { getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+// Reuse the same portfolio photos, optimized to webp via astro:assets.
+const mods = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/portfolio/*.{jpg,jpeg,png,webp}',
+  { eager: true },
+);
+const metas = Object.keys(mods)
+  .sort()
+  .map((k) => mods[k].default);
+const images = await Promise.all(
+  metas.map(async (m) => {
+    const img = await getImage({ src: m, format: 'webp', width: 1200 });
+    return { src: img.src, ratio: m.width / m.height };
+  }),
+);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <!-- Experimental page — keep it out of search. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <title>3D Gallery (experiment) · Ben Tims Media</title>
+    <style is:global>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: #0b0b0c; overflow: hidden; }
+      body { font-family: ui-sans-serif, system-ui, sans-serif; color: #fff; }
+      #app { position: fixed; inset: 0; }
+      canvas { display: block; }
+      #back {
+        position: fixed; top: 16px; left: 16px; z-index: 20;
+        display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px;
+        font-size: 14px; color: #fff; text-decoration: none;
+        background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.25);
+        border-radius: 999px; backdrop-filter: blur(6px);
+      }
+      #back:hover { background: rgba(0,0,0,.7); }
+      #crosshair {
+        position: fixed; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px;
+        border-radius: 50%; background: rgba(255,255,255,.8); z-index: 10; pointer-events: none; display: none;
+      }
+      #overlay {
+        position: fixed; inset: 0; z-index: 15; display: grid; place-items: center;
+        background: rgba(8,8,10,.82); backdrop-filter: blur(4px); text-align: center; padding: 24px;
+      }
+      #overlay .card { max-width: 30rem; }
+      #overlay h1 { font-family: Georgia, serif; font-weight: 500; font-size: clamp(1.8rem, 6vw, 2.75rem); margin: 0 0 .5rem; }
+      #overlay p { color: rgba(255,255,255,.75); line-height: 1.6; margin: .25rem 0; }
+      #overlay kbd {
+        font-family: ui-monospace, monospace; font-size: .8em; background: rgba(255,255,255,.12);
+        border: 1px solid rgba(255,255,255,.2); border-radius: 4px; padding: 1px 6px;
+      }
+      #enter {
+        margin-top: 1.5rem; min-height: 48px; padding: 0 28px; font-size: 14px; font-weight: 500;
+        color: #111; background: #fff; border: 0; border-radius: 999px; cursor: pointer;
+      }
+      #enter:hover { background: #ddd; }
+      #loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 16; color: rgba(255,255,255,.7); }
+    </style>
+  </head>
+  <body>
+    <div id="loading">Loading gallery…</div>
+    <div id="app"></div>
+    <div id="crosshair"></div>
+    <a id="back" href="/">← Back to site</a>
+
+    <div id="overlay" hidden>
+      <div class="card">
+        <h1>3D Gallery</h1>
+        <p data-desktop>Click to enter · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> to move · mouse to look · <kbd>Shift</kbd> to run · <kbd>Esc</kbd> to exit</p>
+        <p data-touch hidden>Drag to look around · pinch to zoom</p>
+        <button id="enter" type="button">Enter gallery</button>
+        <p style="margin-top:1rem;font-size:.8rem;opacity:.55">An experiment — the main site stays fast & lightweight.</p>
+      </div>
+    </div>
+
+    <script type="application/json" id="gallery-images" set:html={JSON.stringify(images)}></script>
+
+    <script>
+      import * as THREE from 'three';
+      import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+      type Img = { src: string; ratio: number };
+      const images: Img[] = JSON.parse(
+        document.getElementById('gallery-images')?.textContent || '[]',
+      );
+
+      const isTouch = window.matchMedia('(pointer: coarse)').matches;
+      const app = document.getElementById('app')!;
+      const overlay = document.getElementById('overlay')!;
+      const loading = document.getElementById('loading')!;
+      const crosshair = document.getElementById('crosshair')!;
+
+      // ---- Scene ----
+      const HALL_W = 9;
+      const WALL_H = 3.6;
+      const SPACING = 5;
+      const EYE = 1.65;
+      const rows = Math.max(1, Math.ceil(images.length / 2));
+      const HALL_LEN = rows * SPACING + SPACING;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#141416');
+      scene.fog = new THREE.Fog('#141416', 14, HALL_LEN + 14);
+
+      const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 200);
+      camera.position.set(0, EYE, 4);
+      scene.add(camera);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(innerWidth, innerHeight);
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      app.appendChild(renderer.domElement);
+
+      // ---- Lights ----
+      scene.add(new THREE.HemisphereLight('#ffffff', '#3a3a40', 1.1));
+      scene.add(new THREE.AmbientLight('#ffffff', 0.4));
+      const key = new THREE.DirectionalLight('#ffffff', 0.5);
+      key.position.set(3, 8, 4);
+      scene.add(key);
+
+      // ---- Room ----
+      const floorMat = new THREE.MeshStandardMaterial({ color: '#2a2a2e', roughness: 0.9 });
+      const wallMat = new THREE.MeshStandardMaterial({ color: '#1c1c1f', roughness: 1 });
+      const midZ = -HALL_LEN / 2 + SPACING / 2;
+
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, HALL_LEN + SPACING), floorMat);
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.z = midZ;
+      scene.add(floor);
+
+      const ceil = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, HALL_LEN + SPACING), wallMat);
+      ceil.rotation.x = Math.PI / 2;
+      ceil.position.set(0, WALL_H, midZ);
+      scene.add(ceil);
+
+      const sideGeo = new THREE.PlaneGeometry(HALL_LEN + SPACING, WALL_H);
+      const left = new THREE.Mesh(sideGeo, wallMat);
+      left.rotation.y = Math.PI / 2;
+      left.position.set(-HALL_W / 2, WALL_H / 2, midZ);
+      scene.add(left);
+      const right = new THREE.Mesh(sideGeo, wallMat);
+      right.rotation.y = -Math.PI / 2;
+      right.position.set(HALL_W / 2, WALL_H / 2, midZ);
+      scene.add(right);
+
+      const endGeo = new THREE.PlaneGeometry(HALL_W, WALL_H);
+      const front = new THREE.Mesh(endGeo, wallMat);
+      front.position.set(0, WALL_H / 2, SPACING);
+      front.rotation.y = Math.PI;
+      scene.add(front);
+      const back = new THREE.Mesh(endGeo, wallMat);
+      back.position.set(0, WALL_H / 2, -HALL_LEN);
+      scene.add(back);
+
+      // ---- Artwork ----
+      const loader = new THREE.TextureLoader();
+      const frameMat = new THREE.MeshStandardMaterial({ color: '#0a0a0b', roughness: 0.6 });
+      images.forEach((img, i) => {
+        const row = Math.floor(i / 2);
+        const onLeft = i % 2 === 0;
+        const z = -(SPACING * (row + 1));
+        const h = 1.9;
+        const w = Math.min(h * img.ratio, 3.2);
+
+        const tex = loader.load(img.src);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        const art = new THREE.Mesh(
+          new THREE.PlaneGeometry(w, h),
+          new THREE.MeshBasicMaterial({ map: tex }),
+        );
+        const frame = new THREE.Mesh(new THREE.PlaneGeometry(w + 0.14, h + 0.14), frameMat);
+
+        const x = onLeft ? -HALL_W / 2 + 0.06 : HALL_W / 2 - 0.06;
+        const ry = onLeft ? Math.PI / 2 : -Math.PI / 2;
+        [art, frame].forEach((m) => {
+          m.position.set(x, EYE, z);
+          m.rotation.y = ry;
+        });
+        art.position.x += onLeft ? 0.02 : -0.02;
+        scene.add(frame, art);
+
+        // small wall light per piece
+        const spot = new THREE.PointLight('#fff7e8', 6, 6, 2);
+        spot.position.set(onLeft ? x + 1.2 : x - 1.2, WALL_H - 0.4, z);
+        scene.add(spot);
+      });
+
+      // ---- Controls ----
+      const minX = -HALL_W / 2 + 0.7;
+      const maxX = HALL_W / 2 - 0.7;
+      const minZ = -HALL_LEN + 0.7;
+      const maxZ = SPACING - 0.7;
+      const clamp = () => {
+        camera.position.x = Math.min(maxX, Math.max(minX, camera.position.x));
+        camera.position.z = Math.min(maxZ, Math.max(minZ, camera.position.z));
+        camera.position.y = EYE;
+      };
+
+      let orbit: OrbitControls | null = null;
+      let lock: PointerLockControls | null = null;
+      const keys: Record<string, boolean> = {};
+
+      if (isTouch) {
+        document.querySelector('[data-desktop]')?.setAttribute('hidden', '');
+        document.querySelector('[data-touch]')?.removeAttribute('hidden');
+        orbit = new OrbitControls(camera, renderer.domElement);
+        orbit.target.set(0, EYE, midZ);
+        orbit.enableDamping = true;
+        orbit.minDistance = 1;
+        orbit.maxDistance = HALL_LEN;
+        orbit.maxPolarAngle = Math.PI * 0.52;
+        camera.position.set(0, EYE + 0.3, SPACING - 0.5);
+        overlay.hidden = true;
+      } else {
+        crosshair.style.display = 'block';
+        lock = new PointerLockControls(camera, document.body);
+        overlay.hidden = false;
+        const enter = () => lock!.lock();
+        document.getElementById('enter')!.addEventListener('click', enter);
+        lock.addEventListener('lock', () => (overlay.hidden = true));
+        lock.addEventListener('unlock', () => (overlay.hidden = false));
+        addEventListener('keydown', (e) => (keys[e.code] = true));
+        addEventListener('keyup', (e) => (keys[e.code] = false));
+      }
+
+      // ---- Loop ----
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.1);
+        if (lock && lock.isLocked) {
+          const run = keys['ShiftLeft'] || keys['ShiftRight'] ? 2 : 1;
+          const speed = 3.4 * run * dt;
+          const fwd = (keys['KeyW'] || keys['ArrowUp'] ? 1 : 0) - (keys['KeyS'] || keys['ArrowDown'] ? 1 : 0);
+          const side = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0);
+          if (fwd) lock.moveForward(fwd * speed);
+          if (side) lock.moveRight(side * speed);
+          clamp();
+        }
+        orbit?.update();
+        renderer.render(scene, camera);
+      }
+      loading.remove();
+      animate();
+
+      addEventListener('resize', () => {
+        camera.aspect = innerWidth / innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(innerWidth, innerHeight);
+      });
+    </script>
+  </body>
+</html>
