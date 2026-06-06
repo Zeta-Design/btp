@@ -9,6 +9,22 @@
 
 ---
 
+## My main suggestion
+
+**Pick a CRM that integrates with QuickBooks Online — start a free trial of Dubsado and HoneyBook,
+keep the one that fits, and connect it to QBO.** That pairing (not the CRM alone) is what keeps the
+books clean and taxes optimized so revenue isn't lost to poor tracking.
+
+- **Dubsado** — cheapest of the strong options, most customizable, most-used (38% of photographers),
+  works anywhere, **syncs to QuickBooks Online**.
+- **HoneyBook** — choose this if you want the easiest, most polished client experience *and* you're
+  **US/Canada only**; also **syncs to QBO** (pricier, leans on Stripe).
+- **QuickBooks Online** does the part no CRM does well: **automated sales tax, 1099 filing, and the
+  profit/loss that sizes your quarterly estimated taxes.** The CRM just feeds it your sales.
+- Budget ≈ **$20–50/mo CRM + ~$30/mo QBO**. Confirm the actual tax filing with a CPA.
+
+---
+
 ## 1. TL;DR
 
 - **No single tool does both the client side and your taxes well.** The setup that actually works is
