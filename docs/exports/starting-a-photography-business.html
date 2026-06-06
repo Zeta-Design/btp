@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Starting a Photography Business — Evidence-Based Plan</title>
+<style>
+  :root{
+    --ink:#1d2433; --muted:#5b6472; --line:#e6e8ee; --soft:#f6f7f9;
+    --indigo:#4338ca; --teal:#0f766e; --amber:#b45309; --rose:#be123c;
+    --violet:#6d28d9; --cyan:#0e7490; --green:#15803d; --blue:#1d4ed8; --slate:#64748b;
+  }
+  *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  html{ font-size:14px; }
+  body{
+    margin:0; color:var(--ink); background:#fff;
+    font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.5; letter-spacing:.1px;
+  }
+  @page{ size:Letter; margin:13mm 14mm; }
+
+  /* ---------- Cover ---------- */
+  .cover{
+    background:linear-gradient(135deg,#1d2433 0%,#2c3a5e 55%,#4338ca 120%);
+    color:#fff; border-radius:18px; padding:34px 34px 30px;
+    margin-bottom:22px; position:relative; overflow:hidden;
+  }
+  .cover:after{ content:"📷"; position:absolute; right:-6px; top:-14px; font-size:120px; opacity:.10; }
+  .kicker{ text-transform:uppercase; letter-spacing:2.5px; font-size:11px; font-weight:700; color:#c7d2fe; }
+  .cover h1{ font-family:Georgia,"Iowan Old Style",serif; font-size:34px; line-height:1.12; margin:8px 0 6px; font-weight:700; }
+  .cover .sub{ color:#dbe2f1; font-size:14.5px; max-width:60ch; margin:0; }
+  .meta{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+  .pill{ background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.22); color:#eef2ff;
+    border-radius:999px; padding:5px 12px; font-size:11.5px; font-weight:600; }
+
+  /* ---------- Layout / sections ---------- */
+  .section{ margin:26px 0 8px; }
+  .section-head{ display:flex; align-items:center; gap:10px; margin:0 0 12px; }
+  .section-head .dot{ width:11px; height:11px; border-radius:50%; background:var(--indigo); }
+  .section-head h2{ font-size:19px; margin:0; letter-spacing:.2px; }
+  .section-head .lead{ font-size:12px; color:var(--muted); margin-left:auto; max-width:42ch; text-align:right; }
+
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .grid7{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  /* ---------- Cards ---------- */
+  .card{ border:1px solid var(--line); border-radius:13px; padding:14px 16px; background:#fff;
+    break-inside:avoid; box-shadow:0 1px 2px rgba(20,30,60,.04); }
+  .card.tint{ background:var(--soft); }
+  .card h3{ margin:0 0 7px; font-size:14.5px; }
+  .card p{ margin:0 0 6px; }
+  .card ul{ margin:6px 0 0; padding-left:18px; }
+  .card li{ margin:4px 0; }
+
+  /* numbered step cards */
+  .step{ position:relative; padding-left:50px; }
+  .step .num{ position:absolute; left:14px; top:13px; width:26px; height:26px; border-radius:8px;
+    background:var(--indigo); color:#fff; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; }
+  .step h3{ font-size:13.5px; margin:0 0 4px; }
+  .step p{ font-size:12.5px; color:#2b3340; margin:0; }
+
+  /* phase cards */
+  .phase{ border-left:5px solid var(--indigo); }
+  .phase .ph-tag{ font-size:10.5px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--indigo); }
+  .phase h3{ font-size:15px; margin:3px 0 8px; }
+
+  /* ---------- Callouts ---------- */
+  .callout{ border-radius:12px; padding:13px 15px 13px 46px; position:relative; font-size:12.8px; break-inside:avoid; }
+  .callout:before{ position:absolute; left:14px; top:12px; font-size:18px; }
+  .warn{ background:#fffbeb; border:1px solid #fcd34d; color:#7c4a04; }
+  .warn:before{ content:"⚠️"; }
+  .info{ background:#eef2ff; border:1px solid #c7d2fe; color:#312e81; }
+  .info:before{ content:"💡"; }
+  .danger{ background:#fff1f2; border:1px solid #fecdd3; color:#9f1239; }
+  .danger:before{ content:"🚫"; }
+
+  /* ---------- Badges ---------- */
+  .badge{ display:inline-block; font-size:10px; font-weight:800; letter-spacing:.6px; text-transform:uppercase;
+    padding:2px 7px; border-radius:6px; color:#fff; vertical-align:middle; }
+  .t1{ background:var(--green); } .t2{ background:var(--blue); } .t3{ background:var(--slate); }
+  .tc{ background:var(--amber); } .tcase{ background:var(--violet); }
+
+  /* citations + timestamp chips */
+  .cite{ display:block; font-size:11px; color:var(--muted); margin-top:5px; }
+  .cite b{ color:#374151; font-weight:600; }
+  .ts{ font-family:ui-monospace,SFMono-Regular,Menlo,monospace; background:#eef2ff; color:#3730a3;
+    padding:0 5px; border-radius:4px; font-size:10px; }
+
+  /* ---------- Table ---------- */
+  table{ width:100%; border-collapse:collapse; font-size:12px; break-inside:avoid; }
+  th,td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  thead th{ background:#1d2433; color:#fff; font-size:11px; letter-spacing:.5px; }
+  tbody tr:nth-child(even){ background:var(--soft); }
+
+  /* checklist */
+  .check{ list-style:none; padding:0; margin:0; column-count:2; column-gap:18px; }
+  .check li{ break-inside:avoid; margin:0 0 8px; padding-left:26px; position:relative; font-size:12.5px; }
+  .check li:before{ content:"✓"; position:absolute; left:0; top:-1px; width:18px; height:18px; border-radius:5px;
+    background:var(--green); color:#fff; font-size:11px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+
+  .finding{ border-left:4px solid var(--teal); }
+  .finding .ftag{ font-size:10.5px; font-weight:800; color:var(--teal); letter-spacing:.8px; }
+  .muted{ color:var(--muted); }
+  .footer{ margin-top:26px; padding-top:12px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); }
+  h2,h3{ break-after:avoid; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Zeta Design · Field Guide</div>
+  <h1>Starting a Photography Business</h1>
+  <p class="sub">An evidence-based plan synthesized from 45 expert &amp; practitioner video transcripts — weighted by credential, cross-checked, and cited with timestamps.</p>
+  <div class="meta">
+    <span class="pill">📅 2026-06-06</span>
+    <span class="pill">🎞️ 45 transcripts, read in full</span>
+    <span class="pill">⚖️ Source-weighted (CPAs &gt; veterans &gt; newcomers)</span>
+    <span class="pill">🕑 Timestamped evidence</span>
+  </div>
+</div>
+
+<div class="callout warn">
+  <b>Read me first — legal/tax line.</b> This is research, <b>not legal or tax advice</b>. Several
+  creators sell products or were sponsored, and one non-expert contradicted the credentialed CPAs on
+  entity structure. Confirm structure, sales tax, quarterly estimates, and any S-corp election with a
+  <b>qualified CPA/attorney</b> (ideally one who specializes in photographers). The <b>Next Steps</b> and
+  <b>Core Plan</b> below are distilled from the <b>Research Findings</b> — the source of truth, written first.
+</div>
+
+<!-- ================= NEXT STEPS ================= -->
+<div class="section">
+  <div class="section-head"><span class="dot"></span><h2>Next steps — do these first, in order</h2>
+    <span class="lead">The seven highest-leverage moves, pulled straight from the findings.</span></div>
+  <div class="grid7">
+    <div class="card step"><div class="num">1</div><h3>Pick ONE niche + ideal client + your monthly number</h3>
+      <p>One lane is easier to market, be known for, and scale. Write down the revenue you need to live and run the business.</p>
+      <span class="cite"><b>Kylee</b> <span class="ts">3:02</span> · <b>Carty-LOW</b> <span class="ts">1:18</span> · <b>Sarah</b> <span class="ts">2:14</span></span></div>
+    <div class="card step"><div class="num">2</div><h3>Separate bank account + set aside 25–30% for taxes</h3>
+      <p>Track every dollar in/out (a free spreadsheet is fine). Park tax money in an account you don't touch.</p>
+      <span class="cite"><b>Nadia</b> CPA <span class="ts">14:16</span> · <b>Heather</b> <span class="ts">3:26</span> · <b>Luke-DTWM</b> <span class="ts">2:37</span></span></div>
+    <div class="card step"><div class="num">3</div><h3>Build a portfolio with 2–3 FREE (not cheap) shoots</h3>
+      <p>Shoot the exact work you want to be hired for; collect a strong testimonial each time. Cheap brands you cheap.</p>
+      <span class="cite"><b>Carty Top-3</b> <span class="ts">4:35</span> · <b>Cameron</b> <span class="ts">4:28</span> · <b>Tracy</b> <span class="ts">3:32</span></span></div>
+    <div class="card step"><div class="num">4</div><h3>Set profitable prices + contract &amp; deposit</h3>
+      <p>Price for <i>total</i> time + full costs, not shooting hours. Require a signed contract and a non-refundable deposit before every shoot.</p>
+      <span class="cite"><b>Katja</b> <span class="ts">0:59</span> · <b>Sarah</b> <span class="ts">4:12</span> · <b>Tracy</b> <span class="ts">5:10</span></span></div>
+    <div class="card step"><div class="num">5</div><h3>Simple site + a CRM with contact form &amp; payments</h3>
+      <p>Templated booking emails + Stripe/Square (not personal Venmo). Don't over-invest in the website. See the CRM note.</p>
+      <span class="cite"><b>Kylee</b> <span class="ts">7:42</span> · <b>Cameron</b> <span class="ts">5:31</span> · <b>Chris</b> <span class="ts">6:57</span></span></div>
+    <div class="card step"><div class="num">6</div><h3>Start one marketing engine you OWN</h3>
+      <p>Blog every shoot with local/venue SEO + collect emails + build referral relationships. <b>Skip paid ads for now.</b></p>
+      <span class="cite"><b>Kylee</b> <span class="ts">11:58</span> · <b>Thin Angle</b> <span class="ts">4:29</span> · <b>Nathan</b> <span class="ts">12:41</span></span></div>
+    <div class="card step"><div class="num">7</div><h3>Book a photographer-specialist CPA when income is steady</h3>
+      <p>And <i>before</i> an S-corp, multi-state work, or big gear buys.</p>
+      <span class="cite"><b>Nadia</b> CPA <span class="ts">13:32</span> · <b>Travis</b> CPA · <b>Luke-DTWM</b> <span class="ts">1:02</span></span></div>
+  </div>
+</div>
+
+<!-- ================= CORE PLAN ================= -->
+<div class="section">
+  <div class="section-head"><span class="dot" style="background:var(--teal)"></span><h2>Core plan — phase by phase</h2>
+    <span class="lead">From decision to growth. Each phase cites the evidence behind it.</span></div>
+
+  <div class="card phase" style="border-color:var(--indigo)">
+    <div class="ph-tag" style="color:var(--indigo)">Phase 0 · before spending money</div>
+    <h3>Decide &amp; frame</h3>
+    <ul>
+      <li><b>Choose one niche</b> by passion × skill × <i>local</i> demand × competition, and check it's durable, not a fad. Genres differ wildly (commercial &gt; wedding/portrait; real-estate = low barrier + steady volume). <span class="cite"><b>Carty-Start</b> <span class="ts">5:02</span> · <b>Carty Top-3</b> · <b>Jerad</b> <span class="ts">8:00</span></span></li>
+      <li><b>Know your "nut"</b> and work backwards — fewer high-value clients beat volume (50 × $2,000 = 500 × $200, far less work). <span class="cite"><b>Carty-LOW</b> <span class="ts">1:18</span> · <b>Sarah</b> <span class="ts">2:14</span> · <b>Katja</b> <span class="ts">11:41</span></span></li>
+      <li><b>Pick a delivery model up front</b> (esp. portrait): digital-file commodity vs. in-person sales of printed wall art/albums. <span class="cite"><b>Sarah "Portrait"</b> <span class="ts">0:53–8:00</span></span></li>
+    </ul>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card phase" style="border-color:var(--teal)">
+      <div class="ph-tag" style="color:var(--teal)">Phase 1 · skills + portfolio</div>
+      <h3>Build the proof</h3>
+      <ul>
+        <li><b>Get reps</b> — treat practice shoots like paid jobs; shoot friends/events to get comfortable with people. <span class="cite"><b>Cameron</b> <span class="ts">4:28</span> · <b>Sergio</b> <span class="ts">4:16</span></span></li>
+        <li><b>Curate a cohesive portfolio</b> of the work you want to repeat — quality over quantity. <span class="cite"><b>Carty</b> step 5 · <b>Tracy</b> <span class="ts">1:53</span> · <b>Kylee</b> <span class="ts">2:25</span></span></li>
+        <li><b>Free-for-portfolio, never cheap</b> — set the expectation, get a testimonial, then ask "what would you have paid?" to anchor real prices. <span class="cite"><b>Carty Top-3</b> <span class="ts">4:35</span> · <b>Cameron</b> <span class="ts">5:59</span> · <b>Cineminn</b> <span class="ts">4:20</span></span></li>
+      </ul>
+    </div>
+    <div class="card phase" style="border-color:var(--amber)">
+      <div class="ph-tag" style="color:var(--amber)">Phase 2 · money &amp; legal <span class="badge t1" style="margin-left:4px">Tier 1</span></div>
+      <h3>Set up the business</h3>
+      <ul>
+        <li><b>Sole proprietor on the first dollar</b> → Schedule C. No registration needed. <span class="cite"><b>Tiffany</b> EA <span class="ts">13:12</span> · <b>Nadia</b> CPA <span class="ts">10:24</span></span></li>
+        <li><b>An LLC does NOT lower taxes</b> — it's liability protection. Don't over-structure early. <span class="cite"><b>Jasmine</b> Atty/CPA <span class="ts">0:55</span> · <b>Nadia</b> <span class="ts">46:04</span></span></li>
+        <li><b>Quarterly estimates + safe harbor</b> (100% / 110% prior-year) to dodge the penalty. <span class="cite"><b>Jasmine</b> <span class="ts">7:09</span> · <b>Nadia</b> <span class="ts">15:54</span> · <b>Travis</b> CPA</span></li>
+        <li><b>Track all deductions</b>: gear, <b>mileage w/ log</b> ($0.72/mi), <b>home office (exclusive use)</b>, software, education. Receipts 3–7 yrs. <span class="cite"><b>Nadia</b> <span class="ts">20:46 / 18:20</span> · <b>Tiffany</b> <span class="ts">39:47</span></span></li>
+        <li><b>S-corp is a LATER move</b> — only when profit far exceeds a salary (~$2.5–3.5k/mo); needs payroll + 1120S. <span class="cite"><b>Tiffany</b> <span class="ts">18:54</span> · <b>Jasmine</b> <span class="ts">0:35</span></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card phase" style="border-color:var(--rose)">
+      <div class="ph-tag" style="color:var(--rose)">Phase 3 · systems before client #1</div>
+      <h3>Make booking &amp; delivery easy</h3>
+      <ul>
+        <li><b>Simple site + clear contact form</b> (one-page Squarespace/Pixieset/Pixpa). Don't over-invest. <span class="cite"><b>Cameron</b> <span class="ts">5:31</span> · <b>Tracy</b> <span class="ts">1:53</span></span></li>
+        <li><b>A CRM</b> for packages, contracts, invoices, payments + the full templated journey set up <i>before</i> booking anyone. <span class="cite"><b>Kylee</b> <span class="ts">7:42 / 9:50</span> · <b>Eli</b> <span class="ts">15:14</span></span></li>
+        <li><b>Payments via Stripe/Square/PayPal</b>, not personal Venmo. <span class="cite"><b>Kylee</b> <span class="ts">11:16</span></span></li>
+        <li><b>Welcome/pricing pack with boundaries</b> stops scope creep; back up files in two places. <span class="cite"><b>Tracy</b> <span class="ts">7:46 / 10:54</span></span></li>
+      </ul>
+    </div>
+    <div class="card phase" style="border-color:var(--violet)">
+      <div class="ph-tag" style="color:var(--violet)">Phase 4 · pricing</div>
+      <h3>Price for profit</h3>
+      <ul>
+        <li><b>Price for TOTAL time + full Cost of Doing Business</b> — a "3-hr shoot" is 15–19 hrs of real work. <span class="cite"><b>Katja</b> <span class="ts">0:59 / 3:49</span> · <b>Tracy</b> <span class="ts">3:32</span></span></li>
+        <li><b>Profitable from day one.</b> Sarah's split: cost-of-sales ≤20%, overhead 30–40%, net profit 40–50%. <span class="cite"><b>Sarah</b> <span class="ts">4:12</span> · <b>Carty</b> <span class="ts">9:53</span></span></li>
+        <li><b>Packages + anchor price + upsell at booking</b> → higher average order value. <span class="cite"><b>Eli</b> <span class="ts">5:04 / 6:24</span> · <b>SnapHome</b> <span class="ts">10:36</span></span></li>
+        <li><b>Portrait: sell printed wall art (in-person), not digital files.</b> Sell the transformation + story; anchor to existing spend. <span class="cite"><b>Sarah "Portrait"</b> <span class="ts">3:31 / 13:23</span></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card phase" style="border-color:var(--cyan)">
+      <div class="ph-tag" style="color:var(--cyan)">Phase 5 · marketing</div>
+      <h3>Own your audience (owned &gt; rented reach)</h3>
+      <ul>
+        <li><b>Blog every shoot with local + venue SEO</b> — "searchable is profitable," compounds for years. Fix H1 / title tags / category pages / schema. <span class="cite"><b>Kylee</b> <span class="ts">11:58</span> · <b>Joy</b> <span class="ts">2:26</span> · <b>Thin Angle</b> <span class="ts">4:29</span></span></li>
+        <li><b>Build an email list early</b>; social is a "hamster wheel." <span class="cite"><b>Kylee</b> <span class="ts">15:14</span></span></li>
+        <li><b>Relationships &amp; referrals &gt; followers</b>; network (BNI/Chamber), target the right clients (top ~10–20% of realtors). <span class="cite"><b>Sarah</b> <span class="ts">11:07</span> · <b>Eli</b> <span class="ts">1:46</span></span></li>
+        <li><b>Don't cargo-cult ads/tools</b> — Chris spent $650/mo on agency ads → <b>0 bookings</b>; all came organically. <span class="cite"><b>Chris</b> <span class="ts">4:47</span> · <b>Nathan</b> <span class="ts">12:41</span></span></li>
+        <li><b>Define brand values; qualify for FIT; say no.</b> A "bad client" is usually a bad fit. <span class="cite"><b>Luke "BAD Clients"</b></span></li>
+      </ul>
+    </div>
+    <div class="card phase" style="border-color:var(--green)">
+      <div class="ph-tag" style="color:var(--green)">Phase 6 · grow &amp; protect</div>
+      <h3>Scale without burning out</h3>
+      <ul>
+        <li><b>Diversify / niche-stack once established</b> — AI takes commodity work; authentic human work is growing. <span class="cite"><b>Jerad</b> <span class="ts">8:33</span> · <b>Nathan</b> <span class="ts">15:16</span></span></li>
+        <li><b>Outsource the bottleneck (editing)</b> — labor arbitrage; AI tools slash post time. <span class="cite"><b>Cineminn</b> <span class="ts">2:43</span> (~$0.40/photo) · <b>Sergio</b></span></li>
+        <li><b>Hire a second shooter at capacity.</b> <span class="cite"><b>SnapHome</b> · <b>CNBC-Grace</b> <span class="ts">6:51</span></span></li>
+        <li><b>Protect your life from the start</b> — boundaries, avoid burnout (volume kills margin and joy). <span class="cite"><b>Kylee</b> <span class="ts">17:58</span> · <b>Grace</b> scaled 46→25 weddings</span></li>
+        <li><b>Persist</b> — year one is often a loss; don't quit or take shortcuts. <span class="cite"><b>Nathan</b> <span class="ts">9:51 / 22:02</span> · <b>Cameron</b> <span class="ts">7:39</span></span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ================= FRAMEWORK ================= -->
+<div class="section">
+  <div class="section-head"><span class="dot" style="background:var(--amber)"></span><h2>How this was weighed — the evidence framework</h2></div>
+  <div class="callout info" style="margin-bottom:12px">
+    <b>Weighting rule.</b> weight ≈ <b>(credential in the relevant domain) × (track record + specificity of real numbers) ÷ (conflict of interest)</b> — and treat something as a <b>rule</b> only when <b>≥2 independent sources agree.</b>
+  </div>
+  <table>
+    <thead><tr><th style="width:14%">Tier</th><th style="width:44%">Who</th><th>Trust it for</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge t1">Tier 1</span><br><span class="muted" style="font-size:10.5px">credentialed pros</span></td>
+        <td><b>Jasmine DiLucci</b> (Tax Attorney, CPA, EA), <b>Nadia Rodriguez</b> (CPA), <b>Tiffany Bastian</b> (EA), <b>Travis Reynolds</b> (CPA)</td>
+        <td><b>Tax, entity structure, sales tax, S-corp.</b> Highest weight — and they corroborate each other (strong consensus).</td></tr>
+      <tr><td><span class="badge t2">Tier 2</span><br><span class="muted" style="font-size:10.5px">veteran shooters</span></td>
+        <td><b>Sarah Petty</b> (27 yrs, $3M), <b>Carty</b> (35 yrs, Vogue), <b>Kylee Ann</b> (15 yrs), <b>Nathan Cool</b>, <b>Eli Jones</b>, Pye Jirsa, Katelyn James</td>
+        <td><b>Craft, pricing, marketing, operations</b> within their niche. Lower weight on tax.</td></tr>
+      <tr><td><span class="badge t3">Tier 3</span><br><span class="muted" style="font-size:10.5px">newer / general</span></td>
+        <td>Cameron, Chris, Tracy, Luke, Katja, Joy, Sergio, SnapHome, Cineminn, FullTimeREP, Jerad, Rebecca</td>
+        <td>Useful and corroborating; not authoritative alone.</td></tr>
+      <tr><td><span class="badge tcase">Case</span><br><span class="muted" style="font-size:10.5px">n = 1</span></td>
+        <td><b>CNBC / Grace Torres</b> (23, $177k/yr wedding)</td>
+        <td>A real data point — not a rule.</td></tr>
+    </tbody>
+  </table>
+  <div class="grid2" style="margin-top:12px">
+    <div class="callout warn"><b><span class="badge tc">Conflict flag</span> Discount the <i>sell</i>, judge the <i>claim</i>.</b><br>
+      Sponsored / product-selling clips: Evan (bookkeeping ad), Heather &amp; Katey (tax spreadsheets), Joy (Focal), Carty (Indy), Kylee (HoneyBook/Flodesk), Tiffany (FilterPixel + courses), Thin Angle/SnapHome/Eli/Sarah/Cameron/Cineminn (courses/templates), Katja (MPB), Sergio (Capture One). <i>A Tier-1 expert can still be conflicted when promoting their own service.</i></div>
+    <div class="callout danger"><b>Contradiction &amp; myths — defer to Tier 1.</b><br>
+      <b>SnapHome</b> (Tier 3) implied "an LLC means higher taxes" <span class="ts">6:39</span> — the CPAs contradict this. Ignore these myths: "you need an LLC to write off expenses" (Nadia <span class="ts">46:04</span>); "tax-free trusts" = a prosecuted fraud scheme (Jasmine <span class="ts">3:17</span>); "buy gear to dodge taxes" — you spend $700 to save ~$300 (Luke <span class="ts">7:01</span>).</div>
+  </div>
+</div>
+
+<!-- ================= FINDINGS (verbose) ================= -->
+<div class="section">
+  <div class="section-head"><span class="dot" style="background:var(--teal)"></span><h2>Research findings — the source of truth</h2>
+    <span class="lead">By theme. Citations: <i>(Speaker — timestamp)</i>; tiers per the framework.</span></div>
+
+  <div class="card finding"><div class="ftag">A · MONEY, TAXES &amp; STRUCTURE</div>
+    <h3>Tier-1 consensus</h3>
+    <ul>
+      <li><b>Sole-proprietor automatically on the first dollar</b> → Schedule C. <span class="cite"><b>Tiffany</b> <span class="ts">13:12</span> · <b>Nadia</b> <span class="ts">10:24</span></span></li>
+      <li><b>Self-employment tax = 15.3%</b>; W-2 withholding doesn't cover side income. <span class="cite"><b>Heather</b> <span class="ts">1:31</span> · <b>Travis</b> <span class="ts">1:03</span></span></li>
+      <li><b>Quarterly estimates + safe harbor</b> (100%/110% prior-year); the underpayment penalty is non-deductible. <span class="cite"><b>Jasmine</b> <span class="ts">7:09</span> · <b>Nadia</b> <span class="ts">15:54</span></span></li>
+      <li><b>LLC = liability protection, not a tax cut</b>; don't over-structure early. <span class="cite"><b>Jasmine</b> <span class="ts">0:55 / 4:26</span> · <b>Tiffany</b> <span class="ts">15:25</span></span></li>
+      <li><b>S-corp later, only when profit ≫ a reasonable salary</b> (~$2.5–3.5k/mo); needs payroll + 1120S; backfires with financed assets. <span class="cite"><b>Jasmine</b> <span class="ts">4:13</span> · <b>Tiffany</b> <span class="ts">18:54</span></span></li>
+      <li><b>Deductions:</b> gear, <b>mileage w/ log</b> ($0.72/mi), <b>home office (exclusive use → business miles)</b>, software, education, % utilities. <b>No</b> deduction for donations or everyday clothing; meals 50% &amp; only with a business contact. <span class="cite"><b>Nadia</b> <span class="ts">18:20 / 20:46 / 46:54</span> · <b>Tiffany</b> <span class="ts">39:47</span></span></li>
+      <li><b>Records:</b> separate bank account; receipts 3–7 yrs. <b>Sales/use tax varies by state; digital increasingly taxed; you become a collector.</b> <span class="cite"><b>Nadia</b> <span class="ts">24:18</span> · <b>Tiffany</b> <span class="ts">6:39 / 44:47</span></span></li>
+      <li><b>A CRM is not accounting</b>, and <b>don't over-tool</b> a simple business — a spreadsheet/QuickBooks is enough early. <span class="cite"><b>Luke-Taxes</b> <span class="ts">6:51</span> · <b>Rebecca</b> <span class="ts">2:11</span></span></li>
+    </ul>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card finding" style="border-color:var(--blue)"><div class="ftag" style="color:var(--blue)">B · NICHE &amp; POSITIONING</div>
+      <ul>
+        <li><b>Specialize / pick one "money lane"</b> — easier to market, price, and be searchable; expand later. <span class="cite"><b>Kylee</b> <span class="ts">3:02</span> · <b>Carty-Secret</b> <span class="ts">2:13</span> (10× generalist gap)</span></li>
+        <li><b>Choose by passion × skill × local demand × competition × durability.</b> <span class="cite"><b>Carty-Start</b> <span class="ts">5:02</span></span></li>
+        <li><b>Avoid over-saturated local lanes; fill a gap.</b> <span class="cite"><b>Sergio</b> <span class="ts">5:21</span> · <b>SnapHome</b> <span class="ts">2:20</span></span></li>
+        <li><b>Diversify once established</b> so one shock doesn't reset you. <span class="cite"><b>Jerad</b> <span class="ts">8:33</span></span></li>
+      </ul>
+    </div>
+    <div class="card finding" style="border-color:var(--violet)"><div class="ftag" style="color:var(--violet)">C · PRICING</div>
+      <ul>
+        <li><b>Price for total time + full CODB</b>, not shooting hours. <span class="cite"><b>Katja</b> <span class="ts">0:59 / 3:49</span> · <b>Tracy</b> <span class="ts">3:32</span></span></li>
+        <li><b>Margin &gt; volume; profitable from day one.</b> <span class="cite"><b>Sarah</b> <span class="ts">0:53 / 4:12</span> · <b>Carty</b> <span class="ts">9:53</span></span></li>
+        <li><b>Free-for-portfolio, never cheap.</b> <span class="cite"><b>Carty Top-3</b> <span class="ts">4:35</span> · <b>Tracy</b> (the $50 story)</span></li>
+        <li><b>Packages + anchor + upsell at booking → higher AOV;</b> charge for usage/licensing on commercial work. <span class="cite"><b>Eli</b> <span class="ts">5:04</span> · <b>Katja</b> <span class="ts">6:07</span></span></li>
+        <li><b>Sell value/story; anchor to existing spend; test prices.</b> <span class="cite"><b>Sarah</b> <span class="ts">13:23 / 15:38</span> · <b>Katja</b> <span class="ts">12:53</span></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card finding" style="border-color:var(--rose)"><div class="ftag" style="color:var(--rose)">D · PORTFOLIO &amp; FIRST CLIENTS</div>
+      <ul>
+        <li><b>Reps + cohesive, niche-specific portfolio</b> of work you want to repeat. <span class="cite"><b>Cameron</b> <span class="ts">4:28 / 5:03</span> · <b>Tracy</b> <span class="ts">1:53</span></span></li>
+        <li><b>Outreach without hard-selling; offer free portfolio sessions; nail the work.</b> <span class="cite"><b>Cameron</b> <span class="ts">5:59</span></span></li>
+        <li><b>Shadow seasoned pros; build vendor/planner relationships.</b> <span class="cite"><b>Carty Top-3</b> <span class="ts">5:43</span></span></li>
+      </ul>
+    </div>
+    <div class="card finding" style="border-color:var(--indigo)"><div class="ftag" style="color:var(--indigo)">E · SYSTEMS (BOOKING / CRM / CONTRACTS)</div>
+      <ul>
+        <li><b>Make booking easy:</b> contact form → CRM → templated workflow, set up before client #1. <span class="cite"><b>Kylee</b> <span class="ts">7:42 / 9:50</span></span></li>
+        <li><b>Contracts + deposits non-negotiable; welcome pack stops scope creep; back up files 2×.</b> <span class="cite"><b>Tracy</b> <span class="ts">5:10 / 7:46 / 10:54</span></span></li>
+        <li><b>CRMs named:</b> HoneyBook, Studio Ninja, Dubsado/17hats/Pixieset, Lemley; Spiyo/SPIQ + CubiCasa for real estate. <span class="cite"><b>Kylee</b>, <b>Luke</b>, <b>Chris</b>, <b>Eli</b> <span class="ts">15:14</span> · see CRM note</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:12px">
+    <div class="card finding" style="border-color:var(--cyan)"><div class="ftag" style="color:var(--cyan)">F · MARKETING &amp; OWNING YOUR AUDIENCE</div>
+      <ul>
+        <li><b>Blog + local/venue SEO compounds for years.</b> H1 = "[city] wedding photographer", separate category pages, keyword-first titles, venue blogs, schema. <span class="cite"><b>Kylee</b> <span class="ts">11:58</span> · <b>Thin Angle</b></span></li>
+        <li><b>Email list early; weekly/biweekly.</b> <span class="cite"><b>Kylee</b> <span class="ts">15:14</span></span></li>
+        <li><b>Relationships/referrals/networking &gt; followers; target the right clients.</b> <span class="cite"><b>Sarah</b> <span class="ts">11:07</span> · <b>Eli</b> <span class="ts">1:46</span></span></li>
+        <li><b>Word-of-mouth + exceptional service; respond within the hour.</b> <span class="cite"><b>Carty</b> <span class="ts">29:28</span> · <b>Nathan</b> <span class="ts">12:41</span> (→ $0 ad budget)</span></li>
+        <li><b>Don't waste money cargo-culting ads/tools.</b> <span class="cite"><b>Chris</b> <span class="ts">4:47</span> ($650/mo → 0 weddings)</span></li>
+      </ul>
+    </div>
+    <div class="card finding" style="border-color:var(--amber)"><div class="ftag" style="color:var(--amber)">G · CLIENT EXPERIENCE &amp; FIT</div>
+      <ul>
+        <li><b>Define brand values; qualify for fit; say no; do a consult call.</b> A bad client is usually a bad fit. <span class="cite"><b>Luke "BAD Clients"</b> (throughout)</span></li>
+        <li><b>Assumption of sale: explain price/process up front.</b> <span class="cite"><b>Sarah</b> <span class="ts">9:02</span> · <b>Sarah "Portrait"</b> <span class="ts">3:31</span></span></li>
+      </ul>
+      <div class="ftag" style="color:var(--slate); margin-top:10px">H · GEAR &amp; EDITING — don't over-invest</div>
+      <ul>
+        <li><b>Skill &gt; gear; buy used; quality is the differentiator.</b> <span class="cite"><b>Nathan</b> <span class="ts">19:26</span> (a "consumer" Z5) · <b>SnapHome</b> <span class="ts">6:08</span></span></li>
+        <li><b>Outsource editing (labor arbitrage); AI tools cut post time.</b> <span class="cite"><b>Cineminn</b> <span class="ts">2:43</span> · <b>Sergio</b></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card finding" style="border-color:var(--green); margin-top:12px"><div class="ftag" style="color:var(--green)">I · NICHE DEEP-DIVE — REAL ESTATE (low barrier, steady, scalable)</div>
+    <div class="grid2">
+      <ul>
+        <li><b>Steady work; six figures from ~2 shoots/day if priced right.</b> <span class="cite"><b>Nathan</b> <span class="ts">17:56</span> · <b>Jerad</b> <span class="ts">2:41</span></span></li>
+        <li><b>Cheap used kit (~$700)</b>: body + wide lens + sturdy tripod; add drone/360/video later. <span class="cite"><b>Cineminn</b> <span class="ts">0:50</span> · <b>Eli-What</b> <span class="ts">1:13</span></span></li>
+        <li><b>Portfolio via agent open-house / free shoots ("Trojan-horse").</b> <span class="cite"><b>Cineminn</b> <span class="ts">4:20</span> · <b>SnapHome</b> <span class="ts">9:07</span></span></li>
+      </ul>
+      <ul>
+        <li><b>Sell speed/reliability; bundle photo/drone/floor-plan/twilight/video/3D to beat the $300 ceiling.</b> <span class="cite"><b>Cineminn</b> <span class="ts">5:34</span> · <b>Eli</b> <span class="ts">5:04</span></span></li>
+        <li><b>Target the serious ~10–20% of realtors.</b> <span class="cite"><b>Eli</b> <span class="ts">1:46</span> · <b>Nathan</b> <span class="ts">15:00</span></span></li>
+        <li><b>MLS visibility → referrals → near-zero ad spend.</b> Tools: CubiCasa, Spiyo/SPIQ, Zillow/Matterport 3D. <span class="cite"><b>Nathan</b> <span class="ts">12:41</span> · <b>Eli-What</b> <span class="ts">15:14</span></span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout info" style="margin-top:12px">
+    <div class="ftag" style="color:var(--violet)">J · MARKET REALITY &amp; CASE STUDY</div>
+    <b>The industry is growing, not dying</b> — AI only takes commodity work. Global photography ≈ $55.6B → $81.8B; weddings, real-estate, product &amp; food all growing; AI can't capture reality. Median income ~$33k (75% part-time); wedding $40–100k+, commercial $50–120k+. <span class="cite"><b>Jerad</b> <span class="ts">0:55 / 7:26 / 7:52</span></span><br>
+    <b>Case study — Grace Torres (CNBC), 23, Lakeland FL:</b> $177k/yr; weddings start $4k, avg $4.5–5.5k; grew $0 → $500 → $1.5k → $7k → full-time; invested early in <b>contracts + a CPA</b>; scaled <b>46 → 25 weddings</b> to avoid burnout; bookings now from <b>referrals</b>, not social. <span class="cite"><b>CNBC</b> <span class="ts">4:02 / 6:51</span></span>
+  </div>
+</div>
+
+<!-- ================= DEFINITION OF DONE ================= -->
+<div class="section">
+  <div class="section-head"><span class="dot" style="background:var(--green)"></span><h2>Definition of done — for the new photographer</h2></div>
+  <div class="card tint">
+    <ul class="check">
+      <li>Niche + ideal client + monthly number written down.</li>
+      <li>Separate business bank account; income/expenses tracked.</li>
+      <li>25–30% set aside for taxes; quarterly estimates scheduled.</li>
+      <li>Portfolio of target work built (free-for-portfolio + testimonials).</li>
+      <li>Profitable package pricing set; contract + deposit required.</li>
+      <li>Website + CRM + payments + templated workflow live.</li>
+      <li>One owned marketing engine running (SEO blog + email + referrals); no paid ads yet.</li>
+      <li>CPA consult booked once income is steady; S-corp deferred until the profit threshold.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="footer">
+  Source corpus: 45 transcripts in <code>/inspo/business-photo</code>, read in full · Companion: <b>Photography CRM Selection</b> (research note) ·
+  Tiers &amp; conflicts per the Evidence Framework above · Not legal or tax advice — confirm with a qualified CPA/attorney.
+</div>
+
+</body>
+</html>
