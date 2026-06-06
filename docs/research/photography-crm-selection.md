@@ -11,17 +11,19 @@
 
 ## My main suggestion
 
-**Pick a CRM that integrates with QuickBooks Online — start a free trial of Dubsado and HoneyBook,
-keep the one that fits, and connect it to QBO.** That pairing (not the CRM alone) is what keeps the
-books clean and taxes optimized so revenue isn't lost to poor tracking.
+**Best starting point: free-trial HoneyBook and Dubsado side by side, keep the one that fits how you
+work, and sync it to QuickBooks Online.** This is what *real users* point to (verified reviews + a
+400+ photographer poll), not the affiliate listicles — see §6.
 
-- **Dubsado** — cheapest of the strong options, most customizable, most-used (38% of photographers),
-  works anywhere, **syncs to QuickBooks Online**.
-- **HoneyBook** — choose this if you want the easiest, most polished client experience *and* you're
-  **US/Canada only**; also **syncs to QBO** (pricier, leans on Stripe).
-- **QuickBooks Online** does the part no CRM does well: **automated sales tax, 1099 filing, and the
-  profit/loss that sizes your quarterly estimated taxes.** The CRM just feeds it your sales.
-- Budget ≈ **$20–50/mo CRM + ~$30/mo QBO**. Confirm the actual tax filing with a CPA.
+- **HoneyBook** — easiest and by far the most real-user-reviewed (**4.7/5, 667 Capterra reviews**);
+  best if you're **US/Canada**. Watch its price hikes + transaction fees.
+- **Dubsado** — the dedicated photographer community's favorite (**38% of a 400+ poll**), cheaper and
+  more flexible, works anywhere; slightly steeper setup.
+- **Just starting / tight budget?** A contract + invoice template + Stripe, or a free tier (Maroo
+  free, Pixieset free), is enough at first — the ~$35/mo *starter* CRM plans **exclude automations**
+  (the reason to pay), so upgrade once manual tracking starts causing errors or missed payments.
+- **The tax part you asked about:** whichever you pick, **sync it to QuickBooks Online** — that combo
+  keeps the books clean and taxes optimized (CRMs have no real financial reports). Confirm with a CPA.
 
 ---
 
@@ -226,6 +228,58 @@ portrait studio living on **average order value**, before any education income.
 Vanessa Joy, Susan Stripling, Jasmine Star, Jenna Kutcher (brand/marketing pivot), plus their actual
 CRM/stack and verified numbers.
 
+---
+
+## 6. Round 3 — What *real users* say is the best starting point (not affiliate blogs)
+
+**First, the bias filter.** Most "best CRM for photographers" listicles are **affiliate-monetized** —
+HoneyBook and Dubsado both run referral programs, and many "Dubsado specialists" are paid setup VAs,
+so their "winner" follows the commission. [C] The least-biased real-user signal comes from two places,
+cross-checked: **(a) verified-review platforms** and **(b) photographer community polls**. (Reddit
+threads exist but couldn't be fetched directly here; the poll below is the best community proxy.)
+
+**Verified real-user ratings (Capterra — verified reviews):** [C]
+
+| Tool | Rating | # reviews | Read |
+|---|---|---|---|
+| **HoneyBook** | **4.7 / 5** | **667** | Mainstream small-biz favorite; huge sample |
+| **Studio Ninja** | 4.4 / 5 | 68 | Liked, smaller base; see support note |
+| **Dubsado** | 4.2 / 5 | 59 | Solid; fewer reviews, steeper setup |
+
+**The population gap (the honest part the blogs skip).** HoneyBook wins on *review volume and rating*
+because it markets broadly to all small businesses and is US/Canada-focused — a big, general crowd.
+But inside **dedicated wedding/portrait communities**, **Dubsado leads (38%)** for price and
+customization. Same question, two different populations, two different "bests": **HoneyBook =
+mainstream/easiest; Dubsado = photographers' value pick.** Neither is universally correct — which is
+exactly why the real recommendation is "trial both."
+
+**Real complaints verified users raise (that affiliate posts bury):** [C]
+- **HoneyBook:** price increases + transaction fees; rigid templates/branding; **no built-in
+  galleries**; scheduler bugs; some users migrating to Dubsado/Bloom/Maroo after 2025 price hikes.
+- **Studio Ninja:** acquired by **ImageQuix** → reviewers report **support quality dropped** and it
+  "lacks basic components" peers have.
+- **Dubsado:** steeper setup/learning curve; smallest verified-review base of the three.
+
+**Do you even need one yet?** Real-user consensus: at the *very* start, a contract + invoice template
++ a payment processor (or a free/cheap tier — **Maroo** free, **Pixieset** free, **Bloom** ~$9) is
+enough. The ~$35/mo HoneyBook/Dubsado **starter** plans **exclude automations** — the main reason to
+pay for a CRM — so buying early gets you little over templates. A CRM earns its keep once manual
+tracking starts causing errors or lost payments. [C]
+
+**Best starting point, grounded in the above:**
+1. **US/Canada, want easiest + most-proven** → start a **HoneyBook** trial (accept the fees).
+2. **Want best value + the photographer crowd's pick, work internationally, OK with setup** →
+   **Dubsado**.
+3. **Truly just starting / budget-tight** → templates + Stripe, or **Maroo (free)**; add Dubsado/
+   HoneyBook when volume justifies automations.
+4. **Always:** free-trial both finalists, confirm **QuickBooks Online** sync (your real need), and
+   discount any listicle's "winner" — judge from your own trial + verified reviews.
+
+> ⚠️ **Source caveat:** Maroo's glowing testimonials are on **maroo.us itself** (vendor marketing) —
+> treat as biased; the "migration to Maroo/Bloom" trend appears in third-party context but verify
+> independently. G2's HoneyBook page (4.x, large sample) corroborates Capterra but couldn't be fetched
+> directly here.
+
 ### Sources (graded)
 
 - **[A]** Heather Morton — *State of the Photo Industry Survey 2024* (n=1,294), via PetaPixel, 2025-08-29 — https://petapixel.com/2025/08/29/how-many-photographers-are-making-over-300000-a-year/ · report: https://hmphotoprof.substack.com/
@@ -250,7 +304,14 @@ CRM/stack and verified numbers.
 - **[C]** The Portrait System / PhotoBizX — *Sue Bryce* (paid upfront; $15k/week) — https://photobizx.com/how-to-make-real-money-from-your-photography-business-sue-bryce/
 - **[C]** The Knot — *Average Wedding Photographer Cost* — https://www.theknot.com/content/average-cost-wedding-photographer · WeddingWire — https://www.weddingwire.com/cost/wedding-photographer
 
-> _Status: Round 1 (CRM selection) + Round 2 (expanded CRMs + attainable-photographer seed) complete.
-> **Next (Round 3, not yet started):** build the standalone market-research doc — verify photographer
-> revenue with primary/press sources, add each one's confirmed CRM/stack, profile the remaining names
-> above, and segment by genre. This doc is the starting point, not that doc._
+**Round 3 additions (real-user signal)**
+- **[C]** Capterra — verified reviews: HoneyBook (4.7/5, 667) https://www.capterra.com/p/162588/HoneyBook/reviews/ · Studio Ninja (4.4/5, 68) https://www.capterra.com/p/143855/Studio-Ninja/reviews/ · Dubsado (4.2/5, 59) https://www.capterra.com/p/206389/Dubsado/reviews/
+- **[C]** G2 — HoneyBook reviews (large verified sample; couldn't fetch directly) — https://www.g2.com/products/honeybook/reviews
+- **[C]** Joy Michelle — *Pros and Cons of HoneyBook* — https://joymichelle.co/pros-and-cons-of-honeybook-for-photographers/
+- **[C, vendor-biased]** Maroo — free CRM for wedding pros (testimonials are first-party marketing) — https://www.maroo.us/solutions/photographers
+- **[C, affiliate-disclosed]** Colie James / Lindsey Garvey / Kyle Goldie — comparison posts that *disclose* HoneyBook/Dubsado affiliate links (illustrating the bias to filter) — https://coliejames.com/honeybook-vs-dubsado/
+
+> _Status: Rounds 1–3 complete (CRM selection · expanded CRMs + attainable-photographer seed ·
+> real-user starting-point signal). **Next (Round 4, not started):** the standalone market-research
+> doc — verify photographer revenue with primary/press sources, add each one's confirmed CRM/stack,
+> profile the remaining names, and segment by genre. This doc is the starting point, not that doc._
