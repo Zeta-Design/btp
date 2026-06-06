@@ -1,29 +1,18 @@
 ---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 
-// TEMPORARY realty placeholder photos (LoremFlickr, keyword-based), varied
-// heights for a natural masonry feel. Replace with real listing photos via
-// astro:assets when ready (and add real, descriptive alt text for image SEO).
-const items: [string, number, number][] = [
-  ['interior', 41, 1000],
-  ['kitchen', 42, 700],
-  ['livingroom', 43, 1150],
-  ['house', 44, 850],
-  ['bedroom', 45, 950],
-  ['bathroom', 46, 1200],
-  ['architecture', 47, 800],
-  ['apartment', 48, 1050],
-  ['interior', 49, 900],
-  ['kitchen', 50, 1100],
-  ['house', 51, 750],
-  ['livingroom', 52, 980],
-];
-const photos = items.map(([kw, lock, h]) => ({
-  src: `https://loremflickr.com/800/${h}/${kw}?lock=${lock}`,
-  w: 800,
-  h,
-}));
+// Auto-discovered + optimized (AVIF/WebP, responsive). To change the portfolio,
+// just add/replace files in src/assets/portfolio/ — no code change needed.
+const mods = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/portfolio/*.{jpg,jpeg,png,webp}',
+  { eager: true },
+);
+const photos = Object.keys(mods)
+  .sort()
+  .map((k) => mods[k].default);
 ---
 <BaseLayout title="Portfolio" description={`Real estate and short-term rental photography by ${SITE.name}.`}>
   <section class="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
@@ -34,15 +23,17 @@ const photos = items.map(([kw, lock, h]) => ({
       that make a space feel like home.
     </p>
 
-    <div class="mt-10 columns-1 gap-3 min-[420px]:columns-2 sm:columns-3 sm:gap-4 [&>*]:mb-3 sm:[&>*]:mb-4">
+    <div class="mt-10 columns-1 gap-3 min-[420px]:columns-2 sm:columns-3 sm:gap-4">
       {
-        photos.map((p) => (
-          <figure class="group block overflow-hidden">
-            <img
-              src={p.src}
+        photos.map((img) => (
+          <figure class="group mb-3 overflow-hidden sm:mb-4">
+            <Image
+              src={img}
               alt=""
-              width={p.w}
-              height={p.h}
+              widths={[400, 800]}
+              sizes="(max-width: 420px) 100vw, (max-width: 640px) 50vw, 33vw"
+              format="webp"
+              quality={74}
               loading="lazy"
               class="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
             />
