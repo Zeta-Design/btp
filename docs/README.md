@@ -10,6 +10,7 @@ to graded sources, and opens with a plain-language TL;DR.
 | Doc | Type | Status | Date |
 |---|---|---|---|
 | [Photography CRM Selection](research/photography-crm-selection.md) | Research note | Research only (seed for a later market-research doc) | 2026-06-06 |
+| [Starting a Photography Business](plans/starting-a-photography-business.md) | Plan | Draft (from 45 YouTube transcripts; source-weighted, with timestamps) | 2026-06-06 |
 
 ## Conventions
 - **Research note** → `research/<topic>.md` — options weighed against the Principle Lens; "research
