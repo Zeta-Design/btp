@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
@@ -10,36 +10,112 @@ const mods = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/portfolio/*.{jpg,jpeg,png,webp}',
   { eager: true },
 );
-const photos = Object.keys(mods)
+const metas = Object.keys(mods)
   .sort()
   .map((k) => mods[k].default);
+
+// Larger versions for the click-to-zoom lightbox.
+const full = await Promise.all(
+  metas.map((m) => getImage({ src: m, format: 'webp', width: 1600 })),
+);
+const fullUrls = full.map((f) => f.src);
 ---
 <BaseLayout title="Portfolio" description={`Real estate and short-term rental photography by ${SITE.name}.`}>
   <section class="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
     <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Portfolio</p>
     <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">Recent work</h1>
     <p class="mt-4 max-w-xl text-pretty text-stone-600">
-      Real estate and short-term rental work — interiors, exteriors, and the details
-      that make a space feel like home.
+      Real estate and short-term rental work — tap any image to view it larger.
     </p>
 
-    <div class="mt-10 columns-1 gap-3 min-[420px]:columns-2 sm:columns-3 sm:gap-4">
+    <!-- Uniform grid: images fill each cell cleanly via object-cover -->
+    <div id="gallery" class="mt-10 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
       {
-        photos.map((img) => (
-          <figure class="group mb-3 overflow-hidden sm:mb-4">
+        metas.map((m, i) => (
+          <button
+            type="button"
+            data-i={i}
+            aria-label={`View image ${i + 1} larger`}
+            class="group relative block aspect-[4/5] overflow-hidden bg-stone-100"
+          >
             <Image
-              src={img}
+              src={m}
               alt=""
               widths={[400, 800]}
-              sizes="(max-width: 420px) 100vw, (max-width: 640px) 50vw, 33vw"
+              sizes="(max-width: 640px) 50vw, 33vw"
               format="webp"
               quality={74}
               loading="lazy"
-              class="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
-          </figure>
+          </button>
         ))
       }
     </div>
   </section>
+
+  <!-- Lightbox -->
+  <div
+    id="lightbox"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image viewer"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+  >
+    <button data-close aria-label="Close" class="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-full text-2xl text-white/90 hover:bg-white/10">×</button>
+    <button data-prev aria-label="Previous" class="absolute left-2 inline-flex h-12 w-12 items-center justify-center rounded-full text-3xl text-white/90 hover:bg-white/10 sm:left-5">‹</button>
+    <img id="lb-img" alt="" class="max-h-[88vh] max-w-[92vw] object-contain" />
+    <button data-next aria-label="Next" class="absolute right-2 inline-flex h-12 w-12 items-center justify-center rounded-full text-3xl text-white/90 hover:bg-white/10 sm:right-5">›</button>
+  </div>
+
+  <script type="application/json" id="gallery-full" set:html={JSON.stringify(fullUrls)}></script>
+
+  <script>
+    const fulls: string[] = JSON.parse(
+      document.getElementById('gallery-full')?.textContent || '[]',
+    );
+    const lb = document.getElementById('lightbox') as HTMLElement;
+    const lbImg = document.getElementById('lb-img') as HTMLImageElement;
+    let idx = 0;
+
+    const show = (i: number) => {
+      idx = (i + fulls.length) % fulls.length;
+      lbImg.src = fulls[idx];
+    };
+    const open = (i: number) => {
+      show(i);
+      lb.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+    const close = () => {
+      lb.hidden = true;
+      lbImg.removeAttribute('src');
+      document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll<HTMLButtonElement>('#gallery [data-i]').forEach((btn) =>
+      btn.addEventListener('click', () => open(Number(btn.dataset.i))),
+    );
+    lb.querySelector('[data-close]')!.addEventListener('click', close);
+    lb.querySelector('[data-prev]')!.addEventListener('click', () => show(idx - 1));
+    lb.querySelector('[data-next]')!.addEventListener('click', () => show(idx + 1));
+    lb.addEventListener('click', (e) => {
+      if (e.target === lb) close();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (lb.hidden) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') show(idx - 1);
+      else if (e.key === 'ArrowRight') show(idx + 1);
+    });
+
+    // Swipe to navigate on touch
+    let sx = 0;
+    lb.addEventListener('touchstart', (e) => (sx = e.changedTouches[0].clientX), { passive: true });
+    lb.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 50) show(idx + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  </script>
 </BaseLayout>
