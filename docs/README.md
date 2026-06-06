@@ -9,7 +9,7 @@ to graded sources, and opens with a plain-language TL;DR.
 
 | Doc | Type | Status | Date |
 |---|---|---|---|
-| _(none yet — the first research note will be listed here)_ | | | |
+| [Photography CRM Selection](research/photography-crm-selection.md) | Research note | Research only (seed for a later market-research doc) | 2026-06-06 |
 
 ## Conventions
 - **Research note** → `research/<topic>.md` — options weighed against the Principle Lens; "research
