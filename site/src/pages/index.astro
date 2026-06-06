@@ -11,29 +11,40 @@ const jsonLd = {
   url: Astro.site?.href,
   ...(SITE.email && { email: SITE.email }),
 };
+
+// TEMPORARY placeholder photos (Lorem Picsum). Replace with real images via
+// astro:assets: put files in src/assets/ then use <Image> for AVIF/WebP +
+// responsive sizes. Until then these stable seeded URLs stand in.
+const work = [
+  'https://picsum.photos/seed/btm-1/800/1000',
+  'https://picsum.photos/seed/btm-2/800/1000',
+  'https://picsum.photos/seed/btm-3/800/1000',
+  'https://picsum.photos/seed/btm-4/800/1000',
+  'https://picsum.photos/seed/btm-5/800/1000',
+  'https://picsum.photos/seed/btm-6/800/1000',
+];
 ---
 <BaseLayout title={SITE.name} description={SITE.tagline} jsonLd={jsonLd}>
-  <!-- Hero. Replace the gradient block with a real image via astro:assets:
-       import hero from '../assets/hero.jpg';
-       import { Image } from 'astro:assets';
-       <Image src={hero} alt="…" priority widths={[640,1024,1600]} formats={['avif','webp']} />
-       Mark the LCP hero `priority` so it loads first. -->
-  <section class="relative">
-    <div
-      class="flex min-h-[70vh] items-center justify-center bg-gradient-to-br from-stone-200 via-stone-100 to-stone-300 px-6 text-center"
-    >
-      <div class="max-w-2xl">
-        <h1 class="font-serif text-5xl leading-tight sm:text-6xl">{SITE.tagline}</h1>
-        <p class="mx-auto mt-6 max-w-md text-lg text-stone-600">
-          {SITE.name} — photography made to be looked at for a long time.
-        </p>
-        <a
-          href="/inquire/"
-          class="mt-8 inline-block rounded-full bg-stone-900 px-7 py-3 text-sm text-stone-50 transition hover:bg-stone-700"
-        >
-          Inquire about your date
-        </a>
-      </div>
+  <section class="relative isolate flex min-h-[78vh] items-center justify-center overflow-hidden">
+    <img
+      src="https://picsum.photos/seed/btm-hero/1920/1080"
+      alt=""
+      width="1920"
+      height="1080"
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 -z-10 bg-black/45"></div>
+    <div class="max-w-2xl px-6 text-center text-white">
+      <h1 class="font-serif text-5xl leading-tight sm:text-6xl">{SITE.tagline}</h1>
+      <p class="mx-auto mt-6 max-w-md text-lg text-white/85">
+        {SITE.name} — photography made to be looked at for a long time.
+      </p>
+      <a
+        href="/inquire/"
+        class="mt-8 inline-block rounded-full bg-white px-7 py-3 text-sm text-stone-900 transition hover:bg-stone-200"
+      >
+        Inquire about your date
+      </a>
     </div>
   </section>
 
@@ -44,8 +55,15 @@ const jsonLd = {
     </div>
     <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
       {
-        Array.from({ length: 6 }).map(() => (
-          <div class="aspect-[3/4] rounded-sm bg-stone-200" />
+        work.map((src) => (
+          <img
+            src={src}
+            alt=""
+            width="800"
+            height="1000"
+            loading="lazy"
+            class="aspect-[4/5] w-full rounded-sm object-cover"
+          />
         ))
       }
     </div>
