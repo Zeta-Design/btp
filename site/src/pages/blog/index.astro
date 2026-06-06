@@ -7,9 +7,9 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
 ---
-<BaseLayout title="Journal" description={`Stories, guides, and recent work from ${SITE.name}.`}>
+<BaseLayout title="Blog" description={`Stories, guides, and recent work from ${SITE.name}.`}>
   <section class="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-20">
-    <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Journal</p>
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Blog</p>
     <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">Notes &amp; guides</h1>
     <p class="mt-4 text-stone-600">Stories, guides, and recent work.</p>
 
