@@ -1,29 +1,42 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
+import portrait from '../assets/ben-tims.jpg';
 ---
 <BaseLayout
   title="About"
   description={`About ${SITE.name} — the photographer behind the work, and how we'll work together.`}
 >
-  <section class="mx-auto max-w-2xl px-6 py-16">
-    <h1 class="font-serif text-4xl">About</h1>
-    <div class="prose-body mt-8 text-lg leading-relaxed text-stone-700">
-      <p>
-        Write your story here. Why you photograph, who you love working with, and
-        what a client can expect when they hire you. A genuine, specific voice
-        does more for both connection and SEO than a generic bio.
-      </p>
-      <p>
-        Tip: name the places you shoot and the kind of work you do — it's how
-        the right clients (and Google) find you.
-      </p>
+  <section class="mx-auto max-w-4xl px-6 py-16">
+    <div class="grid gap-10 sm:grid-cols-[2fr_3fr] sm:items-start">
+      <Image
+        src={portrait}
+        alt={`${SITE.name} — the photographer`}
+        widths={[400, 700]}
+        sizes="(max-width: 640px) 100vw, 280px"
+        class="w-full rounded-md object-cover"
+      />
+      <div>
+        <h1 class="font-serif text-4xl">About</h1>
+        <div class="prose-body mt-6 text-lg leading-relaxed text-stone-300">
+          <p>
+            Write your story here. Why you photograph, who you love working with, and
+            what a client can expect when they hire you. A genuine, specific voice
+            does more for both connection and SEO than a generic bio.
+          </p>
+          <p>
+            Tip: name the places you shoot and the kind of work you do — it's how
+            the right clients (and Google) find you.
+          </p>
+        </div>
+        <a
+          href="/inquire/"
+          class="mt-8 inline-block rounded-full bg-stone-100 px-7 py-3 text-sm text-stone-950 transition hover:bg-white"
+        >
+          Work with me
+        </a>
+      </div>
     </div>
-    <a
-      href="/inquire/"
-      class="mt-8 inline-block rounded-full bg-stone-900 px-7 py-3 text-sm text-stone-50 transition hover:bg-stone-700"
-    >
-      Work with me
-    </a>
   </section>
 </BaseLayout>

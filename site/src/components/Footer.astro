@@ -2,12 +2,26 @@
 import { SITE } from '../config/site';
 const year = new Date().getFullYear();
 ---
-<footer class="mt-24 border-t border-stone-200">
+<footer class="mt-24 border-t border-stone-800">
   <div
-    class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-10 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between"
+    class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 text-sm text-stone-400 sm:flex-row sm:items-center sm:justify-between"
   >
     <p>© {year} {SITE.name}</p>
-    {SITE.email && <a href={`mailto:${SITE.email}`} class="hover:text-stone-800">{SITE.email}</a>}
-    <a href="/inquire/" class="hover:text-stone-800">Start a project →</a>
+    <div class="flex flex-wrap items-center gap-5">
+      {
+        SITE.social?.map((s) => (
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="transition hover:text-white"
+          >
+            {s.label}
+          </a>
+        ))
+      }
+      {SITE.email && <a href={`mailto:${SITE.email}`} class="transition hover:text-white">{SITE.email}</a>}
+      <a href="/inquire/" class="transition hover:text-white">Start a project →</a>
+    </div>
   </div>
 </footer>

@@ -15,6 +15,8 @@ export interface Brand {
   tagline: string;
   /** contact email shown in footer/inquire (optional) */
   email?: string;
+  /** social links shown in the footer */
+  social?: { label: string; href: string }[];
   /**
    * Dubsado lead-capture form share/embed link for THIS brand.
    * Get it in Dubsado → Forms → your lead-capture form → Share.
@@ -29,6 +31,10 @@ export const BRANDS: Record<string, Brand> = {
     name: 'Ben Tims Media',
     tagline: 'Timeless photography, thoughtfully made.',
     email: 'hello@bentimsmedia.com',
+    social: [
+      { label: 'Instagram', href: 'https://www.instagram.com/thebtphotography/' },
+      { label: 'VSCO', href: 'https://vsco.co/benjammin-visuals/gallery' },
+    ],
     dubsadoFormUrl: 'https://hello.dubsado.com/public/form/view/6a2489c3971b89d2159a3901',
   },
 
