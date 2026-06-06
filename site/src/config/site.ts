@@ -29,7 +29,7 @@ export const BRANDS: Record<string, Brand> = {
   main: {
     slug: 'main',
     name: 'Ben Tims Media',
-    tagline: 'Timeless photography, thoughtfully made.',
+    tagline: 'Real estate & short-term rental photography in Austin.',
     email: 'hello@bentimsmedia.com',
     social: [
       { label: 'Instagram', href: 'https://www.instagram.com/thebtphotography/' },

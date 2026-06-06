@@ -28,5 +28,5 @@ have fun with it.
 
 ---
 
-*Ready to book? Head to the [inquire page](/inquire/) and tell me about your
+*Ready to book? Head to the [contact page](/contact/) and tell me about your
 project — I'll be in touch within a day.*

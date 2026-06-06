@@ -2,20 +2,36 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 
-// TEMPORARY placeholder photos (Lorem Picsum), varied heights for a natural
-// masonry feel. Replace with real photos via astro:assets when ready (and add
-// real, descriptive alt text — good for accessibility and image SEO).
-const heights = [1000, 700, 1150, 850, 950, 1200, 800, 1050, 900, 1100, 750, 980];
-const photos = heights.map((h, i) => ({
-  src: `https://picsum.photos/seed/btm-p${i + 1}/800/${h}`,
+// TEMPORARY realty placeholder photos (LoremFlickr, keyword-based), varied
+// heights for a natural masonry feel. Replace with real listing photos via
+// astro:assets when ready (and add real, descriptive alt text for image SEO).
+const items: [string, number, number][] = [
+  ['interior', 41, 1000],
+  ['kitchen', 42, 700],
+  ['livingroom', 43, 1150],
+  ['house', 44, 850],
+  ['bedroom', 45, 950],
+  ['bathroom', 46, 1200],
+  ['architecture', 47, 800],
+  ['apartment', 48, 1050],
+  ['interior', 49, 900],
+  ['kitchen', 50, 1100],
+  ['house', 51, 750],
+  ['livingroom', 52, 980],
+];
+const photos = items.map(([kw, lock, h]) => ({
+  src: `https://loremflickr.com/800/${h}/${kw}?lock=${lock}`,
   w: 800,
   h,
 }));
 ---
-<BaseLayout title="Portfolio" description={`A selection of recent work from ${SITE.name}.`}>
+<BaseLayout title="Portfolio" description={`Real estate and short-term rental photography by ${SITE.name}.`}>
   <section class="mx-auto max-w-6xl px-6 py-16">
     <h1 class="font-serif text-4xl">Portfolio</h1>
-    <p class="mt-3 max-w-xl text-stone-400">A selection of recent work.</p>
+    <p class="mt-3 max-w-xl text-stone-600">
+      Recent real estate and short-term rental work — interiors, exteriors, and the
+      details that make a space feel like home.
+    </p>
 
     <div class="mt-10 columns-2 gap-4 sm:columns-3 [&>img]:mb-4">
       {
