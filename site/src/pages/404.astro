@@ -6,29 +6,31 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   description="The page you're looking for doesn't exist or may have moved."
 >
   <section
-    class="mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-6 py-24 text-center"
+    class="mx-auto flex min-h-[60svh] max-w-2xl flex-col items-center justify-center px-5 py-24 text-center sm:px-6"
   >
-    <p class="text-sm uppercase tracking-[0.25em] text-stone-500">404</p>
-    <h1 class="mt-4 font-serif text-4xl sm:text-5xl">This page wandered off.</h1>
-    <p class="mt-4 text-stone-600">
+    <p class="text-xs uppercase tracking-[0.3em] text-stone-400">404</p>
+    <h1 class="mt-4 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">
+      This page wandered off.
+    </h1>
+    <p class="mt-4 text-pretty text-stone-600">
       The page you're looking for doesn't exist or may have moved.
     </p>
-    <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+    <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
       <a
         href="/"
-        class="rounded-full bg-stone-900 px-7 py-3 text-sm text-stone-50 transition hover:bg-stone-700"
+        class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-stone-900 px-7 text-sm font-medium text-stone-50 transition hover:bg-stone-700"
       >
         Back home
       </a>
       <a
         href="/portfolio/"
-        class="rounded-full border border-stone-300 px-7 py-3 text-sm text-stone-700 transition hover:border-stone-500"
+        class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-stone-300 px-7 text-sm text-stone-700 transition hover:border-stone-500"
       >
         View portfolio
       </a>
       <a
         href="/contact/"
-        class="rounded-full border border-stone-300 px-7 py-3 text-sm text-stone-700 transition hover:border-stone-500"
+        class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-stone-300 px-7 text-sm text-stone-700 transition hover:border-stone-500"
       >
         Get in touch
       </a>

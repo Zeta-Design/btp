@@ -26,24 +26,27 @@ const photos = items.map(([kw, lock, h]) => ({
 }));
 ---
 <BaseLayout title="Portfolio" description={`Real estate and short-term rental photography by ${SITE.name}.`}>
-  <section class="mx-auto max-w-6xl px-6 py-16">
-    <h1 class="font-serif text-4xl">Portfolio</h1>
-    <p class="mt-3 max-w-xl text-stone-600">
-      Recent real estate and short-term rental work — interiors, exteriors, and the
-      details that make a space feel like home.
+  <section class="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Portfolio</p>
+    <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">Recent work</h1>
+    <p class="mt-4 max-w-xl text-pretty text-stone-600">
+      Real estate and short-term rental work — interiors, exteriors, and the details
+      that make a space feel like home.
     </p>
 
-    <div class="mt-10 columns-2 gap-4 sm:columns-3 [&>img]:mb-4">
+    <div class="mt-10 columns-1 gap-3 min-[420px]:columns-2 sm:columns-3 sm:gap-4 [&>*]:mb-3 sm:[&>*]:mb-4">
       {
         photos.map((p) => (
-          <img
-            src={p.src}
-            alt=""
-            width={p.w}
-            height={p.h}
-            loading="lazy"
-            class="w-full rounded-sm"
-          />
+          <figure class="group block overflow-hidden">
+            <img
+              src={p.src}
+              alt=""
+              width={p.w}
+              height={p.h}
+              loading="lazy"
+              class="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            />
+          </figure>
         ))
       }
     </div>

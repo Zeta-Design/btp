@@ -1,4 +1,6 @@
 ---
+import '@fontsource-variable/inter';
+import '@fontsource-variable/playfair-display';
 import '../styles/global.css';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
@@ -14,7 +16,6 @@ interface Props {
   jsonLd?: Record<string, unknown>;
 }
 const { title, description, image, type, jsonLd } = Astro.props;
-// Brand name as suffix, except on the home page where title === brand name.
 const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
 ---
 <!doctype html>
@@ -23,7 +24,7 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
     <BaseHead title={fullTitle} description={description} image={image} type={type} />
     {jsonLd && <JsonLd schema={jsonLd} />}
   </head>
-  <body class="min-h-screen bg-stone-50 font-sans text-stone-900">
+  <body class="min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased">
     <Header />
     <main><slot /></main>
     <Footer />

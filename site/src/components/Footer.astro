@@ -2,26 +2,47 @@
 import { SITE } from '../config/site';
 const year = new Date().getFullYear();
 ---
-<footer class="mt-24 border-t border-stone-200">
-  <div
-    class="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-10 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between"
-  >
-    <p>© {year} {SITE.name}</p>
-    <div class="flex flex-wrap items-center gap-5">
-      {
-        SITE.social?.map((s) => (
-          <a
-            href={s.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="transition hover:text-stone-900"
-          >
-            {s.label}
-          </a>
-        ))
-      }
-      {SITE.email && <a href={`mailto:${SITE.email}`} class="transition hover:text-stone-900">{SITE.email}</a>}
-      <a href="/contact/" class="transition hover:text-stone-900">Book a session →</a>
+<footer class="mt-24 border-t border-stone-200 sm:mt-32">
+  <div class="mx-auto max-w-6xl px-5 py-14 sm:px-6">
+    <div class="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="font-serif text-2xl tracking-tight">{SITE.name}</p>
+        <p class="mt-2 max-w-xs text-sm text-stone-500">{SITE.tagline}</p>
+      </div>
+      <a
+        href="/contact/"
+        class="inline-flex min-h-[48px] items-center justify-center self-start rounded-full bg-stone-900 px-7 text-sm font-medium text-stone-50 transition hover:bg-stone-700"
+      >
+        Book a session
+      </a>
+    </div>
+
+    <div
+      class="mt-10 flex flex-col gap-3 border-t border-stone-100 pt-6 text-sm text-stone-500 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} {SITE.name}</p>
+      <div class="flex flex-wrap items-center gap-x-6">
+        <a href="/blog/" class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">Journal</a>
+        {
+          SITE.social?.map((s) => (
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex min-h-[44px] items-center transition hover:text-stone-900"
+            >
+              {s.label}
+            </a>
+          ))
+        }
+        {
+          SITE.email && (
+            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">
+              {SITE.email}
+            </a>
+          )
+        }
+      </div>
     </div>
   </div>
 </footer>
