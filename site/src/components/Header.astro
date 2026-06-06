@@ -1,0 +1,33 @@
+---
+import { SITE } from '../config/site';
+
+const links = [
+  { href: '/portfolio/', label: 'Portfolio' },
+  { href: '/blog/', label: 'Journal' },
+  { href: '/about/', label: 'About' },
+  { href: '/inquire/', label: 'Inquire' },
+];
+const path = Astro.url.pathname;
+---
+<header class="border-b border-stone-200">
+  <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+    <a href="/" class="font-serif text-xl tracking-tight">{SITE.name}</a>
+    <ul class="flex items-center gap-6 text-sm">
+      {
+        links.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              class:list={[
+                'transition hover:text-stone-500',
+                path.startsWith(l.href) && 'underline underline-offset-4',
+              ]}
+            >
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>

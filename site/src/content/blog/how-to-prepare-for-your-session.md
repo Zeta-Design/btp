@@ -1,0 +1,32 @@
+---
+title: "How to Prepare for Your Photography Session"
+description: "A simple guide to getting the most from your shoot — what to wear, when to schedule for the best light, and how to feel at ease in front of the camera."
+pubDate: 2026-06-06
+tags: ["tips", "sessions", "what to expect"]
+---
+
+The difference between a good session and a great one usually comes down to a
+little preparation. Here's everything you need to know before we shoot.
+
+## What to wear
+
+Choose clothes you feel like *yourself* in. Solid colors and soft textures
+photograph beautifully; busy patterns tend to compete for attention. Bring a
+second option so we can change the mood halfway through.
+
+## When we shoot matters
+
+The hour after sunrise and the hour before sunset — "golden hour" — gives the
+warm, flattering light you see in your favorite images. We'll plan your session
+around it whenever we can.
+
+## How to relax on the day
+
+You don't need to know how to pose. My job is to guide you, prompt you, and
+catch the real moments in between. Come a little early, take a breath, and let's
+have fun with it.
+
+---
+
+*Ready to book? Head to the [inquire page](/inquire/) and tell me about your
+project — I'll be in touch within a day.*

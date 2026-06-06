@@ -1,0 +1,8 @@
+---
+// Renders schema.org structured data so Google can show rich results.
+interface Props {
+  schema: Record<string, unknown>;
+}
+const { schema } = Astro.props;
+---
+<script type="application/ld+json" set:html={JSON.stringify(schema)} is:inline />

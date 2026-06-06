@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config/site';
+
+// Home page = ProfessionalService schema for local/business SEO.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: SITE.name,
+  description: SITE.tagline,
+  url: Astro.site?.href,
+  ...(SITE.email && { email: SITE.email }),
+};
+---
+<BaseLayout title={SITE.name} description={SITE.tagline} jsonLd={jsonLd}>
+  <!-- Hero. Replace the gradient block with a real image via astro:assets:
+       import hero from '../assets/hero.jpg';
+       import { Image } from 'astro:assets';
+       <Image src={hero} alt="…" priority widths={[640,1024,1600]} formats={['avif','webp']} />
+       Mark the LCP hero `priority` so it loads first. -->
+  <section class="relative">
+    <div
+      class="flex min-h-[70vh] items-center justify-center bg-gradient-to-br from-stone-200 via-stone-100 to-stone-300 px-6 text-center"
+    >
+      <div class="max-w-2xl">
+        <h1 class="font-serif text-5xl leading-tight sm:text-6xl">{SITE.tagline}</h1>
+        <p class="mx-auto mt-6 max-w-md text-lg text-stone-600">
+          {SITE.name} — photography made to be looked at for a long time.
+        </p>
+        <a
+          href="/inquire/"
+          class="mt-8 inline-block rounded-full bg-stone-900 px-7 py-3 text-sm text-stone-50 transition hover:bg-stone-700"
+        >
+          Inquire about your date
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 py-20">
+    <div class="flex items-end justify-between">
+      <h2 class="font-serif text-3xl">Selected work</h2>
+      <a href="/portfolio/" class="text-sm text-stone-500 hover:text-stone-800">View portfolio →</a>
+    </div>
+    <div class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
+      {
+        Array.from({ length: 6 }).map(() => (
+          <div class="aspect-[3/4] rounded-sm bg-stone-200" />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

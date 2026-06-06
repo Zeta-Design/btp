@@ -1,0 +1,15 @@
+# build output
+dist/
+# generated types
+.astro/
+# deps
+node_modules/
+# environment
+.env
+.env.production
+.env*.local
+# vercel
+.vercel
+# misc
+.DS_Store
+npm-debug.log*
