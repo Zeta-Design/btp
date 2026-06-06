@@ -1,5 +1,8 @@
 ---
+import { Image } from 'astro:assets';
 import { SITE } from '../config/site';
+// Temporary logo — swap src/assets/logo.jpg for the final mark when ready.
+import logo from '../assets/logo.jpg';
 
 const links = [
   { href: '/portfolio/', label: 'Portfolio' },
@@ -10,7 +13,16 @@ const path = Astro.url.pathname;
 ---
 <header class="border-b border-stone-200">
   <nav class="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-    <a href="/" class="font-serif text-xl tracking-tight">{SITE.name}</a>
+    <a href="/" class="flex items-center gap-3">
+      <Image
+        src={logo}
+        alt={`${SITE.name} logo`}
+        width={80}
+        height={80}
+        class="h-9 w-9 rounded-full object-cover"
+      />
+      <span class="font-serif text-xl tracking-tight">{SITE.name}</span>
+    </a>
     <ul class="flex items-center gap-6 text-sm">
       {
         links.map((l) => (
