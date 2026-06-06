@@ -26,9 +26,9 @@ export interface Brand {
 export const BRANDS: Record<string, Brand> = {
   main: {
     slug: 'main',
-    name: 'Your Studio Name',
+    name: 'Bentims Media',
     tagline: 'Timeless photography, thoughtfully made.',
-    email: 'hello@example.com',
+    email: 'hello@bentimsmedia.com',
     dubsadoFormUrl: 'https://hello.dubsado.com/public/form/view/6a2489c3971b89d2159a3901',
   },
 
