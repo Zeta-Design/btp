@@ -1,18 +1,48 @@
 ---
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
+import sharp from 'sharp';
+import path from 'node:path';
 
+// Real photos → optimized webp + a mood palette sampled from each photo's
+// dominant colour, fed into the vendored Codrops depth-gallery engine.
 const mods = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/portfolio/*.{jpg,jpeg,png,webp}',
   { eager: true },
 );
-const metas = Object.keys(mods)
-  .sort()
-  .map((k) => mods[k].default);
-const images = await Promise.all(
-  metas.map(async (m) => {
-    const img = await getImage({ src: m, format: 'webp', width: 900 });
-    return { src: img.src, ratio: m.width / m.height };
+const keys = Object.keys(mods).sort();
+
+type RGB = { r: number; g: number; b: number };
+const xs = [-0.85, 0.7, -0.6, 0.9, -0.75, 0.55, -0.9, 0.65, -0.5, 0.8];
+const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+const hex = (c: RGB) => '#' + [c.r, c.g, c.b].map((v) => clamp(v).toString(16).padStart(2, '0')).join('');
+const mix = (a: RGB, b: RGB, t: number): RGB => ({ r: a.r + (b.r - a.r) * t, g: a.g + (b.g - a.g) * t, b: a.b + (b.b - a.b) * t });
+const lum = (c: RGB) => (0.2126 * c.r + 0.7152 * c.g + 0.0722 * c.b) / 255;
+const DARK: RGB = { r: 18, g: 18, b: 20 };
+const WHITE: RGB = { r: 255, g: 255, b: 255 };
+
+const galleryData = await Promise.all(
+  keys.map(async (key, i) => {
+    const meta = mods[key].default;
+    const img = await getImage({ src: meta, format: 'webp', width: 1200 });
+    let d: RGB = { r: 120, g: 120, b: 130 };
+    try {
+      const fsPath = path.join(process.cwd(), 'src/assets/portfolio', path.basename(key));
+      d = (await sharp(fsPath).stats()).dominant;
+    } catch {
+      /* fall back to neutral */
+    }
+    const bg = mix(d, DARK, 0.62);
+    return {
+      textureSrc: img.src,
+      position: { x: xs[i % xs.length], y: 0 },
+      fallbackColor: hex(d),
+      accentColor: hex(d),
+      backgroundColor: hex(bg),
+      blob1Color: hex(d),
+      blob2Color: hex(mix(d, WHITE, 0.45)),
+      label: { word: '', pms: '', color: lum(bg) > 0.5 ? '#1a1a1a' : '#f4f4f4' },
+    };
   }),
 );
 ---
@@ -24,247 +54,63 @@ const images = await Promise.all(
     <meta name="robots" content="noindex, nofollow" />
     <title>3D Gallery (experiment) · Ben Tims Media</title>
     <style is:global>
-      * { box-sizing: border-box; }
-      html, body { margin: 0; height: 100%; background: #0f0f11; overflow: hidden; }
-      body { font-family: ui-sans-serif, -apple-system, system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
-      #app { position: fixed; inset: 0; touch-action: none; }
-      canvas { display: block; touch-action: none; }
-
-      .pill {
-        background: rgba(0,0,0,.42); border: 1px solid rgba(255,255,255,.16);
-        -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff;
-      }
+      html, body { margin: 0; height: 100%; background: #111114; overflow: hidden; }
       #back {
-        position: fixed; top: max(14px, env(safe-area-inset-top)); left: 14px; z-index: 30;
-        display: inline-flex; align-items: center; height: 40px; padding: 0 14px;
-        font-size: 13px; text-decoration: none; border-radius: 999px;
+        position: fixed; top: max(14px, env(safe-area-inset-top)); left: 14px; z-index: 50;
+        display: inline-flex; align-items: center; height: 40px; padding: 0 14px; gap: 6px;
+        font: 500 13px ui-sans-serif, -apple-system, system-ui, sans-serif; color: #fff;
+        text-decoration: none; border-radius: 999px; background: rgba(0,0,0,.4);
+        border: 1px solid rgba(255,255,255,.18); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
       }
-      #back:active { background: rgba(0,0,0,.7); }
-
-      /* Bottom control bar — unified for desktop + mobile */
-      #ui {
-        position: fixed; left: 50%; transform: translateX(-50%);
-        bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px)); z-index: 25;
-        display: none; align-items: center; gap: 6px; padding: 6px; border-radius: 999px;
+      #gl-loading {
+        position: fixed; inset: 0; z-index: 60; display: grid; place-items: center;
+        background: #111114; color: rgba(255,255,255,.8); transition: opacity .5s ease;
+        font: 14px ui-sans-serif, -apple-system, system-ui, sans-serif;
       }
-      #ui button {
-        appearance: none; width: 52px; height: 52px; border: 0; border-radius: 50%;
-        background: transparent; color: #fff; font-size: 26px; line-height: 1; cursor: pointer;
+      #gl-loading .spin {
+        width: 30px; height: 30px; margin: 0 auto 14px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,.18); border-top-color: #fff; animation: glspin .8s linear infinite;
       }
-      #ui button:active { background: rgba(255,255,255,.14); }
-      #counter { min-width: 64px; text-align: center; font-size: 14px; font-variant-numeric: tabular-nums; color: rgba(255,255,255,.85); }
-
-      #hint {
-        position: fixed; left: 50%; transform: translateX(-50%);
-        bottom: max(86px, calc(env(safe-area-inset-bottom) + 78px)); z-index: 24;
-        font-size: 12.5px; color: rgba(255,255,255,.7); padding: 7px 14px; border-radius: 999px;
+      @keyframes glspin { to { transform: rotate(360deg); } }
+      #gl-hint {
+        position: fixed; left: 50%; transform: translateX(-50%); z-index: 45;
+        bottom: max(20px, calc(env(safe-area-inset-bottom) + 14px));
+        font: 12.5px ui-sans-serif, system-ui, sans-serif; color: rgba(255,255,255,.7);
+        padding: 8px 15px; border-radius: 999px; background: rgba(0,0,0,.4);
+        -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
         transition: opacity .6s ease; pointer-events: none; white-space: nowrap;
       }
-      [hidden] { display: none !important; }
-
-      #loading { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: #0f0f11; transition: opacity .4s ease; padding: 24px; }
-      #loading > div { width: min(78vw, 240px); text-align: center; }
-      #loading p { margin: 0 0 12px; font-size: 15px; color: rgba(255,255,255,.85); font-variant-numeric: tabular-nums; }
-      .bar { height: 3px; width: 100%; background: rgba(255,255,255,.16); border-radius: 999px; overflow: hidden; }
-      #bar-fill { height: 100%; width: 0; background: #fff; transition: width .25s ease; }
     </style>
   </head>
   <body>
-    <a id="back" href="/" class="pill">← Back</a>
-    <div id="app"></div>
+    <a id="back" href="/">← Back</a>
+    <div class="content"><canvas class="webgl"></canvas></div>
+    <div id="gl-hint">Scroll or swipe to move through the gallery</div>
+    <div id="gl-loading"><div><div class="spin"></div><p>Loading gallery…</p></div></div>
 
-    <div id="hint" class="pill" hidden>Swipe to look around · tap arrows to move</div>
-    <div id="ui" class="pill">
-      <button id="prev" type="button" aria-label="Previous photo">‹</button>
-      <span id="counter">1 / 1</span>
-      <button id="next" type="button" aria-label="Next photo">›</button>
-    </div>
-
-    <div id="loading">
-      <div>
-        <p id="loading-text">Loading 0%</p>
-        <div class="bar"><div id="bar-fill"></div></div>
-      </div>
-    </div>
-
-    <script type="application/json" id="gallery-images" set:html={JSON.stringify(images)}></script>
+    <script is:inline set:html={`window.__GALLERY_DATA__ = ${JSON.stringify(galleryData)};`}></script>
 
     <script>
-      import * as THREE from 'three';
+      import '@/css/base.css';
+      import '@/css/canvas.css';
+      import { Engine } from '@/Experience/Engine';
 
-      type Img = { src: string; ratio: number };
-      const images: Img[] = JSON.parse(document.getElementById('gallery-images')?.textContent || '[]');
-      const N = images.length;
+      const canvas = document.querySelector('.webgl');
+      const loading = document.getElementById('gl-loading');
+      const hint = document.getElementById('gl-hint');
+      const done = () => {
+        loading?.style.setProperty('opacity', '0');
+        setTimeout(() => loading?.remove(), 520);
+        setTimeout(() => hint?.style.setProperty('opacity', '0'), 3600);
+      };
 
-      const app = document.getElementById('app')!;
-      const loadingEl = document.getElementById('loading')!;
-      const loadingText = document.getElementById('loading-text')!;
-      const barFill = document.getElementById('bar-fill') as HTMLElement;
-      const ui = document.getElementById('ui') as HTMLElement;
-      const hintEl = document.getElementById('hint') as HTMLElement;
-      const counter = document.getElementById('counter')!;
-
-      // ---- Renderer / scene ----
-      let renderer: THREE.WebGLRenderer;
-      try {
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-      } catch (err) {
-        loadingText.textContent = "This browser couldn't start 3D (WebGL).";
-        throw err;
+      if (canvas instanceof HTMLCanvasElement) {
+        const engine = new Engine(canvas);
+        engine.init().then(done).catch((err) => {
+          console.error('Gallery init failed', err);
+          done();
+        });
       }
-      renderer.setSize(innerWidth, innerHeight);
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      app.appendChild(renderer.domElement);
-
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color('#0f0f11');
-      const EYE = 1.6;
-      const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.1, 200);
-
-      scene.add(new THREE.HemisphereLight('#ffffff', '#26262b', 1.0));
-      scene.add(new THREE.AmbientLight('#ffffff', 0.35));
-
-      // ---- Ring geometry ----
-      const step = N > 0 ? (Math.PI * 2) / N : Math.PI * 2;
-      const maxW = 3.0;
-      const R = Math.max(5, (maxW + 1.6) / (2 * Math.sin(Math.min(step, Math.PI) / 2)));
-      const VIEW = 3.6;
-      const CAMR = Math.max(1.2, R - VIEW);
-      const WALL_H = 4.2;
-
-      // Enclosing cylinder wall + floor for a sense of place (cheap)
-      const wall = new THREE.Mesh(
-        new THREE.CylinderGeometry(R + 0.6, R + 0.6, WALL_H, 64, 1, true),
-        new THREE.MeshStandardMaterial({ color: '#161619', roughness: 1, side: THREE.BackSide }),
-      );
-      wall.position.y = WALL_H / 2;
-      scene.add(wall);
-      const floor = new THREE.Mesh(
-        new THREE.CircleGeometry(R + 0.6, 64),
-        new THREE.MeshStandardMaterial({ color: '#202024', roughness: 0.95 }),
-      );
-      floor.rotation.x = -Math.PI / 2;
-      scene.add(floor);
-
-      // ---- Photos around the ring, facing the centre ----
-      const manager = new THREE.LoadingManager();
-      const loader = new THREE.TextureLoader(manager);
-      const frameMat = new THREE.MeshStandardMaterial({ color: '#0a0a0b', roughness: 0.5 });
-
-      images.forEach((img, i) => {
-        const a = i * step;
-        const px = R * Math.sin(a);
-        const pz = -R * Math.cos(a);
-        const h = 2.0;
-        const w = Math.min(h * img.ratio, maxW);
-
-        const tex = loader.load(img.src);
-        tex.colorSpace = THREE.SRGBColorSpace;
-        const art = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
-        const frame = new THREE.Mesh(new THREE.PlaneGeometry(w + 0.16, h + 0.16), frameMat);
-        [frame, art].forEach((m) => { m.position.set(px, EYE, pz); m.lookAt(0, EYE, 0); });
-        // nudge art slightly toward centre so it sits in front of the frame
-        art.position.add(new THREE.Vector3(-Math.sin(a), 0, Math.cos(a)).multiplyScalar(0.02));
-        scene.add(frame, art);
-
-        const spot = new THREE.PointLight('#fff6e6', 7, 7, 2);
-        spot.position.set(px * 0.78, WALL_H - 0.5, pz * 0.78);
-        scene.add(spot);
-      });
-
-      // ---- Guided navigation: stand inside, turn/step around the ring ----
-      let index = 0;            // target photo (can grow/shrink; wrap only for display)
-      let targetAng = 0;        // index * step
-      let camAng = 0;           // eased current angle
-      const place = () => {
-        camera.position.set(CAMR * Math.sin(camAng), EYE, -CAMR * Math.cos(camAng));
-        camera.lookAt(R * Math.sin(camAng), EYE, -R * Math.cos(camAng));
-      };
-      const updateCounter = () => {
-        const d = N > 0 ? (((index % N) + N) % N) + 1 : 0;
-        counter.textContent = `${d} / ${N}`;
-      };
-      const go = (delta: number) => { index += delta; targetAng = index * step; updateCounter(); };
-      document.getElementById('next')!.addEventListener('click', () => go(1));
-      document.getElementById('prev')!.addEventListener('click', () => go(-1));
-      addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') go(1);
-        else if (e.key === 'ArrowLeft') go(-1);
-      });
-
-      // Drag / swipe to turn (unified pointer events = desktop + touch)
-      let dragging = false, startX = 0, startAng = 0, moved = 0;
-      const ray = new THREE.Raycaster();
-      app.addEventListener('pointerdown', (e) => {
-        dragging = true; moved = 0; startX = e.clientX; startAng = camAng;
-        (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-      });
-      addEventListener('pointermove', (e) => {
-        if (!dragging) return;
-        const dx = e.clientX - startX;
-        moved = Math.max(moved, Math.abs(dx));
-        camAng = startAng - dx * 0.006;
-      });
-      addEventListener('pointerup', (e) => {
-        if (!dragging) return;
-        dragging = false;
-        if (moved < 6) {
-          // tap → focus the photo under the cursor
-          const nx = (e.clientX / innerWidth) * 2 - 1;
-          const ny = -(e.clientY / innerHeight) * 2 + 1;
-          ray.setFromCamera(new THREE.Vector2(nx, ny), camera);
-          const hit = ray.intersectObjects(scene.children).find((h) => (h.object as any).material?.map);
-          if (hit) {
-            const a = Math.atan2(hit.object.position.x, -hit.object.position.z);
-            index = Math.round((camAng - a) / (Math.PI * 2)) * N + Math.round(a / step);
-          }
-        } else {
-          index = Math.round(camAng / step); // snap to nearest photo
-        }
-        targetAng = index * step;
-        updateCounter();
-      });
-
-      // ---- Loading UX ----
-      let revealed = false;
-      const reveal = () => {
-        if (revealed) return;
-        revealed = true;
-        barFill.style.width = '100%';
-        loadingEl.style.opacity = '0';
-        setTimeout(() => (loadingEl.hidden = true), 420);
-        if (N > 1) {
-          ui.style.display = 'flex';
-          hintEl.hidden = false;
-          setTimeout(() => (hintEl.style.opacity = '0'), 3200);
-        }
-      };
-      manager.onProgress = (_u, loaded, total) => {
-        const pct = Math.round((loaded / total) * 100);
-        loadingText.textContent = `Loading ${pct}%`;
-        barFill.style.width = pct + '%';
-      };
-      manager.onLoad = reveal;
-      manager.onError = (url) => console.warn('Image failed to load:', url);
-      setTimeout(reveal, 6000);
-      if (N === 0) reveal();
-
-      updateCounter();
-
-      // ---- Loop ----
-      function animate() {
-        requestAnimationFrame(animate);
-        if (!dragging) camAng += (targetAng - camAng) * 0.1;
-        place();
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      addEventListener('resize', () => {
-        camera.aspect = innerWidth / innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(innerWidth, innerHeight);
-      });
     </script>
   </body>
 </html>

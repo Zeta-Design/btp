@@ -38,6 +38,12 @@ importers:
       three:
         specifier: ^0.184.0
         version: 0.184.0
+      tweakpane:
+        specifier: ^4.0.5
+        version: 4.0.5
+      vite-plugin-glsl:
+        specifier: ^1.6.0
+        version: 1.6.0(@rollup/pluginutils@5.4.0(rollup@4.61.1))(esbuild@0.27.7)(vite@6.4.3(@types/node@24.13.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0))
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.4
@@ -2062,6 +2068,9 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
+  tweakpane@4.0.5:
+    resolution: {integrity: sha512-rxEXdSI+ArlG1RyO6FghC4ZUX8JkEfz8F3v1JuteXSV0pEtHJzyo07fcDG+NsJfN5L39kSbCYbB9cBGHyuI/tQ==}
+
   type-fest@4.41.0:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
@@ -2195,6 +2204,19 @@ packages:
 
   vfile@6.0.3:
     resolution: {integrity: sha512-KzIbH/9tXat2u30jf+smMwFCsno4wHVdNmzFyL+T/L3UGqqk6JKfVqOFOZEpZSHADH1k40ab6NUIXZq422ov3Q==}
+
+  vite-plugin-glsl@1.6.0:
+    resolution: {integrity: sha512-3i3ZvIVb13LhTcAXEHGTOW+cNG2jbJ++XsDFyCWUpnoFN1NPXvdtC4j66pig+i0QjDnmusOK/YCpiDWizxBY0A==}
+    engines: {node: '>= 20.17.0', npm: '>= 10.8.3'}
+    peerDependencies:
+      '@rollup/pluginutils': ^5.x
+      esbuild: '>= 0.25'
+      vite: '>= 3.x'
+    peerDependenciesMeta:
+      '@rollup/pluginutils':
+        optional: true
+      esbuild:
+        optional: true
 
   vite@6.4.3:
     resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
@@ -4802,6 +4824,8 @@ snapshots:
   tslib@2.8.1:
     optional: true
 
+  tweakpane@4.0.5: {}
+
   type-fest@4.41.0: {}
 
   typesafe-path@0.2.2: {}
@@ -4907,6 +4931,13 @@ snapshots:
     dependencies:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
+
+  vite-plugin-glsl@1.6.0(@rollup/pluginutils@5.4.0(rollup@4.61.1))(esbuild@0.27.7)(vite@6.4.3(@types/node@24.13.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0)):
+    dependencies:
+      vite: 6.4.3(@types/node@24.13.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0)
+    optionalDependencies:
+      '@rollup/pluginutils': 5.4.0(rollup@4.61.1)
+      esbuild: 0.27.7
 
   vite@6.4.3(@types/node@24.13.0)(jiti@2.7.0)(lightningcss@1.32.0)(yaml@2.9.0):
     dependencies:

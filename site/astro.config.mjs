@@ -1,8 +1,10 @@
 // @ts-check
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import tailwindcss from '@tailwindcss/vite';
+import glsl from 'vite-plugin-glsl';
 
 // Each deployed domain sets its own SITE_URL (used for canonical URLs, sitemap,
 // and RSS) and PUBLIC_BRAND (selects which brand in src/config/site.ts to render).
@@ -29,7 +31,11 @@ export default defineConfig({
   site,
   integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/gallery-lab') })],
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), glsl()],
+    resolve: {
+      // `@` → src, used by the vendored depth-gallery engine (src/Experience/*)
+      alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+    },
   },
   image: {
     // Astro uses sharp by default. Prefer modern formats for photos.
