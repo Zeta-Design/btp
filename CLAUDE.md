@@ -14,12 +14,15 @@ Project guide for working in this repo. Read before making changes.
 - `.claude/skills/ui-ux-pro-max/` — vendored UI/UX design skill (MIT).
 
 ## Working rules (important)
-- **NEVER `git push` / deploy without the user explicitly saying so.** Vercel auto-deploys
-  on push to `main` and the project has a **100 deploys/day** cap. Committing locally is fine.
-- **Research errors before fixing them** (web-search the exact error), then verify the fix
-  locally (clean `node_modules` + frozen install + build) before pushing.
-- Branch off `main` for larger features; end commit messages with the
-  `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` trailer.
+1. **RESEARCH BEFORE CHANGING CODE TO FIX AN ERROR.** Web-search the exact error message +
+   the tool/stack first, and apply the **documented/canonical** fix — do **not** guess-and-edit.
+   Then **verify locally before pushing** with a clean reproduction (from `site/`):
+   `rm -rf node_modules && pnpm install --frozen-lockfile && pnpm build`. Guessing here already
+   caused several failed Vercel deploys (e.g. the `tslib` issue) — research first avoids that.
+2. **NEVER `git push` / deploy without the user explicitly saying so.** Vercel auto-deploys on
+   push to `main` and the project has a **100 deploys/day** cap. Committing locally is fine.
+3. Branch off `main` for larger features; end commit messages with the
+   `Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>` trailer.
 
 ## Stack
 - **Astro 5** (static-first) + **Tailwind v4** (`@tailwindcss/vite`), self-hosted **Inter**
@@ -61,7 +64,10 @@ Project guide for working in this repo. Read before making changes.
 - `docs/plans/google-business-profile-setup.md` — local SEO / GBP.
 - `docs/plans/photography-pricing-notes.md` — captured pricing (not validated).
 - `docs/plans/future-categories-roadmap.md` — parked service categories.
+- `docs/plans/starting-a-photography-business.md` — evidence-based new-photographer plan
+  (styled HTML/PDF export in `docs/exports/`).
 - `docs/research/photography-crm-selection.md` — CRM (Dubsado) research.
+- `docs/decisions/` — decision records (currently empty).
 
 ## Commands (run from `site/`)
 - `pnpm dev` (localhost:4321) · `pnpm build` · `pnpm preview`.
