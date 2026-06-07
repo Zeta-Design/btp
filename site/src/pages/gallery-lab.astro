@@ -2,8 +2,6 @@
 import { getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 
-// Reuse the same portfolio photos, optimized to webp via astro:assets.
-// Smaller width here (wall art) = faster texture loads.
 const mods = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/portfolio/*.{jpg,jpeg,png,webp}',
   { eager: true },
@@ -13,7 +11,7 @@ const metas = Object.keys(mods)
   .map((k) => mods[k].default);
 const images = await Promise.all(
   metas.map(async (m) => {
-    const img = await getImage({ src: m, format: 'webp', width: 800 });
+    const img = await getImage({ src: m, format: 'webp', width: 900 });
     return { src: img.src, ratio: m.width / m.height };
   }),
 );
@@ -27,133 +25,90 @@ const images = await Promise.all(
     <title>3D Gallery (experiment) · Ben Tims Media</title>
     <style is:global>
       * { box-sizing: border-box; }
-      html, body { margin: 0; height: 100%; background: #141416; overflow: hidden; }
-      body {
-        font-family: ui-sans-serif, -apple-system, system-ui, sans-serif;
-        color: #fff; -webkit-font-smoothing: antialiased;
-      }
-      #app { position: fixed; inset: 0; }
-      canvas { display: block; }
+      html, body { margin: 0; height: 100%; background: #0f0f11; overflow: hidden; }
+      body { font-family: ui-sans-serif, -apple-system, system-ui, sans-serif; color: #fff; -webkit-font-smoothing: antialiased; }
+      #app { position: fixed; inset: 0; touch-action: none; }
+      canvas { display: block; touch-action: none; }
 
-      /* Minimal back control */
+      .pill {
+        background: rgba(0,0,0,.42); border: 1px solid rgba(255,255,255,.16);
+        -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: #fff;
+      }
       #back {
         position: fixed; top: max(14px, env(safe-area-inset-top)); left: 14px; z-index: 30;
-        display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px;
-        font-size: 13px; color: #fff; text-decoration: none;
-        background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.18);
-        border-radius: 999px; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+        display: inline-flex; align-items: center; height: 40px; padding: 0 14px;
+        font-size: 13px; text-decoration: none; border-radius: 999px;
       }
-      #back:active { background: rgba(0,0,0,.65); }
+      #back:active { background: rgba(0,0,0,.7); }
 
-      #crosshair {
-        position: fixed; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px;
-        border-radius: 50%; background: rgba(255,255,255,.85); z-index: 10; pointer-events: none; display: none;
+      /* Bottom control bar — unified for desktop + mobile */
+      #ui {
+        position: fixed; left: 50%; transform: translateX(-50%);
+        bottom: max(20px, calc(env(safe-area-inset-bottom) + 12px)); z-index: 25;
+        display: none; align-items: center; gap: 6px; padding: 6px; border-radius: 999px;
       }
+      #ui button {
+        appearance: none; width: 52px; height: 52px; border: 0; border-radius: 50%;
+        background: transparent; color: #fff; font-size: 26px; line-height: 1; cursor: pointer;
+      }
+      #ui button:active { background: rgba(255,255,255,.14); }
+      #counter { min-width: 64px; text-align: center; font-size: 14px; font-variant-numeric: tabular-nums; color: rgba(255,255,255,.85); }
 
-      /* Loading + start share one centered, uncluttered layer */
-      .layer {
-        position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
-        background: rgba(20,20,22,.9); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
-        padding: 24px; text-align: center; transition: opacity .4s ease;
+      #hint {
+        position: fixed; left: 50%; transform: translateX(-50%);
+        bottom: max(86px, calc(env(safe-area-inset-bottom) + 78px)); z-index: 24;
+        font-size: 12.5px; color: rgba(255,255,255,.7); padding: 7px 14px; border-radius: 999px;
+        transition: opacity .6s ease; pointer-events: none; white-space: nowrap;
       }
-      .layer[hidden] { display: none; }
-      .spinner {
-        width: 34px; height: 34px; border-radius: 50%;
-        border: 2px solid rgba(255,255,255,.18); border-top-color: #fff;
-        animation: spin .8s linear infinite; margin: 0 auto 16px;
-      }
-      @keyframes spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
+      [hidden] { display: none !important; }
+
+      #loading { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; background: #0f0f11; transition: opacity .4s ease; padding: 24px; }
+      #loading > div { width: min(78vw, 240px); text-align: center; }
       #loading p { margin: 0 0 12px; font-size: 15px; color: rgba(255,255,255,.85); font-variant-numeric: tabular-nums; }
       .bar { height: 3px; width: 100%; background: rgba(255,255,255,.16); border-radius: 999px; overflow: hidden; }
       #bar-fill { height: 100%; width: 0; background: #fff; transition: width .25s ease; }
-
-      #start .enter {
-        appearance: none; min-height: 50px; padding: 0 30px; font-size: 15px; font-weight: 500;
-        color: #141416; background: #fff; border: 0; border-radius: 999px; cursor: pointer;
-      }
-      #start .enter:active { background: #d8d8d8; }
-      #start .hint { margin: 16px 0 0; font-size: 12.5px; line-height: 1.5; color: rgba(255,255,255,.55); }
-
-      /* Mobile drag hint — auto-fades */
-      #touchhint {
-        position: fixed; left: 50%; bottom: max(22px, env(safe-area-inset-bottom)); transform: translateX(-50%);
-        z-index: 15; font-size: 13px; color: #fff; padding: 9px 16px; border-radius: 999px;
-        background: rgba(0,0,0,.45); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-        transition: opacity .6s ease; pointer-events: none;
-      }
-      #touchhint[hidden] { display: none; }
     </style>
   </head>
   <body>
-    <a id="back" href="/">← Back</a>
+    <a id="back" href="/" class="pill">← Back</a>
     <div id="app"></div>
-    <div id="crosshair"></div>
 
-    <div id="loading" class="layer">
-      <div style="width: min(78vw, 260px)">
+    <div id="hint" class="pill" hidden>Swipe to look around · tap arrows to move</div>
+    <div id="ui" class="pill">
+      <button id="prev" type="button" aria-label="Previous photo">‹</button>
+      <span id="counter">1 / 1</span>
+      <button id="next" type="button" aria-label="Next photo">›</button>
+    </div>
+
+    <div id="loading">
+      <div>
         <p id="loading-text">Loading 0%</p>
         <div class="bar"><div id="bar-fill"></div></div>
       </div>
     </div>
 
-    <div id="start" class="layer" hidden>
-      <div>
-        <button class="enter" type="button">Enter gallery</button>
-        <p class="hint">WASD to move · mouse to look · Esc to exit</p>
-      </div>
-    </div>
-
-    <div id="touchhint" hidden>Drag to explore</div>
-
     <script type="application/json" id="gallery-images" set:html={JSON.stringify(images)}></script>
 
     <script>
       import * as THREE from 'three';
-      import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
-      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
       type Img = { src: string; ratio: number };
-      const images: Img[] = JSON.parse(
-        document.getElementById('gallery-images')?.textContent || '[]',
-      );
+      const images: Img[] = JSON.parse(document.getElementById('gallery-images')?.textContent || '[]');
+      const N = images.length;
 
-      const isTouch = window.matchMedia('(pointer: coarse)').matches;
       const app = document.getElementById('app')!;
       const loadingEl = document.getElementById('loading')!;
       const loadingText = document.getElementById('loading-text')!;
       const barFill = document.getElementById('bar-fill') as HTMLElement;
-      const startEl = document.getElementById('start')!;
-      const touchHint = document.getElementById('touchhint')!;
-      const crosshair = document.getElementById('crosshair')!;
+      const ui = document.getElementById('ui') as HTMLElement;
+      const hintEl = document.getElementById('hint') as HTMLElement;
+      const counter = document.getElementById('counter')!;
 
-      const fadeOut = (el: HTMLElement) => {
-        el.style.opacity = '0';
-        setTimeout(() => (el.hidden = true), 420);
-      };
-
-      // ---- Scene ----
-      const HALL_W = 9;
-      const WALL_H = 3.6;
-      const SPACING = 5;
-      const EYE = 1.65;
-      const rows = Math.max(1, Math.ceil(images.length / 2));
-      const HALL_LEN = rows * SPACING + SPACING;
-      const midZ = -HALL_LEN / 2 + SPACING / 2;
-
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color('#141416');
-      scene.fog = new THREE.Fog('#141416', 14, HALL_LEN + 14);
-
-      const camera = new THREE.PerspectiveCamera(70, innerWidth / innerHeight, 0.1, 200);
-      camera.position.set(0, EYE, SPACING - 1);
-      scene.add(camera);
-
+      // ---- Renderer / scene ----
       let renderer: THREE.WebGLRenderer;
       try {
         renderer = new THREE.WebGLRenderer({ antialias: true });
       } catch (err) {
-        document.querySelector('#loading .spinner')?.remove();
         loadingText.textContent = "This browser couldn't start 3D (WebGL).";
         throw err;
       }
@@ -161,97 +116,127 @@ const images = await Promise.all(
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       app.appendChild(renderer.domElement);
 
-      scene.add(new THREE.HemisphereLight('#ffffff', '#3a3a40', 1.1));
-      scene.add(new THREE.AmbientLight('#ffffff', 0.4));
-      const key = new THREE.DirectionalLight('#ffffff', 0.5);
-      key.position.set(3, 8, 4);
-      scene.add(key);
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#0f0f11');
+      const EYE = 1.6;
+      const camera = new THREE.PerspectiveCamera(58, innerWidth / innerHeight, 0.1, 200);
 
-      // ---- Room ----
-      const floorMat = new THREE.MeshStandardMaterial({ color: '#2a2a2e', roughness: 0.9 });
-      const wallMat = new THREE.MeshStandardMaterial({ color: '#1c1c1f', roughness: 1 });
-      const floor = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, HALL_LEN + SPACING), floorMat);
-      floor.rotation.x = -Math.PI / 2; floor.position.z = midZ; scene.add(floor);
-      const ceil = new THREE.Mesh(new THREE.PlaneGeometry(HALL_W, HALL_LEN + SPACING), wallMat);
-      ceil.rotation.x = Math.PI / 2; ceil.position.set(0, WALL_H, midZ); scene.add(ceil);
-      const sideGeo = new THREE.PlaneGeometry(HALL_LEN + SPACING, WALL_H);
-      const left = new THREE.Mesh(sideGeo, wallMat);
-      left.rotation.y = Math.PI / 2; left.position.set(-HALL_W / 2, WALL_H / 2, midZ); scene.add(left);
-      const right = new THREE.Mesh(sideGeo, wallMat);
-      right.rotation.y = -Math.PI / 2; right.position.set(HALL_W / 2, WALL_H / 2, midZ); scene.add(right);
-      const endGeo = new THREE.PlaneGeometry(HALL_W, WALL_H);
-      const front = new THREE.Mesh(endGeo, wallMat);
-      front.position.set(0, WALL_H / 2, SPACING); front.rotation.y = Math.PI; scene.add(front);
-      const back = new THREE.Mesh(endGeo, wallMat);
-      back.position.set(0, WALL_H / 2, -HALL_LEN); scene.add(back);
+      scene.add(new THREE.HemisphereLight('#ffffff', '#26262b', 1.0));
+      scene.add(new THREE.AmbientLight('#ffffff', 0.35));
 
-      // ---- Artwork (tracked by a LoadingManager for real progress) ----
+      // ---- Ring geometry ----
+      const step = N > 0 ? (Math.PI * 2) / N : Math.PI * 2;
+      const maxW = 3.0;
+      const R = Math.max(5, (maxW + 1.6) / (2 * Math.sin(Math.min(step, Math.PI) / 2)));
+      const VIEW = 3.6;
+      const CAMR = Math.max(1.2, R - VIEW);
+      const WALL_H = 4.2;
+
+      // Enclosing cylinder wall + floor for a sense of place (cheap)
+      const wall = new THREE.Mesh(
+        new THREE.CylinderGeometry(R + 0.6, R + 0.6, WALL_H, 64, 1, true),
+        new THREE.MeshStandardMaterial({ color: '#161619', roughness: 1, side: THREE.BackSide }),
+      );
+      wall.position.y = WALL_H / 2;
+      scene.add(wall);
+      const floor = new THREE.Mesh(
+        new THREE.CircleGeometry(R + 0.6, 64),
+        new THREE.MeshStandardMaterial({ color: '#202024', roughness: 0.95 }),
+      );
+      floor.rotation.x = -Math.PI / 2;
+      scene.add(floor);
+
+      // ---- Photos around the ring, facing the centre ----
       const manager = new THREE.LoadingManager();
       const loader = new THREE.TextureLoader(manager);
-      const frameMat = new THREE.MeshStandardMaterial({ color: '#0a0a0b', roughness: 0.6 });
+      const frameMat = new THREE.MeshStandardMaterial({ color: '#0a0a0b', roughness: 0.5 });
 
       images.forEach((img, i) => {
-        const row = Math.floor(i / 2);
-        const onLeft = i % 2 === 0;
-        const z = -(SPACING * (row + 1));
-        const h = 1.9;
-        const w = Math.min(h * img.ratio, 3.2);
+        const a = i * step;
+        const px = R * Math.sin(a);
+        const pz = -R * Math.cos(a);
+        const h = 2.0;
+        const w = Math.min(h * img.ratio, maxW);
+
         const tex = loader.load(img.src);
         tex.colorSpace = THREE.SRGBColorSpace;
         const art = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: tex }));
-        const frame = new THREE.Mesh(new THREE.PlaneGeometry(w + 0.14, h + 0.14), frameMat);
-        const x = onLeft ? -HALL_W / 2 + 0.06 : HALL_W / 2 - 0.06;
-        const ry = onLeft ? Math.PI / 2 : -Math.PI / 2;
-        [art, frame].forEach((m) => { m.position.set(x, EYE, z); m.rotation.y = ry; });
-        art.position.x += onLeft ? 0.02 : -0.02;
+        const frame = new THREE.Mesh(new THREE.PlaneGeometry(w + 0.16, h + 0.16), frameMat);
+        [frame, art].forEach((m) => { m.position.set(px, EYE, pz); m.lookAt(0, EYE, 0); });
+        // nudge art slightly toward centre so it sits in front of the frame
+        art.position.add(new THREE.Vector3(-Math.sin(a), 0, Math.cos(a)).multiplyScalar(0.02));
         scene.add(frame, art);
-        const spot = new THREE.PointLight('#fff7e8', 6, 6, 2);
-        spot.position.set(onLeft ? x + 1.2 : x - 1.2, WALL_H - 0.4, z);
+
+        const spot = new THREE.PointLight('#fff6e6', 7, 7, 2);
+        spot.position.set(px * 0.78, WALL_H - 0.5, pz * 0.78);
         scene.add(spot);
       });
 
-      // ---- Controls ----
-      const minX = -HALL_W / 2 + 0.7, maxX = HALL_W / 2 - 0.7;
-      const minZ = -HALL_LEN + 0.7, maxZ = SPACING - 0.7;
-      const clamp = () => {
-        camera.position.x = Math.min(maxX, Math.max(minX, camera.position.x));
-        camera.position.z = Math.min(maxZ, Math.max(minZ, camera.position.z));
-        camera.position.y = EYE;
+      // ---- Guided navigation: stand inside, turn/step around the ring ----
+      let index = 0;            // target photo (can grow/shrink; wrap only for display)
+      let targetAng = 0;        // index * step
+      let camAng = 0;           // eased current angle
+      const place = () => {
+        camera.position.set(CAMR * Math.sin(camAng), EYE, -CAMR * Math.cos(camAng));
+        camera.lookAt(R * Math.sin(camAng), EYE, -R * Math.cos(camAng));
       };
+      const updateCounter = () => {
+        const d = N > 0 ? (((index % N) + N) % N) + 1 : 0;
+        counter.textContent = `${d} / ${N}`;
+      };
+      const go = (delta: number) => { index += delta; targetAng = index * step; updateCounter(); };
+      document.getElementById('next')!.addEventListener('click', () => go(1));
+      document.getElementById('prev')!.addEventListener('click', () => go(-1));
+      addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') go(1);
+        else if (e.key === 'ArrowLeft') go(-1);
+      });
 
-      let orbit: OrbitControls | null = null;
-      let lock: PointerLockControls | null = null;
-      const keys: Record<string, boolean> = {};
+      // Drag / swipe to turn (unified pointer events = desktop + touch)
+      let dragging = false, startX = 0, startAng = 0, moved = 0;
+      const ray = new THREE.Raycaster();
+      app.addEventListener('pointerdown', (e) => {
+        dragging = true; moved = 0; startX = e.clientX; startAng = camAng;
+        (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+      });
+      addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        moved = Math.max(moved, Math.abs(dx));
+        camAng = startAng - dx * 0.006;
+      });
+      addEventListener('pointerup', (e) => {
+        if (!dragging) return;
+        dragging = false;
+        if (moved < 6) {
+          // tap → focus the photo under the cursor
+          const nx = (e.clientX / innerWidth) * 2 - 1;
+          const ny = -(e.clientY / innerHeight) * 2 + 1;
+          ray.setFromCamera(new THREE.Vector2(nx, ny), camera);
+          const hit = ray.intersectObjects(scene.children).find((h) => (h.object as any).material?.map);
+          if (hit) {
+            const a = Math.atan2(hit.object.position.x, -hit.object.position.z);
+            index = Math.round((camAng - a) / (Math.PI * 2)) * N + Math.round(a / step);
+          }
+        } else {
+          index = Math.round(camAng / step); // snap to nearest photo
+        }
+        targetAng = index * step;
+        updateCounter();
+      });
 
-      if (isTouch) {
-        orbit = new OrbitControls(camera, renderer.domElement);
-        orbit.target.set(0, EYE, midZ);
-        orbit.enableDamping = true;
-        orbit.minDistance = 1; orbit.maxDistance = HALL_LEN;
-        orbit.maxPolarAngle = Math.PI * 0.52;
-        camera.position.set(0, EYE + 0.3, SPACING - 0.5);
-      } else {
-        crosshair.style.display = 'block';
-        lock = new PointerLockControls(camera, document.body);
-        document.querySelector('#start .enter')!.addEventListener('click', () => lock!.lock());
-        lock.addEventListener('lock', () => fadeOut(startEl));
-        lock.addEventListener('unlock', () => { startEl.hidden = false; startEl.style.opacity = '1'; });
-        addEventListener('keydown', (e) => (keys[e.code] = true));
-        addEventListener('keyup', (e) => (keys[e.code] = false));
-      }
-
-      // ---- Loading UX: reveal when ready, but NEVER hang ----
+      // ---- Loading UX ----
       let revealed = false;
       const reveal = () => {
         if (revealed) return;
         revealed = true;
         barFill.style.width = '100%';
-        fadeOut(loadingEl);
-        if (isTouch) {
-          touchHint.hidden = false;
-          setTimeout(() => fadeOut(touchHint), 2600);
-        } else {
-          startEl.hidden = false;
+        loadingEl.style.opacity = '0';
+        setTimeout(() => (loadingEl.hidden = true), 420);
+        if (N > 1) {
+          ui.style.display = 'flex';
+          hintEl.hidden = false;
+          setTimeout(() => (hintEl.style.opacity = '0'), 3200);
         }
       };
       manager.onProgress = (_u, loaded, total) => {
@@ -260,27 +245,17 @@ const images = await Promise.all(
         barFill.style.width = pct + '%';
       };
       manager.onLoad = reveal;
-      // A failed texture must not block the gallery (this was the Safari hang).
       manager.onError = (url) => console.warn('Image failed to load:', url);
-      // Safety net: reveal after 6s no matter what; late textures just pop in.
       setTimeout(reveal, 6000);
-      if (images.length === 0) reveal();
+      if (N === 0) reveal();
 
-      // ---- Loop (room renders immediately behind the loader) ----
-      const clock = new THREE.Clock();
+      updateCounter();
+
+      // ---- Loop ----
       function animate() {
         requestAnimationFrame(animate);
-        const dt = Math.min(clock.getDelta(), 0.1);
-        if (lock && lock.isLocked) {
-          const run = keys['ShiftLeft'] || keys['ShiftRight'] ? 2 : 1;
-          const speed = 3.4 * run * dt;
-          const fwd = (keys['KeyW'] || keys['ArrowUp'] ? 1 : 0) - (keys['KeyS'] || keys['ArrowDown'] ? 1 : 0);
-          const side = (keys['KeyD'] || keys['ArrowRight'] ? 1 : 0) - (keys['KeyA'] || keys['ArrowLeft'] ? 1 : 0);
-          if (fwd) lock.moveForward(fwd * speed);
-          if (side) lock.moveRight(side * speed);
-          clamp();
-        }
-        orbit?.update();
+        if (!dragging) camAng += (targetAng - camAng) * 0.1;
+        place();
         renderer.render(scene, camera);
       }
       animate();
