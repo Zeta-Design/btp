@@ -1,6 +1,5 @@
 // @ts-check
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
@@ -30,8 +29,6 @@ function resolveSite(raw) {
 }
 const site = resolveSite(process.env.SITE_URL);
 
-const require = createRequire(import.meta.url);
-
 // https://astro.build/config
 export default defineConfig({
   site,
@@ -49,13 +46,8 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss(), glsl()],
     resolve: {
-      alias: {
-        // `@` → src, used by the vendored depth-gallery engine (src/Experience/*)
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
-        // graphql-tag (via Keystatic) imports "tslib"; pnpm's strict, un-hoisted
-        // layout on Vercel can't resolve it from inside the package. Pin the path.
-        tslib: require.resolve('tslib'),
-      },
+      // `@` → src, used by the vendored depth-gallery engine (src/Experience/*)
+      alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
     },
   },
   image: {
