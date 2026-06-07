@@ -1,7 +1,11 @@
 # Writing Blog Posts (Journal)
 
-How the blog works today. Posts are **Markdown files** — no database. You add a
-file, and you get a fully SEO-optimized page automatically.
+**Easiest way:** write posts in the **admin** at `/admin` → **Blog posts** (no files,
+no Git). This guide covers the file-based way, which still works and is what the admin
+reads/writes underneath.
+
+Posts are **Markdown/MDX files** — no database. You add a file (or use the admin), and
+you get a fully SEO-optimized page automatically.
 
 > ⚠️ **Don't** put this file (or any non-post `.md`) inside `src/content/blog/` —
 > everything in that folder is treated as a blog post. That's why this guide lives

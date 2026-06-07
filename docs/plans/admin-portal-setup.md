@@ -8,8 +8,9 @@
 
 - A private admin at **`/admin`** (redirects to `/keystatic`) — **noindex**, blocked in
   `robots.txt`, and **not linked anywhere** on the site.
-- Manage **portfolio photos**: upload / remove / reorder. Saving **commits to GitHub**,
-  which redeploys the site. New photos are auto-optimized (AVIF/WebP) like the rest.
+- Manage **gallery photos** (upload / remove / reorder) **and blog posts** (write /
+  edit / draft). Saving **commits to GitHub**, which redeploys the site. New photos
+  are auto-optimized (AVIF/WebP); posts are stored as `.mdx` in `src/content/blog/`.
 - **Sign in with GitHub.** Editors = anyone with **write access** to `Zeta-Design/btp`.
 - Admin-managed photos live in `site/src/assets/gallery/`. Until you add any there, the
   site keeps showing the existing `site/src/assets/portfolio/` set (nothing is lost).
