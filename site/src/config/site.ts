@@ -41,7 +41,7 @@ export const BRANDS: Record<string, Brand> = {
     tagline: 'Real estate & short-term rental photography in Austin.',
     email: 'info@bentims.com',
     social: [
-      { label: 'Instagram', href: 'https://www.instagram.com/thebtphotography/' },
+      { label: 'IG', href: 'https://www.instagram.com/thebtphotography/' },
       { label: 'VSCO', href: 'https://vsco.co/benjammin-visuals/gallery' },
     ],
     location: { locality: 'Georgetown', region: 'TX', postalCode: '78628', country: 'US' },
