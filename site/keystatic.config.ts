@@ -40,12 +40,13 @@ export default config({
         draft: fields.checkbox({ label: 'Draft (hidden from the site)', defaultValue: false }),
         content: fields.mdx({
           label: 'Content',
-          // Inline images you drop into a post are saved here and referenced with a
-          // /src/ path so Astro optimizes them (AVIF/WebP) at build.
+          // Inline images dropped into a post are saved to public/blog-images and
+          // referenced by a public URL, so they always display on the live site.
+          // (Served as-is, not astro:assets-optimized — keep uploads reasonably sized.)
           options: {
             image: {
-              directory: 'site/src/assets/blog',
-              publicPath: '/src/assets/blog/',
+              directory: 'site/public/blog-images',
+              publicPath: '/blog-images/',
             },
           },
         }),
@@ -59,17 +60,27 @@ export default config({
       format: { data: 'json' },
       schema: {
         images: fields.array(
-          fields.image({
-            label: 'Photo',
-            directory: 'site/src/assets/gallery',
-            publicPath: '/src/assets/gallery/',
-            validation: { isRequired: true },
+          fields.object({
+            image: fields.image({
+              label: 'Photo',
+              directory: 'site/src/assets/gallery',
+              publicPath: '/src/assets/gallery/',
+              validation: { isRequired: true },
+            }),
+            label: fields.text({
+              label: 'Label',
+              description:
+                'Short caption / alt text (e.g. "Sunlit kitchen"). Shows in this list and as the image alt text on the site.',
+            }),
           }),
           {
             label: 'Photos',
-            itemLabel: (props) => props.value ?? 'Photo',
+            // Use the editable label as the list item title (always a string, so it
+            // never tries to render the image object — which caused React #31).
+            itemLabel: (props) => props.fields.label.value || 'Photo',
           },
         ),
+
       },
     }),
   },

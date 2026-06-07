@@ -7,6 +7,7 @@ import { SITE } from '../config/site';
 // Images come from the /admin-managed gallery (falls back to the original set).
 import { portfolio } from '../lib/portfolio';
 const metas = portfolio.map((e) => e.meta);
+const alts = portfolio.map((e) => e.alt);
 
 // Larger versions for the click-to-zoom lightbox.
 const full = await Promise.all(
@@ -34,7 +35,7 @@ const fullUrls = full.map((f) => f.src);
           >
             <Image
               src={m}
-              alt=""
+              alt={alts[i]}
               widths={[400, 800]}
               sizes="(max-width: 640px) 50vw, 33vw"
               format="webp"
@@ -64,10 +65,14 @@ const fullUrls = full.map((f) => f.src);
   </div>
 
   <script type="application/json" id="gallery-full" set:html={JSON.stringify(fullUrls)}></script>
+  <script type="application/json" id="gallery-alts" set:html={JSON.stringify(alts)}></script>
 
   <script>
     const fulls: string[] = JSON.parse(
       document.getElementById('gallery-full')?.textContent || '[]',
+    );
+    const alts: string[] = JSON.parse(
+      document.getElementById('gallery-alts')?.textContent || '[]',
     );
     const lb = document.getElementById('lightbox') as HTMLElement;
     const lbImg = document.getElementById('lb-img') as HTMLImageElement;
@@ -76,6 +81,7 @@ const fullUrls = full.map((f) => f.src);
     const show = (i: number) => {
       idx = (i + fulls.length) % fulls.length;
       lbImg.src = fulls[idx];
+      lbImg.alt = alts[idx] || '';
     };
     const open = (i: number) => {
       show(i);

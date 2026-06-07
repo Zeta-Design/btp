@@ -1,25 +1,88 @@
 {
   "images": [
-    "DSC_1320-Edit.jpeg",
-    "DSC_1345.jpeg",
-    "IMG_3970.jpg",
-    "IMG_3971.jpg",
-    "IMG_6898.png",
-    "camping.jpg",
-    "longhorn.jpg",
-    "mayo.jpg",
-    "mountains-2.jpg",
-    "mountains.jpg",
-    "nature.jpg",
-    "ocean-2.jpg",
-    "ocean.jpg",
-    "pmc.jpg",
-    "port-1.jpg",
-    "port-2.jpg",
-    "port.jpg",
-    "ram.jpg",
-    "reflection.jpg",
-    "snow.jpg",
-    "tea.jpg"
+    {
+      "image": "DSC_1320-Edit.jpeg",
+      "label": ""
+    },
+    {
+      "image": "DSC_1345.jpeg",
+      "label": ""
+    },
+    {
+      "image": "IMG_3970.jpg",
+      "label": ""
+    },
+    {
+      "image": "IMG_3971.jpg",
+      "label": ""
+    },
+    {
+      "image": "IMG_6898.png",
+      "label": ""
+    },
+    {
+      "image": "camping.jpg",
+      "label": ""
+    },
+    {
+      "image": "longhorn.jpg",
+      "label": ""
+    },
+    {
+      "image": "mayo.jpg",
+      "label": ""
+    },
+    {
+      "image": "mountains-2.jpg",
+      "label": ""
+    },
+    {
+      "image": "mountains.jpg",
+      "label": ""
+    },
+    {
+      "image": "nature.jpg",
+      "label": ""
+    },
+    {
+      "image": "ocean-2.jpg",
+      "label": ""
+    },
+    {
+      "image": "ocean.jpg",
+      "label": ""
+    },
+    {
+      "image": "pmc.jpg",
+      "label": ""
+    },
+    {
+      "image": "port-1.jpg",
+      "label": ""
+    },
+    {
+      "image": "port-2.jpg",
+      "label": ""
+    },
+    {
+      "image": "port.jpg",
+      "label": ""
+    },
+    {
+      "image": "ram.jpg",
+      "label": ""
+    },
+    {
+      "image": "reflection.jpg",
+      "label": ""
+    },
+    {
+      "image": "snow.jpg",
+      "label": ""
+    },
+    {
+      "image": "tea.jpg",
+      "label": ""
+    }
   ]
 }
