@@ -38,7 +38,17 @@ export default config({
           itemLabel: (props) => props.value,
         }),
         draft: fields.checkbox({ label: 'Draft (hidden from the site)', defaultValue: false }),
-        content: fields.mdx({ label: 'Content' }),
+        content: fields.mdx({
+          label: 'Content',
+          // Inline images you drop into a post are saved here and referenced with a
+          // /src/ path so Astro optimizes them (AVIF/WebP) at build.
+          options: {
+            image: {
+              directory: 'site/src/assets/blog',
+              publicPath: '/src/assets/blog/',
+            },
+          },
+        }),
       },
     }),
   },
