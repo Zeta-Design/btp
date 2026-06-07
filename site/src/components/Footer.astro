@@ -22,7 +22,6 @@ const year = new Date().getFullYear();
     >
       <p>© {year} {SITE.name}</p>
       <div class="flex flex-wrap items-center gap-x-6">
-        <a href="/blog/" class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">Blog</a>
         {
           SITE.social?.map((s) => (
             <a
@@ -38,7 +37,7 @@ const year = new Date().getFullYear();
         {
           SITE.email && (
             <a href={`mailto:${SITE.email}`} class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">
-              {SITE.email}
+              Email me
             </a>
           )
         }
