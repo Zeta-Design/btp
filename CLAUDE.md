@@ -33,6 +33,8 @@ Project guide for working in this repo. Read before making changes.
 - **CMS/admin:** **Keystatic** (GitHub mode) at `/admin` → `/keystatic` (noindex, robots-blocked,
   unlinked). Adds `@astrojs/react` + `@astrojs/vercel` adapter → build is static **+** server
   routes for the admin only. See `docs/plans/admin-portal-setup.md` (needs a 1-time GitHub app).
+  **⚠️ If the admin portal's instructions OR implementation change, update the "Admin portal"
+  section in the root `README.md` to match (keep them in sync).**
 - **3D gallery:** `/gallery-lab` — vendored Codrops depth gallery (`src/Experience/`, Three.js +
   GLSL via `vite-plugin-glsl`); isolated so its JS loads only on that page.
 - **CRM:** Dubsado lead form embedded on `/contact`. **Books:** QuickBooks Online (manual).
