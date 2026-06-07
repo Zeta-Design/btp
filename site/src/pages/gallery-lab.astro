@@ -13,7 +13,7 @@ const metas = Object.keys(mods)
   .map((k) => mods[k].default);
 const images = await Promise.all(
   metas.map(async (m) => {
-    const img = await getImage({ src: m, format: 'webp', width: 1000 });
+    const img = await getImage({ src: m, format: 'webp', width: 800 });
     return { src: img.src, ratio: m.width / m.height };
   }),
 );
@@ -64,7 +64,9 @@ const images = await Promise.all(
       }
       @keyframes spin { to { transform: rotate(360deg); } }
       @media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2s; } }
-      #loading p { margin: 0; font-size: 14px; color: rgba(255,255,255,.7); }
+      #loading p { margin: 0 0 12px; font-size: 15px; color: rgba(255,255,255,.85); font-variant-numeric: tabular-nums; }
+      .bar { height: 3px; width: 100%; background: rgba(255,255,255,.16); border-radius: 999px; overflow: hidden; }
+      #bar-fill { height: 100%; width: 0; background: #fff; transition: width .25s ease; }
 
       #start .enter {
         appearance: none; min-height: 50px; padding: 0 30px; font-size: 15px; font-weight: 500;
@@ -89,9 +91,9 @@ const images = await Promise.all(
     <div id="crosshair"></div>
 
     <div id="loading" class="layer">
-      <div>
-        <div class="spinner"></div>
-        <p id="loading-text">Loading…</p>
+      <div style="width: min(78vw, 260px)">
+        <p id="loading-text">Loading 0%</p>
+        <div class="bar"><div id="bar-fill"></div></div>
       </div>
     </div>
 
@@ -120,6 +122,7 @@ const images = await Promise.all(
       const app = document.getElementById('app')!;
       const loadingEl = document.getElementById('loading')!;
       const loadingText = document.getElementById('loading-text')!;
+      const barFill = document.getElementById('bar-fill') as HTMLElement;
       const startEl = document.getElementById('start')!;
       const touchHint = document.getElementById('touchhint')!;
       const crosshair = document.getElementById('crosshair')!;
@@ -242,6 +245,7 @@ const images = await Promise.all(
       const reveal = () => {
         if (revealed) return;
         revealed = true;
+        barFill.style.width = '100%';
         fadeOut(loadingEl);
         if (isTouch) {
           touchHint.hidden = false;
@@ -251,7 +255,9 @@ const images = await Promise.all(
         }
       };
       manager.onProgress = (_u, loaded, total) => {
-        loadingText.textContent = `Loading… ${Math.round((loaded / total) * 100)}%`;
+        const pct = Math.round((loaded / total) * 100);
+        loadingText.textContent = `Loading ${pct}%`;
+        barFill.style.width = pct + '%';
       };
       manager.onLoad = reveal;
       // A failed texture must not block the gallery (this was the Safari hang).
