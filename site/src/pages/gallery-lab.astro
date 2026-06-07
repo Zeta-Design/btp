@@ -146,7 +146,14 @@ const images = await Promise.all(
       camera.position.set(0, EYE, SPACING - 1);
       scene.add(camera);
 
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      let renderer: THREE.WebGLRenderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+      } catch (err) {
+        document.querySelector('#loading .spinner')?.remove();
+        loadingText.textContent = "This browser couldn't start 3D (WebGL).";
+        throw err;
+      }
       renderer.setSize(innerWidth, innerHeight);
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
       app.appendChild(renderer.domElement);
@@ -230,8 +237,11 @@ const images = await Promise.all(
         addEventListener('keyup', (e) => (keys[e.code] = false));
       }
 
-      // ---- Loading UX: only reveal when textures are ready ----
-      const ready = () => {
+      // ---- Loading UX: reveal when ready, but NEVER hang ----
+      let revealed = false;
+      const reveal = () => {
+        if (revealed) return;
+        revealed = true;
         fadeOut(loadingEl);
         if (isTouch) {
           touchHint.hidden = false;
@@ -243,8 +253,12 @@ const images = await Promise.all(
       manager.onProgress = (_u, loaded, total) => {
         loadingText.textContent = `Loading… ${Math.round((loaded / total) * 100)}%`;
       };
-      manager.onLoad = ready;
-      if (images.length === 0) ready();
+      manager.onLoad = reveal;
+      // A failed texture must not block the gallery (this was the Safari hang).
+      manager.onError = (url) => console.warn('Image failed to load:', url);
+      // Safety net: reveal after 6s no matter what; late textures just pop in.
+      setTimeout(reveal, 6000);
+      if (images.length === 0) reveal();
 
       // ---- Loop (room renders immediately behind the loader) ----
       const clock = new THREE.Clock();
