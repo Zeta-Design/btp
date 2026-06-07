@@ -19,11 +19,17 @@ import { SITE } from '../config/site';
     <div class="mt-10">
       {
         SITE.dubsadoFormUrl ? (
+          // Dubsado lead-capture form, embedded with iframe-resizer so it
+          // auto-sizes to the form's height (no inner scrollbar).
           <iframe
-            src={SITE.dubsadoFormUrl}
+            id="dubsado-form"
+            src={`${SITE.dubsadoFormUrl}?iframe=true`}
             title="Inquiry form"
-            class="min-h-[720px] w-full rounded-lg border border-stone-200"
+            frameborder="0"
+            width="100%"
+            height="750"
             loading="lazy"
+            class="w-full rounded-lg border border-stone-200"
           />
         ) : (
           <div class="rounded-lg border border-dashed border-stone-300 bg-white p-8 text-center text-stone-500">
@@ -37,4 +43,27 @@ import { SITE } from '../config/site';
       }
     </div>
   </section>
+
+  {
+    SITE.dubsadoFormUrl && (
+      <>
+        <script
+          is:inline
+          src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.14/iframeResizer.min.js"
+        />
+        <script is:inline>
+          (function () {
+            function init() {
+              if (window.iFrameResize) {
+                window.iFrameResize({ checkOrigin: false }, '#dubsado-form');
+              } else {
+                setTimeout(init, 100);
+              }
+            }
+            setTimeout(init, 30);
+          })();
+        </script>
+      </>
+    )
+  }
 </BaseLayout>

@@ -41,6 +41,18 @@ const year = new Date().getFullYear();
             </a>
           )
         }
+        {
+          SITE.clientPortalUrl && (
+            <a
+              href={SITE.clientPortalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex min-h-[44px] items-center transition hover:text-stone-900"
+            >
+              Client Portal
+            </a>
+          )
+        }
       </div>
     </div>
   </div>

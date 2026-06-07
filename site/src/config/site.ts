@@ -30,6 +30,8 @@ export interface Brand {
    * Leave empty until you have it; the Inquire page shows a placeholder.
    */
   dubsadoFormUrl: string;
+  /** Dubsado client portal — existing-client login, linked from header + footer. */
+  clientPortalUrl?: string;
 }
 
 export const BRANDS: Record<string, Brand> = {
@@ -51,7 +53,8 @@ export const BRANDS: Record<string, Brand> = {
       'Pflugerville',
       'Leander',
     ],
-    dubsadoFormUrl: 'https://hello.dubsado.com/public/form/view/6a2489c3971b89d2159a3901',
+    dubsadoFormUrl: 'https://app.bentimsmedia.com/public/form/view/6a2489c3971b89d2159a3901',
+    clientPortalUrl: 'https://app.bentimsmedia.com/public/client/portal/6a247906a4dda9d09818a8da',
   },
 
   // Add one brand per category/domain, e.g.:

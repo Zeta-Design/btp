@@ -11,6 +11,9 @@ const links: { href: string; label: string; newTab?: boolean }[] = [
   { href: '/blog/', label: 'Blog' },
   { href: '/contact/', label: 'Contact' },
 ];
+if (SITE.clientPortalUrl) {
+  links.push({ href: SITE.clientPortalUrl, label: 'Client Portal', newTab: true });
+}
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || path.startsWith(href);
 ---
