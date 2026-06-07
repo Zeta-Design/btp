@@ -68,7 +68,7 @@ const services = [
 ---
 <BaseLayout title={SITE.name} description={SITE.tagline} jsonLd={jsonLd}>
   <!-- Hero — LCP image: eager + high priority, AVIF/WebP via <Picture> -->
-  <section class="relative isolate flex min-h-[88svh] items-center overflow-hidden">
+  <section class="relative isolate flex min-h-[88svh] items-center overflow-hidden py-24">
     <Picture
       src={hero}
       alt=""
@@ -82,18 +82,18 @@ const services = [
     />
     <div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-black/65"></div>
     <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
-      <div class="max-w-3xl text-white">
+      <div class="max-w-3xl text-center text-white sm:text-left">
         <p class="text-xs uppercase tracking-[0.3em] text-white/80 sm:text-sm">
           Real estate photography · Greater Austin
         </p>
         <h1 class="mt-5 font-serif font-medium leading-[0.95] tracking-tight text-[clamp(2.75rem,9vw,6rem)]">
           Spaces that sell themselves.
         </h1>
-        <p class="mt-6 max-w-lg text-pretty text-base text-white/85 sm:text-lg">
+        <p class="mx-auto mt-6 max-w-lg text-pretty text-base text-white/85 sm:mx-0 sm:text-lg">
           {SITE.name} — real estate and short-term rental photography. Interiors,
           exteriors, and gimbal walkthrough video.
         </p>
-        <div class="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:items-center">
           <a
             href="/portfolio/"
             class="inline-flex min-h-[48px] items-center justify-center rounded-full bg-white px-7 text-sm font-medium text-stone-900 transition hover:bg-stone-200"

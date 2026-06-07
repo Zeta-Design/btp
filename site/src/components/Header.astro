@@ -63,7 +63,7 @@ const isActive = (href: string) => path === href || path.startsWith(href);
 
   <!-- Mobile panel -->
   <div id="mobile-menu" hidden class="border-t border-stone-200 bg-stone-50 md:hidden">
-    <ul class="mx-auto max-w-6xl px-5 py-2">
+    <ul class="mx-auto max-w-6xl divide-y divide-stone-100 px-5 py-2">
       {
         links.map((l) => (
           <li>
@@ -73,7 +73,7 @@ const isActive = (href: string) => path === href || path.startsWith(href);
               rel={l.newTab ? 'noopener noreferrer' : undefined}
               aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
               class:list={[
-                'flex min-h-[52px] items-center border-b border-stone-100 text-base text-stone-700',
+                'flex min-h-[52px] items-center text-base text-stone-700',
                 isActive(l.href) && 'font-medium text-stone-900',
               ]}
             >
