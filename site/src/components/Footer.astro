@@ -22,9 +22,6 @@ const year = new Date().getFullYear();
     >
       <p>© {year} {SITE.name}</p>
       <div class="flex flex-wrap items-center gap-x-6">
-        <a href="/blog/" class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">
-          Blog
-        </a>
         <a
           href="/gallery-lab/"
           target="_blank"
@@ -52,18 +49,9 @@ const year = new Date().getFullYear();
             </a>
           )
         }
-        {
-          SITE.clientPortalUrl && (
-            <a
-              href={SITE.clientPortalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex min-h-[44px] items-center transition hover:text-stone-900"
-            >
-              Client Portal
-            </a>
-          )
-        }
+        <a href="/blog/" class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">
+          Blog
+        </a>
       </div>
     </div>
   </div>
