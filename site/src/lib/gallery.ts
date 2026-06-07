@@ -1,11 +1,13 @@
 import type { ImageMetadata } from 'astro';
 
 // Reads the /admin-managed Category → Collection → Photo structure.
-//   categories:  src/data/categories/<slug>.json   { name, order, cover }
-//   collections: src/data/collections/<slug>.json   { name, category, date, photos[] }
-// Photo/cover image files live in src/assets/* and are matched by filename so
-// astro:assets can optimize them. Everything here is defensive: if the data is
-// missing or shaped slightly differently, callers fall back to placeholders.
+//   categories:  src/data/categories/<slug>.json    { name, order, cover }
+//   collections: src/data/collections/<slug>.json    { name, category, date, photos[] }
+// Keystatic stores array images in indexed subfolders and references them by a
+// full path (e.g. "/src/assets/gallery/images/0/image.png"), so we glob the
+// asset dirs recursively and match by the path relative to the asset folder
+// (falling back to the bare filename). Everything is defensive: if the data is
+// missing or shaped differently, callers fall back to placeholders.
 
 export type Photo = { meta: ImageMetadata; alt: string; featured: boolean; file: string };
 export type Collection = { name: string; date: string; category: string; photos: Photo[] };
@@ -17,32 +19,48 @@ export type Category = {
   href: string;
 };
 
-// ── image metadata, keyed by filename ───────────────────────────────────────
+// ── image metadata (recursive: array images live in subfolders) ──────────────
 const photoMods = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/gallery/*.{jpg,jpeg,png,webp,avif}',
+  '../assets/gallery/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
   { eager: true },
 );
 const coverMods = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/categories/*.{jpg,jpeg,png,webp,avif}',
+  '../assets/categories/**/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
   { eager: true },
 );
-const byName = (mods: Record<string, { default: ImageMetadata }>): Record<string, ImageMetadata> => {
-  const out: Record<string, ImageMetadata> = {};
-  for (const path in mods) {
-    const name = path.split('/').pop();
-    if (name) out[name] = mods[path].default;
-  }
-  return out;
-};
-const photoByName = byName(photoMods);
-const coverByName = byName(coverMods);
 
-const findImage = (
+type ImageIndex = { byRel: Record<string, ImageMetadata>; byName: Record<string, ImageMetadata> };
+const indexImages = (mods: Record<string, { default: ImageMetadata }>, base: string): ImageIndex => {
+  const marker = `/assets/${base}/`;
+  const byRel: Record<string, ImageMetadata> = {};
+  const byName: Record<string, ImageMetadata> = {};
+  for (const p in mods) {
+    const meta = mods[p].default;
+    const i = p.indexOf(marker);
+    if (i >= 0) byRel[p.slice(i + marker.length)] = meta;
+    const name = p.split('/').pop();
+    if (name) byName[name] = meta;
+  }
+  return { byRel, byName };
+};
+const photoIdx = indexImages(photoMods, 'gallery');
+const coverIdx = indexImages(coverMods, 'categories');
+
+// Resolve a CMS ref → { meta, file } where `file` is the path relative to the
+// asset folder (used by the 3D gallery's colour sampling).
+const resolve = (
   ref: string | undefined | null,
-  map: Record<string, ImageMetadata>,
-): ImageMetadata | undefined => {
+  idx: ImageIndex,
+  base: string,
+): { meta: ImageMetadata; file: string } | undefined => {
   if (!ref) return undefined;
-  return map[ref.split('/').pop()!]; // tolerate a bare filename or a path
+  const marker = `/assets/${base}/`;
+  const i = ref.indexOf(marker);
+  const rel = i >= 0 ? ref.slice(i + marker.length) : ref;
+  if (idx.byRel[rel]) return { meta: idx.byRel[rel], file: rel };
+  const name = ref.split('/').pop()!;
+  if (idx.byName[name]) return { meta: idx.byName[name], file: name };
+  return undefined;
 };
 
 // ── raw CMS data (glob handles either <slug>.json or <slug>/index.json) ──────
@@ -72,7 +90,7 @@ export const categories: Category[] = Object.entries(catMods)
       slug,
       name: d.name || slug,
       order: typeof d.order === 'number' ? d.order : 0,
-      cover: findImage(d.cover, coverByName),
+      cover: resolve(d.cover, coverIdx, 'categories')?.meta,
       href: `/portfolio/${slug}/`,
     };
   })
@@ -84,9 +102,8 @@ const allCollections: Collection[] = Object.values(colMods).map((mod) => {
   const d = mod.default ?? {};
   const photos: Photo[] = (Array.isArray(d.photos) ? d.photos : [])
     .map((p) => {
-      const meta = findImage(p.image, photoByName);
-      const file = (p.image ?? '').split('/').pop() ?? '';
-      return meta ? { meta, alt: p.label ?? '', featured: !!p.featured, file } : null;
+      const found = resolve(p.image, photoIdx, 'gallery');
+      return found ? { meta: found.meta, alt: p.label ?? '', featured: !!p.featured, file: found.file } : null;
     })
     .filter((p): p is Photo => p !== null);
   return {
