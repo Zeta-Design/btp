@@ -6,11 +6,8 @@ import path from 'node:path';
 
 // Real photos → optimized webp + a mood palette sampled from each photo's
 // dominant colour, fed into the vendored Codrops depth-gallery engine.
-const mods = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/portfolio/*.{jpg,jpeg,png,webp}',
-  { eager: true },
-);
-const keys = Object.keys(mods).sort();
+// Source list comes from the /admin-managed gallery (falls back to original).
+import { portfolio, portfolioSource } from '../lib/portfolio';
 
 type RGB = { r: number; g: number; b: number };
 const xs = [-0.85, 0.7, -0.6, 0.9, -0.75, 0.55, -0.9, 0.65, -0.5, 0.8];
@@ -22,12 +19,12 @@ const DARK: RGB = { r: 18, g: 18, b: 20 };
 const WHITE: RGB = { r: 255, g: 255, b: 255 };
 
 const galleryData = await Promise.all(
-  keys.map(async (key, i) => {
-    const meta = mods[key].default;
+  portfolio.map(async (entry, i) => {
+    const meta = entry.meta;
     const img = await getImage({ src: meta, format: 'webp', width: 1200 });
     let d: RGB = { r: 120, g: 120, b: 130 };
     try {
-      const fsPath = path.join(process.cwd(), 'src/assets/portfolio', path.basename(key));
+      const fsPath = path.join(process.cwd(), 'src/assets', portfolioSource, path.basename(entry.key));
       d = (await sharp(fsPath).stats()).dominant;
     } catch {
       /* fall back to neutral */

@@ -3,6 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
+import react from '@astrojs/react';
+import keystatic from '@keystatic/astro';
+import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import glsl from 'vite-plugin-glsl';
 
@@ -29,7 +32,17 @@ const site = resolveSite(process.env.SITE_URL);
 // https://astro.build/config
 export default defineConfig({
   site,
-  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/gallery-lab') })],
+  // Pages prerender to static; only the Keystatic admin routes are server-rendered.
+  adapter: vercel(),
+  integrations: [
+    mdx(),
+    sitemap({
+      filter: (page) =>
+        !['/gallery-lab', '/keystatic', '/admin', '/api/'].some((p) => page.includes(p)),
+    }),
+    react(),
+    keystatic(),
+  ],
   vite: {
     plugins: [tailwindcss(), glsl()],
     resolve: {

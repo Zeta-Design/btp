@@ -4,17 +4,10 @@ import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 
-// Gallery images are auto-discovered from src/assets/portfolio/ and optimized by
-// astro:assets (AVIF/WebP, responsive srcset). Drop in real photos and they just
-// work — no code change needed.
-const galleryMods = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/portfolio/*.{jpg,jpeg,png,webp}',
-  { eager: true },
-);
-const gallery = Object.keys(galleryMods)
-  .sort()
-  .map((k) => galleryMods[k].default);
-const work = gallery.slice(0, 6);
+// Portfolio images come from the /admin-managed gallery (falls back to the
+// original set). See src/lib/portfolio.ts.
+import { portfolio } from '../lib/portfolio';
+const work = portfolio.slice(0, 6).map((e) => e.meta);
 
 // Hero: whatever src/assets/hero.* you drop in (any extension), with a fallback.
 const heroMods = import.meta.glob<{ default: ImageMetadata }>(

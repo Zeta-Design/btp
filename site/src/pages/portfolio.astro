@@ -4,15 +4,9 @@ import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 
-// Auto-discovered + optimized (AVIF/WebP, responsive). To change the portfolio,
-// just add/replace files in src/assets/portfolio/ — no code change needed.
-const mods = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/portfolio/*.{jpg,jpeg,png,webp}',
-  { eager: true },
-);
-const metas = Object.keys(mods)
-  .sort()
-  .map((k) => mods[k].default);
+// Images come from the /admin-managed gallery (falls back to the original set).
+import { portfolio } from '../lib/portfolio';
+const metas = portfolio.map((e) => e.meta);
 
 // Larger versions for the click-to-zoom lightbox.
 const full = await Promise.all(
