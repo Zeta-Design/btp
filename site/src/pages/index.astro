@@ -68,7 +68,11 @@ const services = [
 ---
 <BaseLayout title={SITE.name} description={SITE.tagline} jsonLd={jsonLd}>
   <!-- Hero — LCP image: eager + high priority, AVIF/WebP via <Picture> -->
-  <section class="relative isolate flex min-h-[88svh] items-center overflow-hidden py-24">
+  <section
+    class="hero relative isolate flex min-h-[88svh] items-center overflow-hidden py-24"
+    data-hero
+  >
+    <!-- Image sits taller than the section so it has room to drift on scroll -->
     <Picture
       src={hero}
       alt=""
@@ -78,11 +82,15 @@ const services = [
       loading="eager"
       decoding="async"
       fetchpriority="high"
-      class="absolute inset-0 -z-10 h-full w-full object-cover"
+      class="hero-img absolute inset-x-0 -top-[15%] -z-20 h-[130%] w-full object-cover"
+      data-hero-img
     />
-    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-black/65"></div>
+    <!-- Scrim: a soft, bottom-weighted base for overall contrast… -->
+    <div class="absolute inset-0 -z-10 bg-gradient-to-t from-black/65 via-black/25 to-black/35"></div>
+    <!-- …and a focused pool of shade behind the text so the rest of the photo stays bright -->
+    <div class="hero-scrim absolute inset-0 -z-10"></div>
     <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
-      <div class="max-w-3xl text-center text-white sm:text-left">
+      <div class="hero-content max-w-3xl text-center text-white sm:text-left" data-hero-content>
         <p class="text-xs uppercase tracking-[0.3em] text-white/80 sm:text-sm">
           Real estate photography<span class="hidden sm:inline"> · </span><br class="sm:hidden" />Greater Austin
         </p>
@@ -163,3 +171,85 @@ const services = [
     </a>
   </section>
 </BaseLayout>
+
+<style>
+  /* Focused scrim behind the hero text. On mobile the copy is centred, so the
+     pool of shade is centred; on wider screens the copy sits left, so it shifts
+     to follow. The photo stays bright everywhere the text isn't. */
+  .hero-scrim {
+    background: radial-gradient(
+      120% 85% at 50% 48%,
+      rgba(0, 0, 0, 0.5) 0%,
+      rgba(0, 0, 0, 0.18) 46%,
+      transparent 74%
+    );
+  }
+
+  @media (min-width: 640px) {
+    .hero-scrim {
+      background: radial-gradient(
+        72% 95% at 24% 50%,
+        rgba(0, 0, 0, 0.55) 0%,
+        rgba(0, 0, 0, 0.18) 46%,
+        transparent 72%
+      );
+    }
+  }
+
+  /* The JS below drives these transforms; declaring will-change keeps the
+     compositor warm. Both layers fall back to a clean static state with no JS
+     or when the visitor prefers reduced motion. */
+  .hero-img,
+  .hero-content {
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-img,
+    .hero-content {
+      transform: none !important;
+      opacity: 1 !important;
+      will-change: auto;
+    }
+  }
+</style>
+
+<script>
+  // Lightweight scroll parallax: the photo drifts down slowly while the copy
+  // lifts and fades, so the two layers separate as you scroll and never fight
+  // for attention. rAF-throttled and reduced-motion aware.
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const hero = document.querySelector<HTMLElement>('[data-hero]');
+  const img = document.querySelector<HTMLElement>('[data-hero-img]');
+  const content = document.querySelector<HTMLElement>('[data-hero-content]');
+
+  if (hero && img && content && !reduce.matches) {
+    let ticking = false;
+
+    const update = () => {
+      // 0 while the hero fills the viewport, → 1 as it scrolls fully away.
+      const top = hero.getBoundingClientRect().top;
+      const p = Math.min(Math.max(-top / window.innerHeight, 0), 1);
+
+      // Photo drifts down a touch slower than the page (stays fully covered by
+      // the 130%-tall image) and eases in a gentle zoom.
+      img.style.transform = `translate3d(0, ${p * 12}%, 0) scale(${1 + p * 0.06})`;
+      // Copy lifts away and softens so it clears the frame cleanly.
+      content.style.transform = `translate3d(0, ${p * -28}px, 0)`;
+      content.style.opacity = `${1 - p * 0.6}`;
+
+      ticking = false;
+    };
+
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    };
+
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+</script>
