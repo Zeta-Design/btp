@@ -1,4 +1,4 @@
-import { config, fields, collection, singleton } from '@keystatic/core';
+import { config, fields, collection } from '@keystatic/core';
 
 // Admin CMS. GitHub mode: editors sign in with GitHub and changes are committed
 // to the repo, which redeploys the site.
@@ -52,14 +52,55 @@ export default config({
         }),
       },
     }),
-  },
-  singletons: {
-    gallery: singleton({
-      label: 'Gallery photos',
-      path: 'site/src/data/gallery',
+
+    // Categories (e.g. Real Estate, Portraits) → tiles on the Portfolio page.
+    categories: collection({
+      label: 'Categories',
+      slugField: 'name',
+      path: 'site/src/data/categories/*',
       format: { data: 'json' },
+      columns: ['name', 'order'],
       schema: {
-        images: fields.array(
+        name: fields.slug({
+          name: { label: 'Category name', validation: { isRequired: true } },
+        }),
+        order: fields.integer({
+          label: 'Sort order',
+          description: 'Lower numbers appear first on the Portfolio page.',
+          defaultValue: 0,
+        }),
+        cover: fields.image({
+          label: 'Cover image',
+          description: 'Shown on the category tile on the Portfolio page.',
+          directory: 'site/src/assets/categories',
+          publicPath: '/src/assets/categories/',
+        }),
+      },
+    }),
+
+    // Collections (e.g. House 1, Kelsey) belong to a category and hold the photos.
+    collections: collection({
+      label: 'Collections',
+      slugField: 'name',
+      path: 'site/src/data/collections/*',
+      format: { data: 'json' },
+      columns: ['name', 'date'],
+      schema: {
+        name: fields.slug({
+          name: { label: 'Collection name', validation: { isRequired: true } },
+        }),
+        category: fields.relationship({
+          label: 'Category',
+          description: 'Which category this collection belongs to.',
+          collection: 'categories',
+          validation: { isRequired: true },
+        }),
+        date: fields.date({
+          label: 'Date',
+          description: 'Newer collections appear first on the category page.',
+          defaultValue: { kind: 'today' },
+        }),
+        photos: fields.array(
           fields.object({
             image: fields.image({
               label: 'Photo',
@@ -69,18 +110,18 @@ export default config({
             }),
             label: fields.text({
               label: 'Label',
-              description:
-                'Short caption / alt text (e.g. "Sunlit kitchen"). Shows in this list and as the image alt text on the site.',
+              description: 'Short caption / alt text (used for accessibility & SEO).',
+            }),
+            featured: fields.checkbox({
+              label: 'Feature on homepage',
+              defaultValue: false,
             }),
           }),
           {
             label: 'Photos',
-            // Use the editable label as the list item title (always a string, so it
-            // never tries to render the image object — which caused React #31).
             itemLabel: (props) => props.fields.label.value || 'Photo',
           },
         ),
-
       },
     }),
   },

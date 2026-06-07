@@ -4,17 +4,22 @@ import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 
-// Portfolio images come from the /admin-managed gallery (falls back to the
-// original set). See src/lib/portfolio.ts.
+// Home "Selected work" shows the photos featured in /admin; falls back to the
+// existing set until any are featured.
+import { featured } from '../lib/gallery';
 import { portfolio } from '../lib/portfolio';
-const work = portfolio.slice(0, 6).map((e) => e.meta);
+const work = (
+  featured.length > 0
+    ? featured.map((p) => ({ meta: p.meta, alt: p.alt }))
+    : portfolio.map((e) => ({ meta: e.meta, alt: e.alt }))
+).slice(0, 8);
 
 // Hero: whatever src/assets/hero.* you drop in (any extension), with a fallback.
 const heroMods = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/hero.{jpg,jpeg,png,webp}',
   { eager: true },
 );
-const hero = Object.values(heroMods)[0]?.default ?? gallery[0];
+const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -135,11 +140,11 @@ const services = [
     </div>
     <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
       {
-        work.map((img) => (
+        work.map((w) => (
           <a href="/portfolio/" class="group block overflow-hidden" aria-label="View portfolio">
             <Image
-              src={img}
-              alt=""
+              src={w.meta}
+              alt={w.alt}
               widths={[300, 600]}
               sizes="(max-width: 640px) 50vw, 33vw"
               format="webp"
