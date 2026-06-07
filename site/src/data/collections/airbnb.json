@@ -1,0 +1,17 @@
+{
+  "name": "Airbnb",
+  "category": "real-estate",
+  "date": "2026-06-07",
+  "photos": [
+    {
+      "image": "/src/assets/gallery/airbnb/photos/0/image.jpg",
+      "label": "Home",
+      "featured": true
+    },
+    {
+      "image": "/src/assets/gallery/airbnb/photos/1/image.jpeg",
+      "label": "Cheers",
+      "featured": false
+    }
+  ]
+}
