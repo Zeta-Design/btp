@@ -71,7 +71,7 @@ const services = [
       loading="eager"
       decoding="async"
       fetchpriority="high"
-      class="absolute inset-0 -z-10 h-full w-full object-cover"
+      class="hero-img absolute inset-x-0 -top-[15%] -z-10 h-[130%] w-full object-cover"
     />
     <div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-black/65"></div>
     <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
@@ -155,4 +155,29 @@ const services = [
       View all →
     </a>
   </section>
+
+<style is:inline>
+  /* Hero parallax — pure CSS scroll-driven animation (compositor thread, no JS,
+     no jank). Progressive enhancement: only runs where supported and when the
+     user hasn't asked for reduced motion; otherwise the hero is simply static.
+     is:inline so Astro's CSS minifier doesn't prune `animation-timeline: scroll()`. */
+  @keyframes hero-parallax {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(0, 14%, 0);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+      .hero-img {
+        will-change: transform;
+        animation: hero-parallax linear both;
+        animation-timeline: scroll(root block);
+        animation-range: 0 100vh;
+      }
+    }
+  }
+</style>
 </BaseLayout>
