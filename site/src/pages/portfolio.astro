@@ -28,7 +28,7 @@ const fullUrls = full.map((f) => f.src);
           {visibleCategories.map((cat) => (
             <a
               href={cat.href}
-              class="group relative block aspect-[4/5] overflow-hidden rounded-lg bg-stone-100"
+              class="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-stone-100"
             >
               {cat.cover ? (
                 <Image
@@ -58,7 +58,7 @@ const fullUrls = full.map((f) => f.src);
               type="button"
               data-i={i}
               aria-label={`View image ${i + 1} larger`}
-              class="group relative block aspect-[4/5] overflow-hidden bg-stone-100"
+              class="group relative block aspect-[4/3] overflow-hidden bg-stone-100"
             >
               <Image
                 src={e.meta}

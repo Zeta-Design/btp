@@ -1,5 +1,5 @@
 ---
-import { Image, Picture } from 'astro:assets';
+import { Image, Picture, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
@@ -8,11 +8,17 @@ import { SITE } from '../config/site';
 // existing set until any are featured.
 import { featured } from '../lib/gallery';
 import { portfolio } from '../lib/portfolio';
-const work = (
+const workEntries = (
   featured.length > 0
     ? featured.map((p) => ({ meta: p.meta, alt: p.alt }))
     : portfolio.map((e) => ({ meta: e.meta, alt: e.alt }))
 ).slice(0, 8);
+const work = workEntries.map((e) => e.meta);
+const workAlts = workEntries.map((e) => e.alt);
+const workFull = await Promise.all(
+  work.map((m) => getImage({ src: m, format: 'webp', width: 1600 })),
+);
+const workFullUrls = workFull.map((f) => f.src);
 
 // Hero: whatever src/assets/hero.* you drop in (any extension), with a fallback.
 const heroMods = import.meta.glob<{ default: ImageMetadata }>(
@@ -138,21 +144,26 @@ const services = [
         View all →
       </a>
     </div>
-    <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+    <div id="sw-gallery" class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
       {
-        work.map((w) => (
-          <a href="/portfolio/" class="group block overflow-hidden" aria-label="View portfolio">
+        work.map((img, i) => (
+          <button
+            type="button"
+            data-i={i}
+            aria-label={`View image ${i + 1} larger`}
+            class="group relative block aspect-[4/3] w-full overflow-hidden bg-stone-100"
+          >
             <Image
-              src={w.meta}
-              alt={w.alt}
-              widths={[300, 600]}
+              src={img}
+              alt={workAlts[i]}
+              widths={[400, 800]}
               sizes="(max-width: 640px) 50vw, 33vw"
               format="webp"
               quality={72}
               loading="lazy"
-              class="aspect-[4/5] w-full object-cover transition duration-500 group-hover:scale-105"
+              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
-          </a>
+          </button>
         ))
       }
     </div>
@@ -160,6 +171,71 @@ const services = [
       View all →
     </a>
   </section>
+
+  <!-- Lightbox (selected work) -->
+  <div
+    id="sw-lightbox"
+    hidden
+    role="dialog"
+    aria-modal="true"
+    aria-label="Image viewer"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+  >
+    <button data-close aria-label="Close" class="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-full text-2xl text-white/90 hover:bg-white/10">×</button>
+    <button data-prev aria-label="Previous" class="absolute left-2 inline-flex h-12 w-12 items-center justify-center rounded-full text-3xl text-white/90 hover:bg-white/10 sm:left-5">‹</button>
+    <img id="sw-lb-img" alt="" class="max-h-[88vh] max-w-[92vw] object-contain" />
+    <button data-next aria-label="Next" class="absolute right-2 inline-flex h-12 w-12 items-center justify-center rounded-full text-3xl text-white/90 hover:bg-white/10 sm:right-5">›</button>
+    <a href="/portfolio/" data-viewall aria-label="View all photos" class="absolute bottom-5 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-5 py-2 text-sm text-white/90 transition hover:bg-white/20">
+      View all →
+    </a>
+  </div>
+
+  <script type="application/json" id="sw-full" set:html={JSON.stringify(workFullUrls)}></script>
+  <script type="application/json" id="sw-alts" set:html={JSON.stringify(workAlts)}></script>
+
+  <script>
+    const swFulls: string[] = JSON.parse(document.getElementById('sw-full')?.textContent || '[]');
+    const swAlts: string[] = JSON.parse(document.getElementById('sw-alts')?.textContent || '[]');
+    const swLb = document.getElementById('sw-lightbox') as HTMLElement;
+    const swImg = document.getElementById('sw-lb-img') as HTMLImageElement;
+    let swIdx = 0;
+
+    const swShow = (i: number) => {
+      swIdx = (i + swFulls.length) % swFulls.length;
+      swImg.src = swFulls[swIdx];
+      swImg.alt = swAlts[swIdx] || '';
+    };
+    const swOpen = (i: number) => {
+      swShow(i);
+      swLb.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+    const swClose = () => {
+      swLb.hidden = true;
+      swImg.removeAttribute('src');
+      document.body.style.overflow = '';
+    };
+
+    document.querySelectorAll<HTMLButtonElement>('#sw-gallery [data-i]').forEach((btn) =>
+      btn.addEventListener('click', () => swOpen(Number(btn.dataset.i))),
+    );
+    swLb.querySelector('[data-close]')!.addEventListener('click', swClose);
+    swLb.querySelector('[data-prev]')!.addEventListener('click', () => swShow(swIdx - 1));
+    swLb.querySelector('[data-next]')!.addEventListener('click', () => swShow(swIdx + 1));
+    swLb.addEventListener('click', (e) => { if (e.target === swLb) swClose(); });
+    document.addEventListener('keydown', (e) => {
+      if (swLb.hidden) return;
+      if (e.key === 'Escape') swClose();
+      else if (e.key === 'ArrowLeft') swShow(swIdx - 1);
+      else if (e.key === 'ArrowRight') swShow(swIdx + 1);
+    });
+    let swSx = 0;
+    swLb.addEventListener('touchstart', (e) => (swSx = e.changedTouches[0].clientX), { passive: true });
+    swLb.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - swSx;
+      if (Math.abs(dx) > 50) swShow(swIdx + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+  </script>
 
 <style is:inline>
   /* Hero parallax — pure CSS scroll-driven animation (compositor thread, no JS,
