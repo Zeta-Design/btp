@@ -1,0 +1,11 @@
+{
+  "name": "Real Estate",
+  "category": "real-estate",
+  "date": "2026-06-01",
+  "photos": [
+    {
+      "image": "/src/assets/gallery/real-estate/photos/0/image.jpg",
+      "featured": true
+    }
+  ]
+}
