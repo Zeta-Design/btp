@@ -9,7 +9,7 @@ import { SITE } from '../config/site';
 import { featured } from '../lib/gallery';
 import { portfolio } from '../lib/portfolio';
 const workEntries = (
-  featured.length > 0
+  featured.length >= 6
     ? featured.map((p) => ({ meta: p.meta, alt: p.alt }))
     : portfolio.map((e) => ({ meta: e.meta, alt: e.alt }))
 ).slice(0, 8);
