@@ -20,6 +20,8 @@ const workFull = await Promise.all(
 );
 const workFullUrls = workFull.map((f) => f.src);
 
+
+
 // Hero: whatever src/assets/hero.* you drop in (any extension), with a fallback.
 const heroMods = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/hero.{jpg,jpeg,png,webp}',
@@ -88,7 +90,7 @@ const services = [
     <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
       <div class="max-w-3xl text-center text-white sm:text-left">
         <p class="text-xs uppercase tracking-[0.3em] text-white/80 sm:text-sm">
-          Real estate photography<span class="hidden sm:inline"> · </span><br class="sm:hidden" />Greater Austin
+          Real estate photography · Austin based
         </p>
         <h1 class="mt-5 font-serif font-medium leading-[0.95] tracking-tight text-[clamp(2.75rem,9vw,6rem)]">
           Spaces that sell themselves.
@@ -150,7 +152,7 @@ const services = [
             type="button"
             data-i={i}
             aria-label={`View image ${i + 1} larger`}
-            class="group relative block aspect-[4/3] w-full overflow-hidden bg-stone-100"
+            class="group relative block aspect-[4/3] w-full overflow-hidden rounded-sm bg-stone-100 shadow-sm transition duration-300 hover:-translate-y-3 hover:shadow-lg cursor-pointer"
           >
             <Image
               src={img}
@@ -160,11 +162,16 @@ const services = [
               format="webp"
               quality={72}
               loading="lazy"
-              class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              class="h-full w-full object-cover"
             />
           </button>
         ))
       }
+    </div>
+    <div class="mt-10 flex justify-center">
+      <a href="/portfolio/" class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-stone-300 px-8 text-sm font-medium text-stone-700 transition hover:border-stone-900 hover:text-stone-900">
+        View all work
+      </a>
     </div>
     <a href="/portfolio/" class="mt-8 inline-flex text-sm text-stone-500 transition hover:text-stone-900 sm:hidden">
       View all →
@@ -191,7 +198,6 @@ const services = [
 
   <script type="application/json" id="sw-full" set:html={JSON.stringify(workFullUrls)}></script>
   <script type="application/json" id="sw-alts" set:html={JSON.stringify(workAlts)}></script>
-
   <script>
     const swFulls: string[] = JSON.parse(document.getElementById('sw-full')?.textContent || '[]');
     const swAlts: string[] = JSON.parse(document.getElementById('sw-alts')?.textContent || '[]');
@@ -234,6 +240,7 @@ const services = [
       const dx = e.changedTouches[0].clientX - swSx;
       if (Math.abs(dx) > 50) swShow(swIdx + (dx < 0 ? 1 : -1));
     }, { passive: true });
+
   </script>
 
 <style is:inline>
