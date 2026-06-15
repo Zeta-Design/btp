@@ -38,10 +38,11 @@ export const BRANDS: Record<string, Brand> = {
   main: {
     slug: 'main',
     name: 'Ben Tims Media',
-    tagline: 'Real estate & short-term rental photography in Austin.',
+    tagline: 'Real estate & short-term rental photography based in Austin.',
     email: 'info@bentims.com',
     social: [
       { label: 'IG', href: 'https://www.instagram.com/thebtphotography/' },
+      { label: 'FB', href: 'https://www.facebook.com/profile.php?id=61590507817692' },
       { label: 'VSCO', href: 'https://vsco.co/benjammin-visuals/gallery' },
     ],
     location: { locality: 'Georgetown', region: 'TX', postalCode: '78628', country: 'US' },

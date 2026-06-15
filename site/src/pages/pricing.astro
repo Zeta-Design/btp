@@ -60,6 +60,26 @@ import { SITE } from '../config/site';
       </div>
     </div>
 
+    <!-- Video -->
+    <div class="mt-14">
+      <h2 class="font-serif text-2xl sm:text-3xl">Walkthrough Video</h2>
+      <p class="mt-2 text-sm text-stone-500">Gimbal walkthrough + a 30–60 sec vertical social reel — one shoot, two deliverables</p>
+      <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+        {[
+          { label: 'Add-on — same day as photo shoot', price: '$200', detail: 'Booked alongside any photo package — full walkthrough edit + social reel cut' },
+          { label: 'Standalone shoot', price: '$325', detail: 'Separate appointment — full walkthrough edit + social reel cut' },
+        ].map((item) => (
+          <div class="flex items-center justify-between gap-6 px-6 py-5">
+            <div>
+              <p class="font-medium text-stone-900">{item.label}</p>
+              <p class="mt-0.5 text-sm text-stone-500">{item.detail}</p>
+            </div>
+            <p class="shrink-0 font-serif text-xl text-stone-900">{item.price}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
     <!-- Add-ons -->
     <div class="mt-14">
       <h2 class="font-serif text-2xl sm:text-3xl">Add-ons</h2>

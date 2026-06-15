@@ -1,0 +1,111 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config/site';
+---
+<BaseLayout title="Pricing C" description="Pricing layout C">
+  <section class="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20">
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Pricing</p>
+    <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">Simple, transparent rates</h1>
+    <p class="mt-4 max-w-xl text-pretty text-stone-600">
+      No hidden fees. Every shoot includes professional editing and delivery within 24–48 hours.
+    </p>
+
+    <!-- RE + STR side by side -->
+    <div class="mt-14 grid gap-8 sm:grid-cols-2">
+
+      <!-- Real Estate -->
+      <div>
+        <h2 class="font-serif text-2xl">Real Estate</h2>
+        <p class="mt-1 text-sm text-stone-500">For-sale listings · by square footage</p>
+        <div class="mt-5 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+          {[
+            { label: 'Up to 1,500 sq ft', price: '$185', detail: '25 photos' },
+            { label: '1,500 – 2,500 sq ft', price: '$225', detail: '35 photos' },
+            { label: '2,500 – 4,000 sq ft', price: '$295', detail: '40 photos' },
+            { label: '4,000 – 5,500 sq ft', price: '$375', detail: '50 photos' },
+            { label: '5,500 – 8,000 sq ft', price: '$475', detail: '60 photos' },
+            { label: '8,000+ sq ft', price: '$595', detail: '70 photos' },
+          ].map((item) => (
+            <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+              <div>
+                <p class="text-sm font-medium text-stone-900">{item.label}</p>
+                <p class="text-xs text-stone-400">{item.detail}</p>
+              </div>
+              <p class="shrink-0 font-serif text-xl text-stone-900">{item.price}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Vacation Rental -->
+      <div>
+        <h2 class="font-serif text-2xl">Vacation Rental & STR</h2>
+        <p class="mt-1 text-sm text-stone-500">Airbnb & VRBO · by bedrooms</p>
+        <div class="mt-5 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+          {[
+            { label: '1 – 2 Bedrooms', price: '$265', detail: '30 photos' },
+            { label: '3 – 4 Bedrooms', price: '$335', detail: '40 photos' },
+            { label: '4 – 5 Bedrooms', price: '$425', detail: '50 photos' },
+            { label: '6+ Bedrooms', price: '$550', detail: '60 photos' },
+            { label: '6+ Bedrooms — Premium', price: '$650', detail: '70 photos incl. themed rooms & pool' },
+          ].map((item) => (
+            <div class="flex items-center justify-between gap-4 px-5 py-3.5">
+              <div>
+                <p class="text-sm font-medium text-stone-900">{item.label}</p>
+                <p class="text-xs text-stone-400">{item.detail}</p>
+              </div>
+              <p class="shrink-0 font-serif text-xl text-stone-900">{item.price}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Video -->
+    <div class="mt-14">
+      <h2 class="font-serif text-2xl sm:text-3xl">Walkthrough Video</h2>
+      <p class="mt-1 text-sm text-stone-500">Gimbal walkthrough + 30–60 sec social reel — one shoot, two deliverables</p>
+      <div class="mt-5 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+        {[
+          { label: 'Add-on — same day as photo shoot', price: '$200', detail: 'Full walkthrough edit + social reel cut' },
+          { label: 'Standalone shoot', price: '$325', detail: 'Separate appointment — full walkthrough edit + social reel cut' },
+        ].map((item) => (
+          <div class="flex items-center justify-between gap-6 px-5 py-4">
+            <div>
+              <p class="font-medium text-stone-900">{item.label}</p>
+              <p class="mt-0.5 text-sm text-stone-500">{item.detail}</p>
+            </div>
+            <p class="shrink-0 font-serif text-xl text-stone-900">{item.price}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Add-ons -->
+    <div class="mt-14">
+      <h2 class="font-serif text-2xl sm:text-3xl">Add-ons</h2>
+      <div class="mt-5 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+        {[
+          { label: 'Twilight Session — Add-on', price: '$150', detail: '6–8 dusk/twilight exterior photos, same day as main shoot' },
+          { label: 'Twilight Session — Standalone', price: '$200', detail: '6–8 dusk/twilight exterior photos, separate appointment' },
+          { label: 'Virtual Twilight Edit', price: '$35 / image', detail: 'Daytime exterior digitally converted to a twilight look' },
+        ].map((item) => (
+          <div class="flex items-center justify-between gap-6 px-5 py-4">
+            <div>
+              <p class="font-medium text-stone-900">{item.label}</p>
+              <p class="mt-0.5 text-sm text-stone-500">{item.detail}</p>
+            </div>
+            <p class="shrink-0 font-serif text-xl text-stone-900">{item.price}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="mt-14 rounded-2xl bg-stone-900 px-8 py-10 text-center">
+      <h2 class="font-serif text-2xl text-stone-50 sm:text-3xl">Ready to book?</h2>
+      <p class="mt-3 text-stone-400">Get in touch and I'll confirm availability for your property.</p>
+      <a href="/contact/" class="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-white px-8 text-sm font-medium text-stone-900 transition hover:bg-stone-100">Book a shoot</a>
+    </div>
+  </section>
+</BaseLayout>

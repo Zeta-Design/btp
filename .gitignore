@@ -10,3 +10,4 @@ Thumbs.db
 # Claude Code — personal/local state (not shared)
 .claude/settings.local.json
 .claude/worktrees
+.vercel
