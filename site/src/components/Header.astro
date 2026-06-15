@@ -2,11 +2,12 @@
 import { Image } from 'astro:assets';
 import { SITE } from '../config/site';
 // Temporary logo — swap src/assets/logo.jpg for the final mark when ready.
-import logo from '../assets/logo.jpg';
+import logo from '../assets/logo.png';
 
 const links: { href: string; label: string; newTab?: boolean }[] = [
   { href: '/about/', label: 'About' },
   { href: '/portfolio/', label: 'Portfolio' },
+  { href: '/pricing/', label: 'Pricing' },
   { href: '/contact/', label: 'Contact' },
 ];
 if (SITE.clientPortalUrl) {

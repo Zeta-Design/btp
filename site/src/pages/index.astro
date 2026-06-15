@@ -12,7 +12,7 @@ const workEntries = (
   featured.length >= 6
     ? featured.map((p) => ({ meta: p.meta, alt: p.alt }))
     : portfolio.map((e) => ({ meta: e.meta, alt: e.alt }))
-).slice(0, 8);
+).slice(0, 9);
 const work = workEntries.map((e) => e.meta);
 const workAlts = workEntries.map((e) => e.alt);
 const workFull = await Promise.all(
