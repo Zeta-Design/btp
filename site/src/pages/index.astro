@@ -22,6 +22,7 @@ const workFullUrls = workFull.map((f) => f.src);
 
 
 
+
 // Hero: whatever src/assets/hero.* you drop in (any extension), with a fallback.
 const heroMods = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/hero.{jpg,jpeg,png,webp}',
@@ -168,6 +169,7 @@ const services = [
         ))
       }
     </div>
+
     <div class="mt-10 flex justify-center">
       <a href="/portfolio/" class="inline-flex min-h-[48px] items-center justify-center rounded-full border border-stone-300 px-8 text-sm font-medium text-stone-700 transition hover:border-stone-900 hover:text-stone-900">
         View all work
@@ -240,7 +242,6 @@ const services = [
       const dx = e.changedTouches[0].clientX - swSx;
       if (Math.abs(dx) > 50) swShow(swIdx + (dx < 0 ? 1 : -1));
     }, { passive: true });
-
   </script>
 
 <style is:inline>
