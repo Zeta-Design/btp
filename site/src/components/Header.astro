@@ -4,11 +4,12 @@ import { SITE } from '../config/site';
 // Temporary logo — swap src/assets/logo.jpg for the final mark when ready.
 import logo from '../assets/logo.png';
 
-const links: { href: string; label: string; newTab?: boolean }[] = [
+const links: { href: string; label: string; newTab?: boolean; cta?: boolean }[] = [
   { href: '/about/', label: 'About' },
   { href: '/portfolio/', label: 'Portfolio' },
   { href: '/pricing/', label: 'Pricing' },
   { href: '/contact/', label: 'Contact' },
+  { href: '/book/', label: 'Book now', cta: true },
 ];
 if (SITE.clientPortalUrl) {
   links.push({ href: SITE.clientPortalUrl, label: 'Client Portal', newTab: true });
@@ -34,8 +35,10 @@ const isActive = (href: string) => path === href || path.startsWith(href);
               rel={l.newTab ? 'noopener noreferrer' : undefined}
               aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
               class:list={[
-                'inline-flex min-h-[44px] items-center text-stone-600 transition-colors hover:text-stone-900',
-                isActive(l.href) && 'font-medium text-stone-900',
+                l.cta
+                  ? 'inline-flex min-h-[36px] items-center rounded-full bg-stone-900 px-5 text-white transition hover:bg-stone-700'
+                  : 'inline-flex min-h-[44px] items-center text-stone-600 transition-colors hover:text-stone-900',
+                !l.cta && isActive(l.href) && 'font-medium text-stone-900',
               ]}
             >
               {l.label}
@@ -75,8 +78,9 @@ const isActive = (href: string) => path === href || path.startsWith(href);
               rel={l.newTab ? 'noopener noreferrer' : undefined}
               aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
               class:list={[
-                'flex min-h-[52px] items-center text-base text-stone-700',
-                isActive(l.href) && 'font-medium text-stone-900',
+                'flex min-h-[52px] items-center text-base',
+                l.cta ? 'font-medium text-stone-900' : 'text-stone-700',
+                !l.cta && isActive(l.href) && 'font-medium text-stone-900',
               ]}
             >
               {l.label}
