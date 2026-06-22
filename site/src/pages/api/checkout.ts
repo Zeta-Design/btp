@@ -7,16 +7,22 @@ export const POST: APIRoute = async ({ request }) => {
   const stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY as string);
 
   const body = await request.formData();
-  const name     = (body.get('name')      as string)?.trim();
-  const email    = (body.get('email')     as string)?.trim();
-  const phone    = (body.get('phone')     as string)?.trim() ?? '';
-  const service  = (body.get('service')   as string)?.trim();
+  const name      = (body.get('name')      as string)?.trim();
+  const email     = (body.get('email')     as string)?.trim();
+  const phone     = (body.get('phone')     as string)?.trim();
+  const service   = (body.get('service')   as string)?.trim();
   const shootDate = (body.get('shootDate') as string)?.trim();
-  const address  = (body.get('address')   as string)?.trim();
+  const address   = (body.get('address')   as string)?.trim();
+  const address2  = (body.get('address2')  as string)?.trim() ?? '';
+  const city      = (body.get('city')      as string)?.trim();
+  const state     = (body.get('state')     as string)?.trim();
+  const zip       = (body.get('zip')       as string)?.trim();
 
-  if (!name || !email || !service || !shootDate || !address) {
+  if (!name || !email || !phone || !service || !shootDate || !address || !city || !state || !zip) {
     return new Response('Missing required fields', { status: 400 });
   }
+
+  const fullAddress = [address, address2 || null, `${city}, ${state} ${zip}`].filter(Boolean).join(', ');
 
   const siteUrl = (import.meta.env.SITE_URL as string) ?? 'https://bentimsmedia.com';
 
@@ -35,7 +41,7 @@ export const POST: APIRoute = async ({ request }) => {
     }],
     mode: 'payment',
     customer_email: email,
-    metadata: { name, phone, service, shootDate, address },
+    metadata: { name, phone, service, shootDate, address: fullAddress },
     success_url: `${siteUrl}/booking-confirmed?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/book`,
   });
