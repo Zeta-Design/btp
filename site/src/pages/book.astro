@@ -312,24 +312,6 @@ const serviceLabel = SERVICE_LABELS[service] || service;
                 <p class="shrink-0 text-sm font-medium text-stone-900">+$150</p>
               </label>
 
-              <p class="pt-2 text-xs font-medium uppercase tracking-widest text-stone-400">Separate appointment</p>
-              <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
-                <input type="checkbox" name="addon_video_sa" id="btp-addon-video-sa" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-stone-900">Walkthrough Video — Standalone</p>
-                  <p class="mt-0.5 text-xs text-stone-500">Separate appointment — full walkthrough edit + social reel cut</p>
-                </div>
-                <p class="shrink-0 text-sm font-medium text-stone-900">+$325</p>
-              </label>
-              <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
-                <input type="checkbox" name="addon_twilight_sa" id="btp-addon-twilight-sa" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
-                <div class="flex-1">
-                  <p class="text-sm font-medium text-stone-900">Twilight Session — Standalone</p>
-                  <p class="mt-0.5 text-xs text-stone-500">Separate appointment — 6–8 dusk/twilight exterior photos</p>
-                </div>
-                <p class="shrink-0 text-sm font-medium text-stone-900">+$200</p>
-              </label>
-
               <p class="pt-2 text-xs font-medium uppercase tracking-widest text-stone-400">Editing (no appointment needed)</p>
               <div class="rounded-xl border border-stone-200 bg-white p-4">
                 <div class="flex items-start justify-between gap-4">
@@ -402,17 +384,13 @@ const serviceLabel = SERVICE_LABELS[service] || service;
   }
 
   /* ── Step 2 payment form ── */
-  const ADDON_VIDEO_PRICE       = 200;
-  const ADDON_TWILIGHT_PRICE    = 150;
-  const ADDON_VIDEO_SA_PRICE    = 325;
-  const ADDON_TWILIGHT_SA_PRICE = 200;
-  const ADDON_VTE_PRICE         = 35;
+  const ADDON_VIDEO_PRICE    = 200;
+  const ADDON_TWILIGHT_PRICE = 150;
+  const ADDON_VTE_PRICE      = 35;
 
-  const addonVideo      = document.getElementById('btp-addon-video')      as HTMLInputElement | null;
-  const addonTwilight   = document.getElementById('btp-addon-twilight')   as HTMLInputElement | null;
-  const addonVideoSA    = document.getElementById('btp-addon-video-sa')   as HTMLInputElement | null;
-  const addonTwilightSA = document.getElementById('btp-addon-twilight-sa') as HTMLInputElement | null;
-  const addonVteQty     = document.getElementById('btp-addon-vte-qty')    as HTMLInputElement | null;
+  const addonVideo    = document.getElementById('btp-addon-video')    as HTMLInputElement | null;
+  const addonTwilight = document.getElementById('btp-addon-twilight') as HTMLInputElement | null;
+  const addonVteQty   = document.getElementById('btp-addon-vte-qty')  as HTMLInputElement | null;
   const addonVteTotal   = document.getElementById('btp-vte-addon-total');
   const depositPriceEl  = document.getElementById('btp-deposit-price');
   const fullPriceEl     = document.getElementById('btp-full-price');
@@ -428,11 +406,9 @@ const serviceLabel = SERVICE_LABELS[service] || service;
     : 0;
 
   function getAddonTotal(): number {
-    return (addonVideo?.checked      ? ADDON_VIDEO_PRICE       : 0)
-         + (addonTwilight?.checked   ? ADDON_TWILIGHT_PRICE    : 0)
-         + (addonVideoSA?.checked    ? ADDON_VIDEO_SA_PRICE    : 0)
-         + (addonTwilightSA?.checked ? ADDON_TWILIGHT_SA_PRICE : 0)
-         + (addonVteQty              ? parseInt(addonVteQty.value || '0') * ADDON_VTE_PRICE : 0);
+    return (addonVideo?.checked    ? ADDON_VIDEO_PRICE    : 0)
+         + (addonTwilight?.checked ? ADDON_TWILIGHT_PRICE : 0)
+         + (addonVteQty            ? parseInt(addonVteQty.value || '0') * ADDON_VTE_PRICE : 0);
   }
 
   function updateDisplay() {
@@ -481,13 +457,11 @@ const serviceLabel = SERVICE_LABELS[service] || service;
     updateDisplay();
   }
 
-  optDeposit?.addEventListener('click',  () => selectOption('deposit'));
-  optFull?.addEventListener('click',     () => selectOption('full'));
-  addonVideo?.addEventListener('change',      updateDisplay);
-  addonTwilight?.addEventListener('change',   updateDisplay);
-  addonVideoSA?.addEventListener('change',    updateDisplay);
-  addonTwilightSA?.addEventListener('change', updateDisplay);
-  addonVteQty?.addEventListener('input',      updateDisplay);
+  optDeposit?.addEventListener('click', () => selectOption('deposit'));
+  optFull?.addEventListener('click',    () => selectOption('full'));
+  addonVideo?.addEventListener('change',    updateDisplay);
+  addonTwilight?.addEventListener('change', updateDisplay);
+  addonVteQty?.addEventListener('input',    updateDisplay);
 
   // Populate from localStorage (set by PackageCards before Calendly redirect)
   const raw = localStorage.getItem('btpBooking');
