@@ -1,8 +1,9 @@
 ---
 interface Props {
   showInfoSections?: boolean;
+  filterType?: 'real-estate' | 'vacation-rental';
 }
-const { showInfoSections = true } = Astro.props;
+const { showInfoSections = true, filterType } = Astro.props;
 
 const reEstate = [
   { label: 'Up to 1,500 sq ft',    price: '$185', detail: 'Up to 25 photos' },
@@ -20,6 +21,9 @@ const vacRental = [
   { label: '6+ Bedrooms',           price: '$550', detail: 'Up to 60 photos' },
   { label: '6+ Bedrooms — Premium', price: '$650', detail: 'Up to 70 photos incl. themed rooms, game room & pool' },
 ];
+
+const showRE  = !filterType || filterType === 'real-estate';
+const showSTR = !filterType || filterType === 'vacation-rental';
 ---
 <style is:global>
   #btp-backdrop {
@@ -64,71 +68,72 @@ const vacRental = [
   }
 </style>
 
-<!-- Real Estate -->
-<div class="mt-14">
-  <h2 class="font-serif text-2xl sm:text-3xl">Real Estate</h2>
-  <p class="mt-2 text-sm text-stone-500">MLS &amp; for-sale listings — priced by square footage</p>
-  <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-    {reEstate.map((tier) => (
-      <div
-        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
-        style="min-height:180px;"
-        data-category="Real Estate Photography"
-        data-label={tier.label}
-        data-price={tier.price}
-        data-detail={tier.detail}
-        data-duration="2 hr 30 min"
-        data-service="real-estate"
-        data-tier={`Real Estate – ${tier.label}`}
-        data-calendly="https://calendly.com/benjammintims/30min"
-      >
-        <div>
-          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
-          <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+{showRE && (
+  <div class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">Real Estate</h2>
+    <p class="mt-2 text-sm text-stone-500">MLS &amp; for-sale listings — priced by square footage</p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {reEstate.map((tier) => (
+        <div
+          class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+          style="min-height:180px;"
+          data-category="Real Estate Photography"
+          data-label={tier.label}
+          data-price={tier.price}
+          data-detail={tier.detail}
+          data-duration="2 hr 30 min"
+          data-service="real-estate"
+          data-tier={`Real Estate – ${tier.label}`}
+          data-calendly="https://calendly.com/benjammintims/30min"
+        >
+          <div>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
+            <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
+            <span class="text-xs text-stone-400">tap to book →</span>
+          </div>
         </div>
-        <div class="mt-4 flex items-center justify-between">
-          <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
-          <span class="text-xs text-stone-400">tap to book →</span>
-        </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
-</div>
+)}
 
-<!-- Vacation Rental -->
-<div class="mt-14">
-  <h2 class="font-serif text-2xl sm:text-3xl">Vacation Rental &amp; STR</h2>
-  <p class="mt-2 text-sm text-stone-500">Airbnb, VRBO &amp; short-term rentals — priced by bedrooms</p>
-  <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-    {vacRental.map((tier) => (
-      <div
-        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
-        style="min-height:180px;"
-        data-category="Vacation Rental Photography"
-        data-label={tier.label}
-        data-price={tier.price}
-        data-detail={tier.detail}
-        data-duration="4 hr"
-        data-service="vacation-rental"
-        data-tier={`Vacation Rental – ${tier.label}`}
-        data-calendly="https://calendly.com/benjammintims/vacation-rental-photography"
-      >
-        <div>
-          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
-          <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+{showSTR && (
+  <div class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">Vacation Rental &amp; STR</h2>
+    <p class="mt-2 text-sm text-stone-500">Airbnb, VRBO &amp; short-term rentals — priced by bedrooms</p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {vacRental.map((tier) => (
+        <div
+          class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+          style="min-height:180px;"
+          data-category="Vacation Rental Photography"
+          data-label={tier.label}
+          data-price={tier.price}
+          data-detail={tier.detail}
+          data-duration="4 hr"
+          data-service="vacation-rental"
+          data-tier={`Vacation Rental – ${tier.label}`}
+          data-calendly="https://calendly.com/benjammintims/vacation-rental-photography"
+        >
+          <div>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
+            <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
+            <span class="text-xs text-stone-400">tap to book →</span>
+          </div>
         </div>
-        <div class="mt-4 flex items-center justify-between">
-          <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
-          <span class="text-xs text-stone-400">tap to book →</span>
-        </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
-</div>
+)}
 
 {showInfoSections && (
   <>
-    <!-- Walkthrough Video -->
     <div class="mt-14">
       <h2 class="font-serif text-2xl sm:text-3xl">Walkthrough Video</h2>
       <p class="mt-2 text-sm text-stone-500">Gimbal walkthrough + a 30–60 sec vertical social reel — one shoot, two deliverables</p>
@@ -149,13 +154,12 @@ const vacRental = [
       <p class="mt-3 text-xs text-stone-400">Video add-on can be selected during checkout after scheduling.</p>
     </div>
 
-    <!-- Add-ons -->
     <div class="mt-14">
       <h2 class="font-serif text-2xl sm:text-3xl">Add-ons</h2>
       <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
         {[
-          { label: 'Twilight Session — Add-on',    price: '$150',       detail: '6–8 dusk/twilight exterior photos, booked same day as main shoot' },
-          { label: 'Twilight Session — Standalone', price: '$200',       detail: '6–8 dusk/twilight exterior photos, separate appointment' },
+          { label: 'Twilight Session — Add-on',    price: '$150',        detail: '6–8 dusk/twilight exterior photos, booked same day as main shoot' },
+          { label: 'Twilight Session — Standalone', price: '$200',        detail: '6–8 dusk/twilight exterior photos, separate appointment' },
           { label: 'Virtual Twilight Edit',         price: '$35 / image', detail: 'Daytime exterior digitally converted to a twilight look' },
         ].map((item) => (
           <div class="flex items-center justify-between gap-6 px-6 py-5">
@@ -172,10 +176,8 @@ const vacRental = [
   </>
 )}
 
-<!-- Backdrop -->
 <div id="btp-backdrop"></div>
 
-<!-- Modal -->
 <div id="btp-modal-wrap" aria-hidden="true">
   <div id="btp-modal-card">
     <div class="p-8 pb-6">
@@ -197,7 +199,6 @@ const vacRental = [
 </div>
 
 <script>
-  // Guard: only run when the card grid is actually on this page
   const backdrop = document.getElementById('btp-backdrop');
   if (backdrop) {
     const modalWrap  = document.getElementById('btp-modal-wrap')!;
@@ -248,7 +249,6 @@ const vacRental = [
       btmBook.dataset.service  = service;
       btmBook.dataset.tier     = tier;
       btmBook.dataset.price    = price;
-
       card.classList.add('is-folding');
       backdrop.classList.add('active');
       document.body.style.overflow = 'hidden';
