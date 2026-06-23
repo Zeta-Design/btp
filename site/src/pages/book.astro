@@ -18,6 +18,10 @@ const prefillName  = params.get('invitee_full_name') ?? '';
 const prefillEmail = params.get('invitee_email') ?? '';
 const eventStart   = params.get('event_start_time') ?? '';
 
+// UTM fallback: Calendly passes these through from the pricing modal click
+const utmPrice = params.get('utm_content') ?? '';
+const utmTier  = params.get('utm_term')    ?? '';
+
 let shootDateFormatted = '';
 if (eventStart) {
   try {
@@ -94,16 +98,16 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
 
         <div class="mt-6 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
           <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Scheduled shoot</p>
-          <p id="btp-tier-label" class="mt-1 font-medium text-stone-900">{serviceLabel}</p>
+          <p id="btp-tier-label" class="mt-1 font-medium text-stone-900">{utmTier || serviceLabel}</p>
           {shootDateFormatted && <p class="text-sm text-stone-600">{shootDateFormatted}</p>}
-          <p id="btp-price-label" class="mt-0.5 text-sm text-stone-500 hidden"></p>
+          <p id="btp-price-label" class={`mt-0.5 text-sm text-stone-500${utmPrice ? '' : ' hidden'}`}>{utmPrice ? `Package: ${utmPrice}` : ''}</p>
         </div>
 
         <form method="POST" action="/api/checkout" class="mt-8 space-y-6">
           <input type="hidden" name="service"   id="btp-service-input" value={serviceLabel} />
           <input type="hidden" name="shootDate" value={eventStart || 'To be confirmed'} />
-          <input type="hidden" name="tier"      id="btp-tier-input" value="" />
-          <input type="hidden" name="price"     id="btp-price-input" value="" />
+          <input type="hidden" name="tier"      id="btp-tier-input" value={utmTier} />
+          <input type="hidden" name="price"     id="btp-price-input" value={utmPrice} />
 
           <!-- Name + Email -->
           <div class="grid gap-6 sm:grid-cols-2">
@@ -232,7 +236,7 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
                 data-value="full"
               >
                 <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Pay in full</p>
-                <p id="btp-full-price" class="mt-1 text-xl font-light text-stone-900">—</p>
+                <p id="btp-full-price" class="mt-1 text-xl font-light text-stone-900">{utmPrice ? `${utmPrice} now` : '—'}</p>
                 <p class="mt-1 text-xs text-stone-500">Everything covered upfront</p>
               </button>
             </div>
@@ -269,7 +273,11 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
   const submitBtn      = document.getElementById('btp-submit-btn')      as HTMLButtonElement | null;
   const submitNote     = document.getElementById('btp-submit-note')     as HTMLParagraphElement | null;
 
-  let basePriceNum = 0;
+  // Initialize from server-rendered UTM value (pre-populated in the hidden input)
+  const priceInputEl = document.getElementById('btp-price-input') as HTMLInputElement | null;
+  let basePriceNum = priceInputEl?.value
+    ? parseFloat(priceInputEl.value.replace(/[^0-9.]/g, ''))
+    : 0;
 
   function getAddonTotal(): number {
     return (addonVideo?.checked ? ADDON_VIDEO_PRICE : 0) +

@@ -374,13 +374,18 @@ const vacRental = [
   modalWrap.addEventListener('click', closeModal);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
-  // Save tier to sessionStorage before Calendly redirect
-  btmBook.addEventListener('click', () => {
-    sessionStorage.setItem('btpBooking', JSON.stringify({
-      service: btmBook.dataset.service,
-      tier:    btmBook.dataset.tier,
-      price:   btmBook.dataset.price,
-    }));
+  // Before Calendly redirect: save to sessionStorage AND encode price+tier as UTM
+  // params so they survive cross-origin navigation (Calendly passes UTMs through).
+  btmBook.addEventListener('click', (e) => {
+    e.preventDefault();
+    const price   = btmBook.dataset.price   ?? '';
+    const tier    = btmBook.dataset.tier    ?? '';
+    const service = btmBook.dataset.service ?? '';
+    sessionStorage.setItem('btpBooking', JSON.stringify({ service, tier, price }));
+    const url = new URL(btmBook.href);
+    url.searchParams.set('utm_content', price);
+    url.searchParams.set('utm_term', tier);
+    window.location.href = url.toString();
   });
 </script>
 </BaseLayout>
