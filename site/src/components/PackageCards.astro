@@ -238,6 +238,10 @@ const showTwilightSA  = filterType === 'twilight-standalone';
   </>
 )}
 
+<!-- Calendly popup widget assets -->
+<link rel="stylesheet" href="https://assets.calendly.com/assets/external/widget.css" />
+<script is:inline src="https://assets.calendly.com/assets/external/widget.js"></script>
+
 <div id="btp-backdrop"></div>
 
 <div id="btp-modal-wrap" aria-hidden="true">
@@ -374,10 +378,45 @@ const showTwilightSA  = filterType === 'twilight-standalone';
       const tier    = btmBook.dataset.tier    ?? '';
       const service = btmBook.dataset.service ?? '';
       localStorage.setItem('btpBooking', JSON.stringify({ service, tier, price }));
-      const url = new URL(btmBook.href);
-      url.searchParams.set('utm_content', price);
-      url.searchParams.set('utm_term', tier);
-      window.location.href = url.toString();
+
+      const calendlyUrl = new URL(btmBook.href);
+      calendlyUrl.searchParams.set('utm_content', price);
+      calendlyUrl.searchParams.set('utm_term', tier);
+
+      closeModal();
+
+      const Cal = (window as any).Calendly;
+      if (Cal) {
+        Cal.initPopupWidget({ url: calendlyUrl.toString() });
+      } else {
+        // Script still loading — wait then open, or fall back to navigation
+        const s = document.querySelector('script[src*="assets.calendly.com"]') as HTMLScriptElement | null;
+        if (s) {
+          s.addEventListener('load', () => (window as any).Calendly?.initPopupWidget({ url: calendlyUrl.toString() }), { once: true });
+        } else {
+          window.location.href = calendlyUrl.toString();
+        }
+      }
+    });
+
+    // After Calendly booking completes, redirect to Step 2 without the interstitial.
+    // Name/email pre-fill is lost (user fills them in on Step 2); everything else
+    // comes from localStorage set above.
+    window.addEventListener('message', (e) => {
+      if (e.origin === 'https://calendly.com' && e.data?.event === 'calendly.event_scheduled') {
+        const stored = localStorage.getItem('btpBooking');
+        if (stored) {
+          try {
+            const { service } = JSON.parse(stored);
+            if (service) {
+              setTimeout(() => {
+                (window as any).Calendly?.closePopupWidget?.();
+                window.location.href = `/book?service=${encodeURIComponent(service)}`;
+              }, 1200);
+            }
+          } catch {}
+        }
+      }
     });
   }
 </script>
