@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { name, phone, service, tier, price, paymentOption, shootDate, address } = session.metadata ?? {};
+    const { name, phone, service, tier, price, paymentOption, shootDate, address, addons } = session.metadata ?? {};
     const email = session.customer_email ?? '';
 
     if (email) {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
         to: [email],
         bcc: ['info@bentims.com'],
         subject: `Booking Confirmed – ${service ?? 'Your Photography Session'}`,
-        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address }),
+        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address, addons }),
       });
     }
   }
@@ -51,6 +51,7 @@ interface EmailData {
   paymentOption?: string;
   shootDate?: string;
   address?: string;
+  addons?: string;
 }
 
 export function formatShootDate(raw?: string): string {
@@ -145,6 +146,10 @@ export function buildConfirmationEmail(d: EmailData): string {
         ${d.phone ? `<tr>
           <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Phone</td>
           <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.phone}</td>
+        </tr>` : ''}
+        ${d.addons ? `<tr>
+          <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Add-ons</td>
+          <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.addons}</td>
         </tr>` : ''}
       </table>
 

@@ -184,6 +184,27 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
             </div>
           </div>
 
+          <!-- Add-ons -->
+          <div class="space-y-3">
+            <p class="text-sm font-medium text-stone-700">Add-ons <span class="font-normal text-stone-400">(optional — same day as your shoot)</span></p>
+            <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
+              <input type="checkbox" name="addon_video" id="btp-addon-video" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
+              <div class="flex-1">
+                <p class="text-sm font-medium text-stone-900">Walkthrough Video</p>
+                <p class="mt-0.5 text-xs text-stone-500">Gimbal walkthrough + 30–60 sec vertical social reel</p>
+              </div>
+              <p class="shrink-0 text-sm font-medium text-stone-900">+$200</p>
+            </label>
+            <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
+              <input type="checkbox" name="addon_twilight" id="btp-addon-twilight" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
+              <div class="flex-1">
+                <p class="text-sm font-medium text-stone-900">Twilight Session</p>
+                <p class="mt-0.5 text-xs text-stone-500">6–8 dusk/twilight exterior photos, same day as main shoot</p>
+              </div>
+              <p class="shrink-0 text-sm font-medium text-stone-900">+$150</p>
+            </label>
+          </div>
+
           <!-- Payment option selector -->
           <input type="hidden" name="paymentOption" id="btp-payment-option" value="deposit" />
 
@@ -199,7 +220,7 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
                 data-value="deposit"
               >
                 <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Deposit</p>
-                <p class="mt-1 text-xl font-light text-stone-900">$150 <span class="text-sm font-normal text-stone-500">now</span></p>
+                <p id="btp-deposit-price" class="mt-1 text-xl font-light text-stone-900">$150 <span class="text-sm font-normal text-stone-500">now</span></p>
                 <p class="mt-1 text-xs text-stone-500">Balance due after your shoot</p>
               </button>
 
@@ -235,59 +256,102 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
 
   </section>
 <script>
+  const ADDON_VIDEO_PRICE    = 200;
+  const ADDON_TWILIGHT_PRICE = 150;
+
+  const addonVideo     = document.getElementById('btp-addon-video')     as HTMLInputElement | null;
+  const addonTwilight  = document.getElementById('btp-addon-twilight')  as HTMLInputElement | null;
+  const depositPriceEl = document.getElementById('btp-deposit-price');
+  const fullPriceEl    = document.getElementById('btp-full-price');
+  const optDeposit     = document.getElementById('btp-opt-deposit')     as HTMLButtonElement | null;
+  const optFull        = document.getElementById('btp-opt-full')        as HTMLButtonElement | null;
+  const paymentInput   = document.getElementById('btp-payment-option')  as HTMLInputElement | null;
+  const submitBtn      = document.getElementById('btp-submit-btn')      as HTMLButtonElement | null;
+  const submitNote     = document.getElementById('btp-submit-note')     as HTMLParagraphElement | null;
+
+  let basePriceNum = 0;
+
+  function getAddonTotal(): number {
+    return (addonVideo?.checked ? ADDON_VIDEO_PRICE : 0) +
+           (addonTwilight?.checked ? ADDON_TWILIGHT_PRICE : 0);
+  }
+
+  function updateDisplay() {
+    const addonAmt     = getAddonTotal();
+    const depositTotal = 150 + addonAmt;
+    const fullTotal    = basePriceNum > 0 ? basePriceNum + addonAmt : 0;
+    const isDeposit    = (paymentInput?.value ?? 'deposit') === 'deposit';
+
+    if (depositPriceEl) {
+      depositPriceEl.innerHTML = `$${depositTotal} <span style="font-size:0.875rem;font-weight:400;color:#78716c;">now</span>`;
+    }
+    if (fullPriceEl) {
+      fullPriceEl.innerHTML = fullTotal > 0
+        ? `$${fullTotal} <span style="font-size:0.875rem;font-weight:400;color:#78716c;">now</span>`
+        : '—';
+    }
+    if (submitBtn) {
+      submitBtn.textContent = isDeposit
+        ? `Pay $${depositTotal} deposit →`
+        : fullTotal > 0 ? `Pay $${fullTotal} in full →` : submitBtn.textContent;
+    }
+    if (submitNote) {
+      if (isDeposit) {
+        submitNote.textContent = addonAmt > 0
+          ? 'Secure checkout via Stripe · Add-ons paid in full · Balance due after your shoot'
+          : 'Secure checkout via Stripe · Balance due after your shoot';
+      } else {
+        submitNote.textContent = 'Secure checkout via Stripe · No balance due after your shoot';
+      }
+    }
+  }
+
+  function selectOption(value: string) {
+    if (!paymentInput || !optDeposit || !optFull) return;
+    paymentInput.value = value;
+    if (value === 'deposit') {
+      optDeposit.classList.add('border-stone-900');
+      optDeposit.classList.remove('border-stone-200');
+      optFull.classList.remove('border-stone-900');
+      optFull.classList.add('border-stone-200');
+    } else {
+      optFull.classList.add('border-stone-900');
+      optFull.classList.remove('border-stone-200');
+      optDeposit.classList.remove('border-stone-900');
+      optDeposit.classList.add('border-stone-200');
+    }
+    updateDisplay();
+  }
+
+  optDeposit?.addEventListener('click', () => selectOption('deposit'));
+  optFull?.addEventListener('click', () => selectOption('full'));
+  addonVideo?.addEventListener('change', updateDisplay);
+  addonTwilight?.addEventListener('change', updateDisplay);
+
+  // Populate from sessionStorage (set by pricing page before Calendly redirect)
   const raw = sessionStorage.getItem('btpBooking');
   if (raw) {
     try {
       const { service, tier, price } = JSON.parse(raw);
       const tierLabel  = document.getElementById('btp-tier-label');
       const priceLabel = document.getElementById('btp-price-label');
-      const tierInput   = document.getElementById('btp-tier-input') as HTMLInputElement;
-      const svcInput    = document.getElementById('btp-service-input') as HTMLInputElement;
-      const priceInput  = document.getElementById('btp-price-input') as HTMLInputElement;
-      if (tierLabel && tier)  tierLabel.textContent = tier;
-      if (priceLabel && price) {
-        priceLabel.textContent = `Total after shoot: ${price}`;
-        priceLabel.classList.remove('hidden');
-      }
+      const tierInput  = document.getElementById('btp-tier-input')  as HTMLInputElement | null;
+      const svcInput   = document.getElementById('btp-service-input') as HTMLInputElement | null;
+      const priceInput = document.getElementById('btp-price-input') as HTMLInputElement | null;
+
+      if (tierLabel && tier)   tierLabel.textContent = tier;
       if (tierInput && tier)   tierInput.value = tier;
       if (priceInput && price) priceInput.value = price;
       if (svcInput && service) svcInput.value = service === 'real-estate' ? 'Real Estate Photography' : 'Vacation Rental Photography';
-      sessionStorage.removeItem('btpBooking');
-
-      // Wire up pay-in-full option if we have a price
-      if (price) {
-        const fullPriceEl  = document.getElementById('btp-full-price');
-        const optDeposit   = document.getElementById('btp-opt-deposit') as HTMLButtonElement;
-        const optFull      = document.getElementById('btp-opt-full') as HTMLButtonElement;
-        const paymentInput = document.getElementById('btp-payment-option') as HTMLInputElement;
-        const submitBtn    = document.getElementById('btp-submit-btn') as HTMLButtonElement;
-        const submitNote   = document.getElementById('btp-submit-note') as HTMLParagraphElement;
-
-        if (fullPriceEl) fullPriceEl.textContent = `${price} now`;
-
-        function selectOption(value: string) {
-          paymentInput.value = value;
-          if (value === 'deposit') {
-            optDeposit.classList.add('border-stone-900');
-            optDeposit.classList.remove('border-stone-200');
-            optFull.classList.remove('border-stone-900');
-            optFull.classList.add('border-stone-200');
-            submitBtn.textContent = 'Pay $150 deposit →';
-            submitNote.textContent = 'Secure checkout via Stripe · Balance due after your shoot';
-          } else {
-            optFull.classList.add('border-stone-900');
-            optFull.classList.remove('border-stone-200');
-            optDeposit.classList.remove('border-stone-900');
-            optDeposit.classList.add('border-stone-200');
-            submitBtn.textContent = `Pay ${price} in full →`;
-            submitNote.textContent = 'Secure checkout via Stripe · No balance due after your shoot';
-          }
-        }
-
-        optDeposit.addEventListener('click', () => selectOption('deposit'));
-        optFull.addEventListener('click', () => selectOption('full'));
+      if (priceLabel && price) {
+        priceLabel.textContent = `Package: ${price}`;
+        priceLabel.classList.remove('hidden');
       }
+      sessionStorage.removeItem('btpBooking');
+      if (price) basePriceNum = parseFloat(price.replace(/[^0-9.]/g, ''));
     } catch {}
   }
+
+  updateDisplay();
 </script>
 </BaseLayout>
