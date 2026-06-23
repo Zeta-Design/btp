@@ -336,8 +336,9 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
   addonVideo?.addEventListener('change', updateDisplay);
   addonTwilight?.addEventListener('change', updateDisplay);
 
-  // Populate from sessionStorage (set by pricing page before Calendly redirect)
-  const raw = sessionStorage.getItem('btpBooking');
+  // Populate from localStorage (set by pricing page before Calendly redirect)
+  // localStorage survives cross-domain navigation; sessionStorage can be cleared by some browsers.
+  const raw = localStorage.getItem('btpBooking');
   if (raw) {
     try {
       const { service, tier, price } = JSON.parse(raw);
@@ -355,7 +356,7 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
         priceLabel.textContent = `Package: ${price}`;
         priceLabel.classList.remove('hidden');
       }
-      sessionStorage.removeItem('btpBooking');
+      localStorage.removeItem('btpBooking');
       if (price) basePriceNum = parseFloat(price.replace(/[^0-9.]/g, ''));
     } catch {}
   }

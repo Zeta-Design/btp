@@ -381,7 +381,7 @@ const vacRental = [
     const price   = btmBook.dataset.price   ?? '';
     const tier    = btmBook.dataset.tier    ?? '';
     const service = btmBook.dataset.service ?? '';
-    sessionStorage.setItem('btpBooking', JSON.stringify({ service, tier, price }));
+    localStorage.setItem('btpBooking', JSON.stringify({ service, tier, price }));
     const url = new URL(btmBook.href);
     url.searchParams.set('utm_content', price);
     url.searchParams.set('utm_term', tier);
