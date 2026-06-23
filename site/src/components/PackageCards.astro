@@ -1,0 +1,305 @@
+---
+interface Props {
+  showInfoSections?: boolean;
+}
+const { showInfoSections = true } = Astro.props;
+
+const reEstate = [
+  { label: 'Up to 1,500 sq ft',    price: '$185', detail: 'Up to 25 photos' },
+  { label: '1,500 – 2,500 sq ft',  price: '$225', detail: 'Up to 35 photos' },
+  { label: '2,500 – 4,000 sq ft',  price: '$295', detail: 'Up to 40 photos' },
+  { label: '4,000 – 5,500 sq ft',  price: '$375', detail: 'Up to 50 photos' },
+  { label: '5,500 – 8,000 sq ft',  price: '$475', detail: 'Up to 60 photos' },
+  { label: '8,000+ sq ft',          price: '$595', detail: 'Up to 70 photos' },
+];
+
+const vacRental = [
+  { label: '1 – 2 Bedrooms',        price: '$265', detail: 'Up to 30 photos' },
+  { label: '3 – 4 Bedrooms',        price: '$335', detail: 'Up to 40 photos' },
+  { label: '4 – 5 Bedrooms',        price: '$425', detail: 'Up to 50 photos' },
+  { label: '6+ Bedrooms',           price: '$550', detail: 'Up to 60 photos' },
+  { label: '6+ Bedrooms — Premium', price: '$650', detail: 'Up to 70 photos incl. themed rooms, game room & pool' },
+];
+---
+<style is:global>
+  #btp-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.65);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    z-index: 45; opacity: 0; pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  #btp-backdrop.active { opacity: 1; pointer-events: auto; }
+
+  .btp-card { cursor: pointer; transform-origin: center; }
+  .btp-card.is-folding {
+    transition: transform 0.22s ease-in, opacity 0.18s ease;
+    transform: perspective(1400px) rotateY(90deg); opacity: 0; pointer-events: none;
+  }
+  .btp-card.is-restoring {
+    transition: transform 0.38s cubic-bezier(0.34,1.1,0.64,1), opacity 0.28s ease;
+    transform: perspective(1400px) rotateY(0deg); opacity: 1;
+  }
+
+  #btp-modal-wrap {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; align-items: center; justify-content: center;
+    padding: 1.25rem; pointer-events: none;
+  }
+  #btp-modal-wrap.active { pointer-events: auto; }
+
+  #btp-modal-card {
+    width: min(540px, 94vw); background: #1c1917;
+    border-radius: 0.875rem; box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    display: flex; flex-direction: column;
+    opacity: 0; transform: perspective(1400px) rotateY(-90deg); transition: none;
+  }
+  #btp-modal-card.entering {
+    transition: transform 0.48s cubic-bezier(0.34,1.06,0.64,1), opacity 0.22s ease;
+    opacity: 1; transform: perspective(1400px) rotateY(0deg);
+  }
+  #btp-modal-card.leaving {
+    transition: transform 0.28s ease-in, opacity 0.22s ease;
+    opacity: 0; transform: perspective(1400px) rotateY(90deg);
+  }
+</style>
+
+<!-- Real Estate -->
+<div class="mt-14">
+  <h2 class="font-serif text-2xl sm:text-3xl">Real Estate</h2>
+  <p class="mt-2 text-sm text-stone-500">MLS &amp; for-sale listings — priced by square footage</p>
+  <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {reEstate.map((tier) => (
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-category="Real Estate Photography"
+        data-label={tier.label}
+        data-price={tier.price}
+        data-detail={tier.detail}
+        data-duration="2 hr 30 min"
+        data-service="real-estate"
+        data-tier={`Real Estate – ${tier.label}`}
+        data-calendly="https://calendly.com/benjammintims/30min"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
+          <span class="text-xs text-stone-400">tap to book →</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+<!-- Vacation Rental -->
+<div class="mt-14">
+  <h2 class="font-serif text-2xl sm:text-3xl">Vacation Rental &amp; STR</h2>
+  <p class="mt-2 text-sm text-stone-500">Airbnb, VRBO &amp; short-term rentals — priced by bedrooms</p>
+  <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {vacRental.map((tier) => (
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-category="Vacation Rental Photography"
+        data-label={tier.label}
+        data-price={tier.price}
+        data-detail={tier.detail}
+        data-duration="4 hr"
+        data-service="vacation-rental"
+        data-tier={`Vacation Rental – ${tier.label}`}
+        data-calendly="https://calendly.com/benjammintims/vacation-rental-photography"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
+          <span class="text-xs text-stone-400">tap to book →</span>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+{showInfoSections && (
+  <>
+    <!-- Walkthrough Video -->
+    <div class="mt-14">
+      <h2 class="font-serif text-2xl sm:text-3xl">Walkthrough Video</h2>
+      <p class="mt-2 text-sm text-stone-500">Gimbal walkthrough + a 30–60 sec vertical social reel — one shoot, two deliverables</p>
+      <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+        {[
+          { label: 'Add-on — same day as photo shoot', price: '$200', detail: 'Booked alongside any photo package — full walkthrough edit + social reel cut' },
+          { label: 'Standalone shoot',                 price: '$325', detail: 'Separate appointment — full walkthrough edit + social reel cut' },
+        ].map((item) => (
+          <div class="flex items-center justify-between gap-6 px-6 py-5">
+            <div>
+              <p class="font-medium text-stone-900">{item.label}</p>
+              <p class="mt-0.5 text-sm text-stone-500">{item.detail}</p>
+            </div>
+            <p class="shrink-0 text-base font-light text-stone-900">{item.price}</p>
+          </div>
+        ))}
+      </div>
+      <p class="mt-3 text-xs text-stone-400">Video add-on can be selected during checkout after scheduling.</p>
+    </div>
+
+    <!-- Add-ons -->
+    <div class="mt-14">
+      <h2 class="font-serif text-2xl sm:text-3xl">Add-ons</h2>
+      <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+        {[
+          { label: 'Twilight Session — Add-on',    price: '$150',       detail: '6–8 dusk/twilight exterior photos, booked same day as main shoot' },
+          { label: 'Twilight Session — Standalone', price: '$200',       detail: '6–8 dusk/twilight exterior photos, separate appointment' },
+          { label: 'Virtual Twilight Edit',         price: '$35 / image', detail: 'Daytime exterior digitally converted to a twilight look' },
+        ].map((item) => (
+          <div class="flex items-center justify-between gap-6 px-6 py-5">
+            <div>
+              <p class="font-medium text-stone-900">{item.label}</p>
+              <p class="mt-0.5 text-sm text-stone-500">{item.detail}</p>
+            </div>
+            <p class="shrink-0 text-base font-light text-stone-900">{item.price}</p>
+          </div>
+        ))}
+      </div>
+      <p class="mt-3 text-xs text-stone-400">Add-ons can be selected during checkout after scheduling your shoot.</p>
+    </div>
+  </>
+)}
+
+<!-- Backdrop -->
+<div id="btp-backdrop"></div>
+
+<!-- Modal -->
+<div id="btp-modal-wrap" aria-hidden="true">
+  <div id="btp-modal-card">
+    <div class="p-8 pb-6">
+      <p id="btm-cat"   class="text-xs font-medium uppercase tracking-widest text-stone-500"></p>
+      <p id="btm-label" class="mt-3 font-serif text-2xl leading-snug text-white"></p>
+      <p id="btm-price" class="mt-2 text-5xl font-light text-white"></p>
+      <div id="btm-badges" class="mt-5 flex flex-wrap gap-2"></div>
+      <p class="mt-4 text-sm text-stone-500">$150 deposit · balance due after shoot</p>
+      <div class="mt-6 border-t border-stone-800 pt-5">
+        <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">What's included</p>
+        <ul id="btm-included" class="mt-3 space-y-2"></ul>
+      </div>
+    </div>
+    <div class="border-t border-stone-800 px-8 py-5 flex items-center gap-4">
+      <a id="btm-book" href="#" class="flex-1 rounded-xl bg-white py-3.5 text-center text-base font-medium text-stone-900 transition hover:bg-stone-100">Book</a>
+      <button id="btm-close" class="shrink-0 text-sm text-stone-500 transition hover:text-stone-300">← back</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Guard: only run when the card grid is actually on this page
+  const backdrop = document.getElementById('btp-backdrop');
+  if (backdrop) {
+    const modalWrap  = document.getElementById('btp-modal-wrap')!;
+    const modalCard  = document.getElementById('btp-modal-card')!;
+    const btmCat      = document.getElementById('btm-cat')!;
+    const btmLabel    = document.getElementById('btm-label')!;
+    const btmPrice    = document.getElementById('btm-price')!;
+    const btmBadges   = document.getElementById('btm-badges')!;
+    const btmIncluded = document.getElementById('btm-included')!;
+    const btmBook     = document.getElementById('btm-book') as HTMLAnchorElement;
+    const btmClose    = document.getElementById('btm-close') as HTMLButtonElement;
+
+    const INCLUDED: Record<string, string[]> = {
+      'real-estate': [
+        'Professional HDR editing on every image',
+        'MLS-ready JPEGs delivered via online gallery',
+        'Delivery within 24–48 hours of your shoot',
+        'Licensed for MLS, listing sites &amp; social media',
+        'Unlimited downloads — no watermarks',
+      ],
+      'vacation-rental': [
+        'Professional HDR editing on every image',
+        'High-res JPEGs delivered via online gallery',
+        'Delivery within 24–48 hours of your shoot',
+        'Licensed for Airbnb, VRBO &amp; marketing use',
+        'Styled staging suggestions included',
+        'Unlimited downloads — no watermarks',
+      ],
+    };
+
+    let activeCard: HTMLElement | null = null;
+    let closing = false;
+
+    function openModal(card: HTMLElement) {
+      if (activeCard || closing) return;
+      activeCard = card;
+      const { category, label, price, detail, duration, service, tier, calendly } = card.dataset;
+      btmCat.textContent   = category!;
+      btmLabel.textContent = label!;
+      btmPrice.textContent = price!;
+      btmBadges.innerHTML  = [duration!, detail!, '24–48 hr delivery']
+        .map(b => `<span class="rounded-full bg-stone-800 px-4 py-1.5 text-sm text-stone-300">${b}</span>`)
+        .join('');
+      btmIncluded.innerHTML = (INCLUDED[service!] ?? INCLUDED['real-estate'])
+        .map(item => `<li class="flex items-start gap-2 text-sm text-stone-300"><span class="mt-0.5 shrink-0 text-stone-500">→</span>${item}</li>`)
+        .join('');
+      btmBook.href             = calendly!;
+      btmBook.dataset.service  = service;
+      btmBook.dataset.tier     = tier;
+      btmBook.dataset.price    = price;
+
+      card.classList.add('is-folding');
+      backdrop.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      modalWrap.classList.add('active');
+      modalWrap.setAttribute('aria-hidden', 'false');
+      modalCard.classList.remove('entering', 'leaving');
+      void modalCard.offsetWidth;
+      setTimeout(() => modalCard.classList.add('entering'), 130);
+    }
+
+    function closeModal() {
+      if (!activeCard || closing) return;
+      closing = true;
+      const card = activeCard;
+      activeCard = null;
+      modalCard.classList.remove('entering');
+      modalCard.classList.add('leaving');
+      backdrop.classList.remove('active');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        card.classList.remove('is-folding');
+        card.classList.add('is-restoring');
+        card.addEventListener('transitionend', () => card.classList.remove('is-restoring'), { once: true });
+      }, 120);
+      setTimeout(() => {
+        modalWrap.classList.remove('active');
+        modalWrap.setAttribute('aria-hidden', 'true');
+        modalCard.classList.remove('leaving');
+        closing = false;
+      }, 320);
+    }
+
+    document.querySelectorAll<HTMLElement>('.btp-card').forEach(card => {
+      card.addEventListener('click', () => openModal(card));
+    });
+    modalCard.addEventListener('click', e => e.stopPropagation());
+    btmClose.addEventListener('click', closeModal);
+    backdrop.addEventListener('click', closeModal);
+    modalWrap.addEventListener('click', closeModal);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    btmBook.addEventListener('click', (e) => {
+      e.preventDefault();
+      const price   = btmBook.dataset.price   ?? '';
+      const tier    = btmBook.dataset.tier    ?? '';
+      const service = btmBook.dataset.service ?? '';
+      localStorage.setItem('btpBooking', JSON.stringify({ service, tier, price }));
+      const url = new URL(btmBook.href);
+      url.searchParams.set('utm_content', price);
+      url.searchParams.set('utm_term', tier);
+      window.location.href = url.toString();
+    });
+  }
+</script>
