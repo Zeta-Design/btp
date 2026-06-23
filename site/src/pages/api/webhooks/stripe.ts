@@ -52,7 +52,7 @@ interface EmailData {
   address?: string;
 }
 
-function formatShootDate(raw?: string): string {
+export function formatShootDate(raw?: string): string {
   if (!raw || raw === 'To be confirmed') return 'To be confirmed';
   try {
     return new Date(raw).toLocaleString('en-US', {
@@ -69,14 +69,14 @@ function formatShootDate(raw?: string): string {
   }
 }
 
-function remainingBalance(price?: string): string {
+export function remainingBalance(price?: string): string {
   if (!price) return '';
   const num = parseFloat(price.replace(/[^0-9.]/g, ''));
   if (isNaN(num)) return '';
   return `$${(num - 150).toFixed(0)}`;
 }
 
-function buildConfirmationEmail(d: EmailData): string {
+export function buildConfirmationEmail(d: EmailData): string {
   const shootDateFormatted = formatShootDate(d.shootDate);
   const firstName = (d.name ?? 'there').split(' ')[0];
   const remaining = remainingBalance(d.price);
