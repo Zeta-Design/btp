@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { name, phone, service, tier, price, shootDate, address } = session.metadata ?? {};
+    const { name, phone, service, tier, price, paymentOption, shootDate, address } = session.metadata ?? {};
     const email = session.customer_email ?? '';
 
     if (email) {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
         to: [email],
         bcc: ['info@bentims.com'],
         subject: `Booking Confirmed – ${service ?? 'Your Photography Session'}`,
-        html: buildConfirmationEmail({ name, email, phone, service, tier, price, shootDate, address }),
+        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address }),
       });
     }
   }
@@ -48,6 +48,7 @@ interface EmailData {
   service?: string;
   tier?: string;
   price?: string;
+  paymentOption?: string;
   shootDate?: string;
   address?: string;
 }
@@ -80,6 +81,7 @@ export function buildConfirmationEmail(d: EmailData): string {
   const shootDateFormatted = formatShootDate(d.shootDate);
   const firstName = (d.name ?? 'there').split(' ')[0];
   const remaining = remainingBalance(d.price);
+  const isPaidInFull = d.paymentOption === 'full';
   const isSTR = (d.service ?? '').toLowerCase().includes('vacation') || (d.service ?? '').toLowerCase().includes('str');
 
   return `<!DOCTYPE html>
@@ -148,6 +150,16 @@ export function buildConfirmationEmail(d: EmailData): string {
 
       <!-- Payment summary -->
       <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:#f5f4f2;border-radius:8px;padding:16px 20px;">
+        ${isPaidInFull ? `
+        <tr>
+          <td style="font-size:13px;color:#78716c;">Paid in full</td>
+          <td style="font-size:13px;font-weight:600;color:#16a34a;text-align:right;">${d.price ?? ''} ✓</td>
+        </tr>
+        <tr>
+          <td style="font-size:13px;color:#78716c;padding-top:8px;">Balance due after shoot</td>
+          <td style="font-size:13px;font-weight:500;color:#1c1917;text-align:right;padding-top:8px;">$0</td>
+        </tr>
+        ` : `
         <tr>
           <td style="font-size:13px;color:#78716c;">Deposit paid</td>
           <td style="font-size:13px;font-weight:600;color:#16a34a;text-align:right;">$150 ✓</td>
@@ -160,6 +172,7 @@ export function buildConfirmationEmail(d: EmailData): string {
           <td style="font-size:13px;color:#78716c;padding-top:8px;">Total</td>
           <td style="font-size:13px;color:#78716c;text-align:right;padding-top:8px;">${d.price}</td>
         </tr>` : ''}
+        `}
       </table>
     </td>
   </tr>
