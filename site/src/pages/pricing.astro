@@ -235,6 +235,11 @@ const vacRental = [
       <p id="btm-price" class="mt-2 text-5xl font-light text-white"></p>
       <div id="btm-badges" class="mt-5 flex flex-wrap gap-2"></div>
       <p class="mt-4 text-sm text-stone-500">$150 deposit · balance due after shoot</p>
+
+      <div class="mt-6 border-t border-stone-800 pt-5">
+        <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">What's included</p>
+        <ul id="btm-included" class="mt-3 space-y-2"></ul>
+      </div>
     </div>
     <div class="border-t border-stone-800 px-8 py-5 flex items-center gap-4">
       <a
@@ -254,12 +259,31 @@ const vacRental = [
   const backdrop   = document.getElementById('btp-backdrop')!;
   const modalWrap  = document.getElementById('btp-modal-wrap')!;
   const modalCard  = document.getElementById('btp-modal-card')!;
-  const btmCat     = document.getElementById('btm-cat')!;
-  const btmLabel   = document.getElementById('btm-label')!;
-  const btmPrice   = document.getElementById('btm-price')!;
-  const btmBadges  = document.getElementById('btm-badges')!;
-  const btmBook    = document.getElementById('btm-book') as HTMLAnchorElement;
-  const btmClose   = document.getElementById('btm-close') as HTMLButtonElement;
+  const btmCat      = document.getElementById('btm-cat')!;
+  const btmLabel    = document.getElementById('btm-label')!;
+  const btmPrice    = document.getElementById('btm-price')!;
+  const btmBadges   = document.getElementById('btm-badges')!;
+  const btmIncluded = document.getElementById('btm-included')!;
+  const btmBook     = document.getElementById('btm-book') as HTMLAnchorElement;
+  const btmClose    = document.getElementById('btm-close') as HTMLButtonElement;
+
+  const INCLUDED: Record<string, string[]> = {
+    'real-estate': [
+      'Professional HDR editing on every image',
+      'MLS-ready JPEGs delivered via online gallery',
+      'Delivery within 24–48 hours of your shoot',
+      'Licensed for MLS, listing sites &amp; social media',
+      'Unlimited downloads — no watermarks',
+    ],
+    'vacation-rental': [
+      'Professional HDR editing on every image',
+      'High-res JPEGs delivered via online gallery',
+      'Delivery within 24–48 hours of your shoot',
+      'Licensed for Airbnb, VRBO &amp; marketing use',
+      'Styled staging suggestions included',
+      'Unlimited downloads — no watermarks',
+    ],
+  };
 
   let activeCard: HTMLElement | null = null;
   let closing = false;
@@ -276,6 +300,9 @@ const vacRental = [
     btmPrice.textContent = price!;
     btmBadges.innerHTML  = [duration!, detail!, '24–48 hr delivery']
       .map(b => `<span class="rounded-full bg-stone-800 px-4 py-1.5 text-sm text-stone-300">${b}</span>`)
+      .join('');
+    btmIncluded.innerHTML = (INCLUDED[service!] ?? INCLUDED['real-estate'])
+      .map(item => `<li class="flex items-start gap-2 text-sm text-stone-300"><span class="mt-0.5 shrink-0 text-stone-500">→</span>${item}</li>`)
       .join('');
     btmBook.href             = calendly!;
     btmBook.dataset.service  = service;
