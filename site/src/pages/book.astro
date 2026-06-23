@@ -1,4 +1,6 @@
 ---
+export const prerender = false;
+
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 
@@ -90,17 +92,17 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
           Your shoot date is scheduled. Pay the <strong class="font-medium text-stone-800">$150 deposit</strong> below to lock it in — balance due after your session.
         </p>
 
-        {shootDateFormatted && (
-          <div class="mt-6 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
-            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Scheduled shoot</p>
-            <p class="mt-1 font-medium text-stone-900">{serviceLabel}</p>
-            <p class="text-sm text-stone-600">{shootDateFormatted}</p>
-          </div>
-        )}
+        <div class="mt-6 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Scheduled shoot</p>
+          <p id="btp-tier-label" class="mt-1 font-medium text-stone-900">{serviceLabel}</p>
+          {shootDateFormatted && <p class="text-sm text-stone-600">{shootDateFormatted}</p>}
+          <p id="btp-price-label" class="mt-0.5 text-sm text-stone-500 hidden"></p>
+        </div>
 
         <form method="POST" action="/api/checkout" class="mt-8 space-y-6">
-          <input type="hidden" name="service"   value={serviceLabel} />
+          <input type="hidden" name="service"   id="btp-service-input" value={serviceLabel} />
           <input type="hidden" name="shootDate" value={eventStart || 'To be confirmed'} />
+          <input type="hidden" name="tier"      id="btp-tier-input" value="" />
 
           <!-- Name + Email -->
           <div class="grid gap-6 sm:grid-cols-2">
@@ -197,4 +199,24 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
     )}
 
   </section>
+<script>
+  const raw = sessionStorage.getItem('btpBooking');
+  if (raw) {
+    try {
+      const { service, tier, price } = JSON.parse(raw);
+      const tierLabel  = document.getElementById('btp-tier-label');
+      const priceLabel = document.getElementById('btp-price-label');
+      const tierInput  = document.getElementById('btp-tier-input') as HTMLInputElement;
+      const svcInput   = document.getElementById('btp-service-input') as HTMLInputElement;
+      if (tierLabel && tier)  tierLabel.textContent = tier;
+      if (priceLabel && price) {
+        priceLabel.textContent = `Total after shoot: ${price}`;
+        priceLabel.classList.remove('hidden');
+      }
+      if (tierInput && tier)  tierInput.value = tier;
+      if (svcInput && service) svcInput.value = service === 'real-estate' ? 'Real Estate Photography' : 'Vacation Rental Photography';
+      sessionStorage.removeItem('btpBooking');
+    } catch {}
+  }
+</script>
 </BaseLayout>
