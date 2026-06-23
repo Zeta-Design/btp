@@ -1,7 +1,7 @@
 ---
 interface Props {
   showInfoSections?: boolean;
-  filterType?: 'real-estate' | 'vacation-rental';
+  filterType?: 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone';
 }
 const { showInfoSections = true, filterType } = Astro.props;
 
@@ -22,8 +22,10 @@ const vacRental = [
   { label: '6+ Bedrooms — Premium', price: '$650', detail: 'Up to 70 photos incl. themed rooms, game room & pool' },
 ];
 
-const showRE  = !filterType || filterType === 'real-estate';
-const showSTR = !filterType || filterType === 'vacation-rental';
+const showRE          = !filterType || filterType === 'real-estate';
+const showSTR         = !filterType || filterType === 'vacation-rental';
+const showVideo       = filterType === 'walkthrough-video';
+const showTwilightSA  = filterType === 'twilight-standalone';
 ---
 <style is:global>
   #btp-backdrop {
@@ -132,6 +134,66 @@ const showSTR = !filterType || filterType === 'vacation-rental';
   </div>
 )}
 
+{showVideo && (
+  <div class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">Walkthrough Video</h2>
+    <p class="mt-2 text-sm text-stone-500">Standalone shoot — no photo package required</p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-category="Walkthrough Video"
+        data-label="Standalone Shoot"
+        data-price="$325"
+        data-detail="Full walkthrough + social reel"
+        data-duration="~2 hr"
+        data-service="walkthrough-video"
+        data-tier="Walkthrough Video – Standalone"
+        data-calendly="https://calendly.com/benjammintims/30min"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Standalone</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">$325</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">Gimbal walkthrough + social reel · 24–48 hrs</p>
+          <span class="text-xs text-stone-400">tap to book →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showTwilightSA && (
+  <div class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">Twilight Session</h2>
+    <p class="mt-2 text-sm text-stone-500">Standalone shoot — separate appointment</p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-category="Twilight Session"
+        data-label="Standalone Shoot"
+        data-price="$200"
+        data-detail="6–8 dusk/twilight exterior photos"
+        data-duration="~1 hr"
+        data-service="twilight-standalone"
+        data-tier="Twilight Session – Standalone"
+        data-calendly="https://calendly.com/benjammintims/30min"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Standalone</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">$200</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">6–8 twilight exterior photos · 24–48 hrs</p>
+          <span class="text-xs text-stone-400">tap to book →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
 {showInfoSections && (
   <>
     <div class="mt-14">
@@ -225,6 +287,22 @@ const showSTR = !filterType || filterType === 'vacation-rental';
         'Delivery within 24–48 hours of your shoot',
         'Licensed for Airbnb, VRBO &amp; marketing use',
         'Styled staging suggestions included',
+        'Unlimited downloads — no watermarks',
+      ],
+      'walkthrough-video': [
+        'Full gimbal stabilizer walkthrough of the property',
+        '30–60 second vertical social media reel cut',
+        'Professional color grade and background music',
+        'Delivery within 24–48 hours',
+        'Licensed for all platforms — Instagram, Facebook, TikTok, MLS',
+        'Unlimited downloads — no watermarks',
+      ],
+      'twilight-standalone': [
+        '6–8 professional dusk/twilight exterior photos',
+        'Professional HDR editing on every image',
+        'High-res JPEGs delivered via online gallery',
+        'Delivery within 24–48 hours of your shoot',
+        'Licensed for MLS, listing sites &amp; social media',
         'Unlimited downloads — no watermarks',
       ],
     };

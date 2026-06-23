@@ -7,30 +7,45 @@ export const POST: APIRoute = async ({ request }) => {
   const stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY as string);
 
   const body = await request.formData();
-  const name      = (body.get('name')      as string)?.trim();
-  const email     = (body.get('email')     as string)?.trim();
-  const phone     = (body.get('phone')     as string)?.trim();
-  const service   = (body.get('service')   as string)?.trim();
-  const shootDate = (body.get('shootDate') as string)?.trim();
-  const address   = (body.get('address')   as string)?.trim();
-  const address2  = (body.get('address2')  as string)?.trim() ?? '';
-  const city      = (body.get('city')      as string)?.trim();
-  const state     = (body.get('state')     as string)?.trim();
-  const zip       = (body.get('zip')       as string)?.trim();
-  const tier          = (body.get('tier')          as string)?.trim() ?? '';
-  const price         = (body.get('price')         as string)?.trim() ?? '';
-  const paymentOption = (body.get('paymentOption') as string)?.trim() || 'deposit';
-  const addonVideo    = body.get('addon_video')    === '1';
-  const addonTwilight = body.get('addon_twilight') === '1';
+  const name            = (body.get('name')            as string)?.trim();
+  const email           = (body.get('email')           as string)?.trim();
+  const phone           = (body.get('phone')           as string)?.trim();
+  const service         = (body.get('service')         as string)?.trim();
+  const shootDate       = (body.get('shootDate')       as string)?.trim();
+  const address         = (body.get('address')         as string)?.trim();
+  const address2        = (body.get('address2')        as string)?.trim() ?? '';
+  const city            = (body.get('city')            as string)?.trim();
+  const state           = (body.get('state')           as string)?.trim();
+  const zip             = (body.get('zip')             as string)?.trim();
+  const tier            = (body.get('tier')            as string)?.trim() ?? '';
+  const price           = (body.get('price')           as string)?.trim() ?? '';
+  const paymentOption   = (body.get('paymentOption')   as string)?.trim() || 'deposit';
+  const serviceCategory = (body.get('serviceCategory') as string)?.trim() || 'photo';
+  const notes           = (body.get('notes')           as string)?.trim() ?? '';
 
-  if (!name || !email || !phone || !service || !shootDate || !address || !city || !state || !zip) {
+  // Add-ons: same day
+  const addonVideo      = body.get('addon_video')       === '1';
+  const addonTwilight   = body.get('addon_twilight')    === '1';
+  // Add-ons: standalone (separate appointment)
+  const addonVideoSA    = body.get('addon_video_sa')    === '1';
+  const addonTwilightSA = body.get('addon_twilight_sa') === '1';
+  // Add-on: Virtual Twilight Edit (qty × $35)
+  const addonVteQty     = Math.max(0, parseInt(((body.get('addon_vte_qty') as string) || '').replace(/\D/g, '') || '0'));
+
+  const isEditingService = serviceCategory === 'editing';
+
+  if (!name || !email || !phone || !service) {
     return new Response('Missing required fields', { status: 400 });
   }
+  if (!isEditingService && (!shootDate || !address || !city || !state || !zip)) {
+    return new Response('Missing required fields for shoot booking', { status: 400 });
+  }
 
-  const fullAddress = [address, address2 || null, `${city}, ${state} ${zip}`].filter(Boolean).join(', ');
+  const fullAddress = isEditingService
+    ? ''
+    : [address, address2 || null, `${city}, ${state} ${zip}`].filter(Boolean).join(', ');
   const siteUrl = (import.meta.env.SITE_URL as string) ?? 'https://bentimsmedia.com';
 
-  // Base session charge
   const isFullPayment = paymentOption === 'full' && !!price;
   const fullPriceCents = isFullPayment
     ? Math.round(parseFloat(price.replace(/[^0-9.]/g, '')) * 100)
@@ -57,40 +72,58 @@ export const POST: APIRoute = async ({ request }) => {
   // Add-on line items only apply to Pay in Full — deposit is always $150 flat.
   // In deposit mode, add-ons are tracked in metadata and billed with the final balance.
   if (isFullPayment) {
-    if (addonVideo) {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: { name: 'Add-on: Walkthrough Video', description: 'Gimbal walkthrough + 30–60 sec vertical social reel' },
-          unit_amount: 20000,
-        },
-        quantity: 1,
-      });
-    }
-    if (addonTwilight) {
-      lineItems.push({
-        price_data: {
-          currency: 'usd',
-          product_data: { name: 'Add-on: Twilight Session', description: '6–8 dusk/twilight exterior photos, same day as main shoot' },
-          unit_amount: 15000,
-        },
-        quantity: 1,
-      });
-    }
+    if (addonVideo) lineItems.push({
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Same Day)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, same day as photo shoot' }, unit_amount: 20000 },
+      quantity: 1,
+    });
+    if (addonTwilight) lineItems.push({
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Same Day)', description: '6–8 dusk/twilight exterior photos, same day as main shoot' }, unit_amount: 15000 },
+      quantity: 1,
+    });
+    if (addonVideoSA) lineItems.push({
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Standalone)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, separate appointment' }, unit_amount: 32500 },
+      quantity: 1,
+    });
+    if (addonTwilightSA) lineItems.push({
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Standalone)', description: '6–8 dusk/twilight exterior photos, separate appointment' }, unit_amount: 20000 },
+      quantity: 1,
+    });
+    if (addonVteQty > 0) lineItems.push({
+      price_data: { currency: 'usd', product_data: { name: 'Virtual Twilight Edit', description: 'Daytime exterior digitally converted to a twilight look' }, unit_amount: 3500 },
+      quantity: addonVteQty,
+    });
   }
 
-  const addons = [addonVideo ? 'Walkthrough Video' : null, addonTwilight ? 'Twilight Session' : null]
-    .filter(Boolean).join(', ');
-  const addonsTotal = String((addonVideo ? 200 : 0) + (addonTwilight ? 150 : 0));
+  const addons = [
+    addonVideo      ? 'Walkthrough Video — Same Day (+$200)'      : null,
+    addonTwilight   ? 'Twilight Session — Same Day (+$150)'       : null,
+    addonVideoSA    ? 'Walkthrough Video — Standalone (+$325)'    : null,
+    addonTwilightSA ? 'Twilight Session — Standalone (+$200)'     : null,
+    addonVteQty > 0 ? `Virtual Twilight Edit ×${addonVteQty} (+$${addonVteQty * 35})` : null,
+  ].filter(Boolean).join('; ');
+
+  const addonsTotal = String(
+    (addonVideo      ? 200 : 0)
+    + (addonTwilight   ? 150 : 0)
+    + (addonVideoSA    ? 325 : 0)
+    + (addonTwilightSA ? 200 : 0)
+    + (addonVteQty     * 35),
+  );
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: lineItems,
     mode: 'payment',
     customer_email: email,
-    metadata: { name, phone, service, tier, price, paymentOption, shootDate, address: fullAddress, addons, addonsTotal },
+    metadata: {
+      name, phone, service, tier, price, paymentOption,
+      shootDate: shootDate || '',
+      address: fullAddress,
+      addons, addonsTotal,
+      notes: notes.slice(0, 490),
+    },
     success_url: `${siteUrl}/booking-confirmed?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/book`,
+    cancel_url:  `${siteUrl}/book`,
   });
 
   return Response.redirect(session.url!, 303);

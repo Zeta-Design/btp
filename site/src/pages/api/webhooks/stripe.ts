@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { name, phone, service, tier, price, paymentOption, shootDate, address, addons, addonsTotal } = session.metadata ?? {};
+    const { name, phone, service, tier, price, paymentOption, shootDate, address, addons, addonsTotal, notes } = session.metadata ?? {};
     const email = session.customer_email ?? '';
 
     if (email) {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
         to: [email],
         bcc: ['info@bentims.com'],
         subject: `Booking Confirmed – ${service ?? 'Your Photography Session'}`,
-        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address, addons, addonsTotal }),
+        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address, addons, addonsTotal, notes }),
       });
     }
   }
@@ -53,10 +53,12 @@ interface EmailData {
   address?: string;
   addons?: string;
   addonsTotal?: string;
+  notes?: string;
 }
 
 export function formatShootDate(raw?: string): string {
   if (!raw || raw === 'To be confirmed') return 'To be confirmed';
+  if (raw.startsWith('N/A')) return raw;
   try {
     return new Date(raw).toLocaleString('en-US', {
       weekday: 'long',
@@ -85,7 +87,42 @@ export function buildConfirmationEmail(d: EmailData): string {
   const addonsTotalNum = parseInt(d.addonsTotal ?? '0') || 0;
   const remaining = remainingBalance(d.price, addonsTotalNum);
   const isPaidInFull = d.paymentOption === 'full';
+  const isVTE = (d.service ?? '') === 'Virtual Twilight Edit';
   const isSTR = (d.service ?? '').toLowerCase().includes('vacation') || (d.service ?? '').toLowerCase().includes('str');
+  const heroTitle = isPaidInFull ? 'Payment received!' : 'Deposit received!';
+  const heroBody  = isVTE
+    ? `Hi ${firstName}, your order is confirmed. I'll be in touch within 24 hours to confirm receipt of your photos and start editing.`
+    : `Hi ${firstName}, your shoot date is locked in. Here's everything you need to know.`;
+
+  const whatsIncluded: string[] = isVTE ? [
+    'Professional digital twilight conversion of each image',
+    'Realistic sky replacement and exterior lighting adjustments',
+    'Warm window glow and exterior light effects added',
+    'High-res JPEGs delivered via online gallery',
+    'Delivery within 24–48 hours of receiving your photos',
+    'Licensed for all marketing and listing use',
+  ] : (d.service ?? '').includes('Walkthrough') ? [
+    'Full gimbal stabilizer walkthrough of the property',
+    '30–60 second vertical social media reel cut',
+    'Professional color grade and background music',
+    'Delivery within 24–48 hours',
+    'Licensed for all platforms — Instagram, Facebook, TikTok, MLS',
+    'Unlimited downloads — no watermarks',
+  ] : (d.service ?? '').includes('Twilight') ? [
+    '6–8 professional dusk/twilight exterior photos',
+    'Professional HDR editing on every image',
+    'High-res JPEGs delivered via online gallery',
+    'Delivery within 24–48 hours of your shoot',
+    'Licensed for MLS, listing sites &amp; social media',
+    'Unlimited downloads — no watermarks',
+  ] : [
+    'Professional HDR editing on every image',
+    isSTR ? 'High-res JPEGs delivered via online gallery' : 'MLS-ready JPEGs delivered via online gallery',
+    'Delivery within 24–48 hours of your shoot',
+    isSTR ? 'Licensed for Airbnb, VRBO &amp; marketing use' : 'Licensed for MLS, listing sites &amp; social media',
+    ...(isSTR ? ['Styled staging suggestions included'] : []),
+    'Unlimited downloads — no watermarks',
+  ];
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -115,11 +152,8 @@ export function buildConfirmationEmail(d: EmailData): string {
       <!-- Checkmark -->
       <div style="display:inline-block;width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.08);line-height:56px;font-size:24px;margin-bottom:20px;">✓</div>
       <p style="margin:0;font-size:11px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#a8a29e;">You're booked</p>
-      <h1 style="margin:10px 0 12px;font-size:32px;font-weight:300;color:#fafaf9;line-height:1.15;">Deposit received!</h1>
-      <p style="margin:0;font-size:15px;color:#d6d3d1;line-height:1.6;">
-        Hi ${firstName}, your shoot date is locked in.<br/>
-        Here's everything you need to know.
-      </p>
+      <h1 style="margin:10px 0 12px;font-size:32px;font-weight:300;color:#fafaf9;line-height:1.15;">${heroTitle}</h1>
+      <p style="margin:0;font-size:15px;color:#d6d3d1;line-height:1.6;">${heroBody}</p>
     </td>
   </tr>
 
@@ -133,14 +167,14 @@ export function buildConfirmationEmail(d: EmailData): string {
           <td style="padding:8px 0;font-size:13px;color:#78716c;width:38%;vertical-align:top;">Service</td>
           <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.service}</td>
         </tr>` : ''}
-        ${d.tier ? `<tr>
+        ${d.tier && d.tier !== d.service ? `<tr>
           <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Package</td>
           <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.tier}</td>
         </tr>` : ''}
-        <tr>
+        ${!isVTE && shootDateFormatted ? `<tr>
           <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Date &amp; Time</td>
           <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${shootDateFormatted}</td>
-        </tr>
+        </tr>` : ''}
         ${d.address ? `<tr>
           <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Property</td>
           <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.address}</td>
@@ -152,6 +186,10 @@ export function buildConfirmationEmail(d: EmailData): string {
         ${d.addons ? `<tr>
           <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Add-ons</td>
           <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.addons}</td>
+        </tr>` : ''}
+        ${d.notes ? `<tr>
+          <td style="padding:8px 0;font-size:13px;color:#78716c;vertical-align:top;">Notes</td>
+          <td style="padding:8px 0;font-size:13px;font-weight:500;color:#1c1917;">${d.notes}</td>
         </tr>` : ''}
       </table>
 
@@ -196,13 +234,7 @@ export function buildConfirmationEmail(d: EmailData): string {
     <td style="background:#ffffff;padding:28px 40px;">
       <p style="margin:0 0 16px;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#a8a29e;">What's Included</p>
       <table cellpadding="0" cellspacing="0">
-        ${[
-          'Professional HDR editing on every image',
-          'MLS-ready JPEGs delivered via online gallery',
-          'Delivery within 24–48 hours of your shoot',
-          'Licensed for MLS, listing sites &amp; social media',
-          'Unlimited downloads — no watermarks',
-        ].map(item => `
+        ${whatsIncluded.map(item => `
         <tr>
           <td style="padding:5px 0;font-size:13px;color:#44403c;vertical-align:top;">
             <span style="color:#1c1917;margin-right:10px;">→</span>${item}
@@ -213,10 +245,10 @@ export function buildConfirmationEmail(d: EmailData): string {
   </tr>
 
   <!-- Divider -->
-  <tr><td style="background:#ffffff;padding:0 40px;"><hr style="border:none;border-top:1px solid #f5f4f2;margin:0;" /></td></tr>
+  ${!isVTE ? `<tr><td style="background:#ffffff;padding:0 40px;"><hr style="border:none;border-top:1px solid #f5f4f2;margin:0;" /></td></tr>` : ''}
 
-  <!-- Prep checklist -->
-  <tr>
+  <!-- Prep checklist (not shown for editing services) -->
+  ${!isVTE ? `<tr>
     <td style="background:#ffffff;padding:28px 40px 36px;">
       <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#a8a29e;">Preparing Your Property</p>
       <p style="margin:0 0 20px;font-size:13px;color:#78716c;line-height:1.6;">A little prep goes a long way toward great photos. Here's the standard checklist I send all clients:</p>
@@ -281,15 +313,17 @@ export function buildConfirmationEmail(d: EmailData): string {
         </tr>`).join('')}
       </table>
     </td>
-  </tr>
+  </tr>` : ''}
 
   <!-- Next steps -->
   <tr>
     <td style="background:#f9fafb;border:1px solid #e7e5e4;border-radius:0;padding:28px 40px;">
       <p style="margin:0 0 8px;font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#a8a29e;">What Happens Next</p>
       <p style="margin:0;font-size:14px;color:#44403c;line-height:1.7;">
-        I'll reach out within <strong>24 hours</strong> to confirm all the details and answer any questions.<br/><br/>
-        On the day of the shoot, please have the property ready and accessible at the scheduled time. I'll take care of the rest.
+        ${isVTE
+          ? `I'll reach out within <strong>24 hours</strong> to confirm receipt of your photos. Once I have them, edits will be delivered within 24–48 hours via an online gallery link.`
+          : `I'll reach out within <strong>24 hours</strong> to confirm all the details and answer any questions.<br/><br/>On the day of the shoot, please have the property ready and accessible at the scheduled time. I'll take care of the rest.`
+        }
       </p>
     </td>
   </tr>
