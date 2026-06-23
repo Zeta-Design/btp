@@ -32,6 +32,7 @@ const site = resolveSite(process.env.SITE_URL);
 // https://astro.build/config
 export default defineConfig({
   site,
+  security: { checkOrigin: false },
   // Pages prerender to static; only the Keystatic admin routes are server-rendered.
   adapter: vercel(),
   integrations: [
