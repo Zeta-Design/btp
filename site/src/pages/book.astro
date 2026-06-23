@@ -285,13 +285,13 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
   }
 
   function updateDisplay() {
-    const addonAmt     = getAddonTotal();
-    const depositTotal = 150 + addonAmt;
-    const fullTotal    = basePriceNum > 0 ? basePriceNum + addonAmt : 0;
-    const isDeposit    = (paymentInput?.value ?? 'deposit') === 'deposit';
+    const addonAmt  = getAddonTotal();
+    const fullTotal = basePriceNum > 0 ? basePriceNum + addonAmt : 0;
+    const isDeposit = (paymentInput?.value ?? 'deposit') === 'deposit';
 
+    // Deposit is always $150 — add-ons are billed with the remaining balance after the shoot
     if (depositPriceEl) {
-      depositPriceEl.innerHTML = `$${depositTotal} <span style="font-size:0.875rem;font-weight:400;color:#78716c;">now</span>`;
+      depositPriceEl.innerHTML = `$150 <span style="font-size:0.875rem;font-weight:400;color:#78716c;">now</span>`;
     }
     if (fullPriceEl) {
       fullPriceEl.innerHTML = fullTotal > 0
@@ -300,13 +300,13 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
     }
     if (submitBtn) {
       submitBtn.textContent = isDeposit
-        ? `Pay $${depositTotal} deposit →`
+        ? 'Pay $150 deposit →'
         : fullTotal > 0 ? `Pay $${fullTotal} in full →` : submitBtn.textContent;
     }
     if (submitNote) {
       if (isDeposit) {
         submitNote.textContent = addonAmt > 0
-          ? 'Secure checkout via Stripe · Add-ons paid in full · Balance due after your shoot'
+          ? 'Secure checkout via Stripe · Add-ons included in final balance'
           : 'Secure checkout via Stripe · Balance due after your shoot';
       } else {
         submitNote.textContent = 'Secure checkout via Stripe · No balance due after your shoot';

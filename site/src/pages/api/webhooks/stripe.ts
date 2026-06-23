@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { name, phone, service, tier, price, paymentOption, shootDate, address, addons } = session.metadata ?? {};
+    const { name, phone, service, tier, price, paymentOption, shootDate, address, addons, addonsTotal } = session.metadata ?? {};
     const email = session.customer_email ?? '';
 
     if (email) {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
         to: [email],
         bcc: ['info@bentims.com'],
         subject: `Booking Confirmed – ${service ?? 'Your Photography Session'}`,
-        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address, addons }),
+        html: buildConfirmationEmail({ name, email, phone, service, tier, price, paymentOption, shootDate, address, addons, addonsTotal }),
       });
     }
   }
@@ -52,6 +52,7 @@ interface EmailData {
   shootDate?: string;
   address?: string;
   addons?: string;
+  addonsTotal?: string;
 }
 
 export function formatShootDate(raw?: string): string {
@@ -71,17 +72,18 @@ export function formatShootDate(raw?: string): string {
   }
 }
 
-export function remainingBalance(price?: string): string {
+export function remainingBalance(price?: string, addonsTotal = 0): string {
   if (!price) return '';
   const num = parseFloat(price.replace(/[^0-9.]/g, ''));
   if (isNaN(num)) return '';
-  return `$${(num - 150).toFixed(0)}`;
+  return `$${(num - 150 + addonsTotal).toFixed(0)}`;
 }
 
 export function buildConfirmationEmail(d: EmailData): string {
   const shootDateFormatted = formatShootDate(d.shootDate);
   const firstName = (d.name ?? 'there').split(' ')[0];
-  const remaining = remainingBalance(d.price);
+  const addonsTotalNum = parseInt(d.addonsTotal ?? '0') || 0;
+  const remaining = remainingBalance(d.price, addonsTotalNum);
   const isPaidInFull = d.paymentOption === 'full';
   const isSTR = (d.service ?? '').toLowerCase().includes('vacation') || (d.service ?? '').toLowerCase().includes('str');
 
@@ -158,7 +160,7 @@ export function buildConfirmationEmail(d: EmailData): string {
         ${isPaidInFull ? `
         <tr>
           <td style="font-size:13px;color:#78716c;">Paid in full</td>
-          <td style="font-size:13px;font-weight:600;color:#16a34a;text-align:right;">${d.price ?? ''} ✓</td>
+          <td style="font-size:13px;font-weight:600;color:#16a34a;text-align:right;">${d.price ?? ''}${addonsTotalNum > 0 ? ` + $${addonsTotalNum} add-ons` : ''} ✓</td>
         </tr>
         <tr>
           <td style="font-size:13px;color:#78716c;padding-top:8px;">Balance due after shoot</td>
@@ -169,13 +171,17 @@ export function buildConfirmationEmail(d: EmailData): string {
           <td style="font-size:13px;color:#78716c;">Deposit paid</td>
           <td style="font-size:13px;font-weight:600;color:#16a34a;text-align:right;">$150 ✓</td>
         </tr>
+        ${addonsTotalNum > 0 ? `<tr>
+          <td style="font-size:13px;color:#78716c;padding-top:8px;">Add-ons (due with balance)</td>
+          <td style="font-size:13px;font-weight:500;color:#1c1917;text-align:right;padding-top:8px;">$${addonsTotalNum}</td>
+        </tr>` : ''}
         <tr>
           <td style="font-size:13px;color:#78716c;padding-top:8px;">Balance due after shoot</td>
           <td style="font-size:13px;font-weight:500;color:#1c1917;text-align:right;padding-top:8px;">${remaining || 'TBD'}</td>
         </tr>
         ${d.price ? `<tr>
           <td style="font-size:13px;color:#78716c;padding-top:8px;">Total</td>
-          <td style="font-size:13px;color:#78716c;text-align:right;padding-top:8px;">${d.price}</td>
+          <td style="font-size:13px;color:#78716c;text-align:right;padding-top:8px;">${d.price}${addonsTotalNum > 0 ? ` + $${addonsTotalNum} add-ons` : ''}</td>
         </tr>` : ''}
         `}
       </table>

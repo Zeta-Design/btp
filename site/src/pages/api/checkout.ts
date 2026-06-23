@@ -54,36 +54,41 @@ export const POST: APIRoute = async ({ request }) => {
     quantity: 1,
   }];
 
-  if (addonVideo) {
-    lineItems.push({
-      price_data: {
-        currency: 'usd',
-        product_data: { name: 'Add-on: Walkthrough Video', description: 'Gimbal walkthrough + 30–60 sec vertical social reel' },
-        unit_amount: 20000,
-      },
-      quantity: 1,
-    });
-  }
-  if (addonTwilight) {
-    lineItems.push({
-      price_data: {
-        currency: 'usd',
-        product_data: { name: 'Add-on: Twilight Session', description: '6–8 dusk/twilight exterior photos, same day as main shoot' },
-        unit_amount: 15000,
-      },
-      quantity: 1,
-    });
+  // Add-on line items only apply to Pay in Full — deposit is always $150 flat.
+  // In deposit mode, add-ons are tracked in metadata and billed with the final balance.
+  if (isFullPayment) {
+    if (addonVideo) {
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: { name: 'Add-on: Walkthrough Video', description: 'Gimbal walkthrough + 30–60 sec vertical social reel' },
+          unit_amount: 20000,
+        },
+        quantity: 1,
+      });
+    }
+    if (addonTwilight) {
+      lineItems.push({
+        price_data: {
+          currency: 'usd',
+          product_data: { name: 'Add-on: Twilight Session', description: '6–8 dusk/twilight exterior photos, same day as main shoot' },
+          unit_amount: 15000,
+        },
+        quantity: 1,
+      });
+    }
   }
 
   const addons = [addonVideo ? 'Walkthrough Video' : null, addonTwilight ? 'Twilight Session' : null]
     .filter(Boolean).join(', ');
+  const addonsTotal = String((addonVideo ? 200 : 0) + (addonTwilight ? 150 : 0));
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: lineItems,
     mode: 'payment',
     customer_email: email,
-    metadata: { name, phone, service, tier, price, paymentOption, shootDate, address: fullAddress, addons },
+    metadata: { name, phone, service, tier, price, paymentOption, shootDate, address: fullAddress, addons, addonsTotal },
     success_url: `${siteUrl}/booking-confirmed?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/book`,
   });
