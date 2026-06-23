@@ -22,14 +22,18 @@ import { SITE } from '../config/site';
       I'll reach out within 24 hours to confirm the details and answer any questions.
     </p>
 
-    {SITE.email && (
-      <p class="mt-3 text-sm text-stone-500">
-        Questions? Email me at{' '}
+    <p class="mt-3 text-sm text-stone-500">
+      Questions? Reach me at{' '}
+      {SITE.email && (
         <a href={`mailto:${SITE.email}`} class="underline underline-offset-2 hover:text-stone-800">
           {SITE.email}
         </a>
-      </p>
-    )}
+      )}
+      {' '}or{' '}
+      <a href="tel:5129565646" class="underline underline-offset-2 hover:text-stone-800">
+        (512) 956-5646
+      </a>
+    </p>
 
     <div class="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
       <a
