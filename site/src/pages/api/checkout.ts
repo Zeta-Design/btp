@@ -18,6 +18,7 @@ export const POST: APIRoute = async ({ request }) => {
   const state     = (body.get('state')     as string)?.trim();
   const zip       = (body.get('zip')       as string)?.trim();
   const tier      = (body.get('tier')      as string)?.trim() ?? '';
+  const price     = (body.get('price')     as string)?.trim() ?? '';
 
   if (!name || !email || !phone || !service || !shootDate || !address || !city || !state || !zip) {
     return new Response('Missing required fields', { status: 400 });
@@ -42,7 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
     }],
     mode: 'payment',
     customer_email: email,
-    metadata: { name, phone, service, tier, shootDate, address: fullAddress },
+    metadata: { name, phone, service, tier, price, shootDate, address: fullAddress },
     success_url: `${siteUrl}/booking-confirmed?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${siteUrl}/book`,
   });

@@ -103,6 +103,7 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
           <input type="hidden" name="service"   id="btp-service-input" value={serviceLabel} />
           <input type="hidden" name="shootDate" value={eventStart || 'To be confirmed'} />
           <input type="hidden" name="tier"      id="btp-tier-input" value="" />
+          <input type="hidden" name="price"     id="btp-price-input" value="" />
 
           <!-- Name + Email -->
           <div class="grid gap-6 sm:grid-cols-2">
@@ -206,14 +207,16 @@ const serviceLabel = service === 'real-estate' ? 'Real Estate Photography' : 'Va
       const { service, tier, price } = JSON.parse(raw);
       const tierLabel  = document.getElementById('btp-tier-label');
       const priceLabel = document.getElementById('btp-price-label');
-      const tierInput  = document.getElementById('btp-tier-input') as HTMLInputElement;
-      const svcInput   = document.getElementById('btp-service-input') as HTMLInputElement;
+      const tierInput   = document.getElementById('btp-tier-input') as HTMLInputElement;
+      const svcInput    = document.getElementById('btp-service-input') as HTMLInputElement;
+      const priceInput  = document.getElementById('btp-price-input') as HTMLInputElement;
       if (tierLabel && tier)  tierLabel.textContent = tier;
       if (priceLabel && price) {
         priceLabel.textContent = `Total after shoot: ${price}`;
         priceLabel.classList.remove('hidden');
       }
-      if (tierInput && tier)  tierInput.value = tier;
+      if (tierInput && tier)   tierInput.value = tier;
+      if (priceInput && price) priceInput.value = price;
       if (svcInput && service) svcInput.value = service === 'real-estate' ? 'Real Estate Photography' : 'Vacation Rental Photography';
       sessionStorage.removeItem('btpBooking');
     } catch {}

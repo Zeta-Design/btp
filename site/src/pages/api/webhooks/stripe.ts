@@ -22,7 +22,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    const { name, phone, service, tier, shootDate, address } = session.metadata ?? {};
+    const { name, phone, service, tier, price, shootDate, address } = session.metadata ?? {};
     const email = session.customer_email ?? '';
 
     if (email) {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
         to: [email],
         bcc: ['info@bentims.com'],
         subject: `Booking Confirmed – ${service ?? 'Your Photography Session'}`,
-        html: buildConfirmationEmail({ name, email, phone, service, tier, shootDate, address }),
+        html: buildConfirmationEmail({ name, email, phone, service, tier, price, shootDate, address }),
       });
     }
   }
@@ -39,12 +39,15 @@ export const POST: APIRoute = async ({ request }) => {
   return new Response('OK', { status: 200 });
 };
 
+const PHOTOGRAPHER_PHONE = '(512) 956-5646';
+
 interface EmailData {
   name?: string;
   email?: string;
   phone?: string;
   service?: string;
   tier?: string;
+  price?: string;
   shootDate?: string;
   address?: string;
 }
@@ -66,9 +69,18 @@ function formatShootDate(raw?: string): string {
   }
 }
 
+function remainingBalance(price?: string): string {
+  if (!price) return '';
+  const num = parseFloat(price.replace(/[^0-9.]/g, ''));
+  if (isNaN(num)) return '';
+  return `$${(num - 150).toFixed(0)}`;
+}
+
 function buildConfirmationEmail(d: EmailData): string {
   const shootDateFormatted = formatShootDate(d.shootDate);
   const firstName = (d.name ?? 'there').split(' ')[0];
+  const remaining = remainingBalance(d.price);
+  const isSTR = (d.service ?? '').toLowerCase().includes('vacation') || (d.service ?? '').toLowerCase().includes('str');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -141,9 +153,13 @@ function buildConfirmationEmail(d: EmailData): string {
           <td style="font-size:13px;font-weight:600;color:#16a34a;text-align:right;">$150 ✓</td>
         </tr>
         <tr>
-          <td style="font-size:13px;color:#78716c;padding-top:8px;">Balance due</td>
-          <td style="font-size:13px;color:#78716c;text-align:right;padding-top:8px;">After your shoot</td>
+          <td style="font-size:13px;color:#78716c;padding-top:8px;">Balance due after shoot</td>
+          <td style="font-size:13px;font-weight:500;color:#1c1917;text-align:right;padding-top:8px;">${remaining || 'TBD'}</td>
         </tr>
+        ${d.price ? `<tr>
+          <td style="font-size:13px;color:#78716c;padding-top:8px;">Total</td>
+          <td style="font-size:13px;color:#78716c;text-align:right;padding-top:8px;">${d.price}</td>
+        </tr>` : ''}
       </table>
     </td>
   </tr>
@@ -184,7 +200,19 @@ function buildConfirmationEmail(d: EmailData): string {
       <!-- Interior -->
       <p style="margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1c1917;">Interior</p>
       <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
-        ${[
+        ${(isSTR ? [
+          'Turn on <strong>all</strong> lights — lamps, under-cabinet, closets, fans',
+          'Open all blinds, curtains, and shades fully',
+          'Stage the space as if guests are checking in',
+          'Set out fresh, neatly folded towels and linens',
+          'Display all amenities visibly — coffee maker, toaster, etc.',
+          'Clear countertops of personal items; leave only decor',
+          'Remove all personal belongings from drawers, closets &amp; surfaces',
+          'Put all toilet lids down; set out fresh hand towels',
+          'Tuck away cords, chargers &amp; appliances',
+          'Replace any burnt-out bulbs — match color temperature throughout',
+          'Ensure welcome guides or house manuals are neatly placed',
+        ] : [
           'Turn on <strong>all</strong> lights — lamps, under-cabinet, closets, fans',
           'Open all blinds, curtains, and shades fully',
           'Clear and de-clutter countertops, tables &amp; shelves',
@@ -194,7 +222,7 @@ function buildConfirmationEmail(d: EmailData): string {
           'Put all toilet lids down',
           'Tuck away cords, chargers &amp; appliances',
           'Replace any burnt-out bulbs',
-        ].map(item => `
+        ]).map(item => `
         <tr>
           <td style="padding:4px 0;font-size:13px;color:#44403c;vertical-align:top;">
             <span style="color:#a8a29e;margin-right:10px;font-size:11px;">☐</span>${item}
@@ -205,14 +233,23 @@ function buildConfirmationEmail(d: EmailData): string {
       <!-- Exterior -->
       <p style="margin:0 0 10px;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1c1917;">Exterior</p>
       <table cellpadding="0" cellspacing="0">
-        ${[
+        ${(isSTR ? [
+          'Move all vehicles out of the driveway',
+          'Mow, edge, and blow the lawn &amp; walkways',
+          'Sweep the porch, patio &amp; front entry',
+          'Remove garden hoses, tools &amp; outdoor clutter',
+          'Set up and stage all outdoor furniture',
+          'Clean the pool or hot tub; remove any covers',
+          'Turn on pool/spa lighting if applicable',
+          'Put away children\'s toys &amp; sports equipment',
+        ] : [
           'Move all vehicles out of the driveway',
           'Mow, edge, and blow the lawn &amp; walkways',
           'Sweep the porch, patio &amp; front entry',
           'Remove garden hoses, tools &amp; outdoor clutter',
           'Put away children\'s toys &amp; sports equipment',
           'Stage the patio/deck if furnished',
-        ].map(item => `
+        ]).map(item => `
         <tr>
           <td style="padding:4px 0;font-size:13px;color:#44403c;vertical-align:top;">
             <span style="color:#a8a29e;margin-right:10px;font-size:11px;">☐</span>${item}
@@ -239,6 +276,8 @@ function buildConfirmationEmail(d: EmailData): string {
       <p style="margin:0 0 8px;font-size:14px;color:#44403c;">Questions? I'm easy to reach.</p>
       <p style="margin:0;font-size:13px;color:#78716c;">
         Email: <a href="mailto:info@bentims.com" style="color:#1c1917;text-decoration:underline;">info@bentims.com</a>
+        &nbsp;&nbsp;·&nbsp;&nbsp;
+        Text/Call: <a href="tel:${PHOTOGRAPHER_PHONE.replace(/\D/g,'')}" style="color:#1c1917;text-decoration:underline;">${PHOTOGRAPHER_PHONE}</a>
       </p>
     </td>
   </tr>
@@ -246,11 +285,11 @@ function buildConfirmationEmail(d: EmailData): string {
   <!-- Footer -->
   <tr>
     <td style="padding:28px 16px 8px;text-align:center;">
-      <p style="margin:0;font-size:11px;color:#a8a29e;">Ben Tims Media · Georgetown, TX</p>
+      <p style="margin:0;font-size:11px;color:#a8a29e;">Ben Tims Media · Austin, TX</p>
       <p style="margin:6px 0 0;font-size:11px;color:#a8a29e;">
         <a href="https://bentimsmedia.com" style="color:#a8a29e;text-decoration:none;">bentimsmedia.com</a>
         &nbsp;·&nbsp;
-        <a href="https://www.instagram.com/thebtphotography/" style="color:#a8a29e;text-decoration:none;">Instagram</a>
+        <a href="https://www.facebook.com/profile.php?id=61590507817692" style="color:#a8a29e;text-decoration:none;">Facebook</a>
       </p>
       <p style="margin:12px 0 0;font-size:11px;color:#d6d3d1;">You're receiving this because you booked a session with Ben Tims Media.</p>
     </td>

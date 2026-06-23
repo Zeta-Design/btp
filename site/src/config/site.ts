@@ -45,7 +45,7 @@ export const BRANDS: Record<string, Brand> = {
       { label: 'FB', href: 'https://www.facebook.com/profile.php?id=61590507817692' },
       { label: 'VSCO', href: 'https://vsco.co/benjammin-visuals/gallery' },
     ],
-    location: { locality: 'Georgetown', region: 'TX', postalCode: '78628', country: 'US' },
+    location: { locality: 'Austin', region: 'TX', postalCode: '78701', country: 'US' },
     areaServed: [
       'Austin',
       'Georgetown',
