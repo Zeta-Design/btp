@@ -85,7 +85,7 @@ const services = [
       loading="eager"
       decoding="async"
       fetchpriority="high"
-      class="hero-img absolute inset-x-0 -top-[32%] -z-10 h-[165%] w-full object-cover"
+      class="hero-img absolute inset-x-0 top-0 -z-10 h-full w-full object-cover object-center sm:-top-[32%] sm:h-[165%]"
     />
     <div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/55 via-black/30 to-black/65"></div>
     <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
@@ -257,7 +257,7 @@ const services = [
       transform: translate3d(0, 30%, 0);
     }
   }
-  @media (prefers-reduced-motion: no-preference) {
+  @media (min-width: 640px) and (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: scroll()) {
       .hero-img {
         will-change: transform;
