@@ -8,9 +8,10 @@ const links: { href: string; label: string; newTab?: boolean; cta?: boolean }[] 
   { href: '/contact/', label: 'Contact' },
   { href: '/book/', label: 'Book now', cta: true },
 ];
-if (SITE.clientPortalUrl) {
-  links.push({ href: SITE.clientPortalUrl, label: 'Client Portal', newTab: true });
-}
+// Client portal hidden until fully built out
+// if (SITE.clientPortalUrl) {
+//   links.push({ href: SITE.clientPortalUrl, label: 'Client Portal', newTab: true });
+// }
 const path = Astro.url.pathname;
 const isActive = (href: string) => path === href || path.startsWith(href);
 ---
