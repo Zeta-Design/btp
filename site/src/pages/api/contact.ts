@@ -6,22 +6,27 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   const resend = new Resend(import.meta.env.RESEND_API_KEY as string);
 
-  const body    = await request.formData();
-  const name    = (body.get('name')    as string)?.trim();
-  const email   = (body.get('email')   as string)?.trim();
-  const phone   = (body.get('phone')   as string)?.trim() ?? '';
-  const service = (body.get('service') as string)?.trim() ?? '';
-  const message = (body.get('message') as string)?.trim();
+  const body          = await request.formData();
+  const firstName     = (body.get('firstName')     as string)?.trim();
+  const lastName      = (body.get('lastName')      as string)?.trim();
+  const email         = (body.get('email')         as string)?.trim();
+  const phone         = (body.get('phone')         as string)?.trim() ?? '';
+  const service       = (body.get('service')       as string)?.trim() ?? '';
+  const preferredDate = (body.get('preferredDate') as string)?.trim() ?? '';
+  const message       = (body.get('message')       as string)?.trim();
 
-  if (!name || !email || !message) {
+  if (!firstName || !lastName || !email || !message) {
     return new Response('Missing required fields', { status: 400 });
   }
+
+  const name = `${firstName} ${lastName}`;
 
   const rows = [
     ['Name',    name],
     ['Email',   email],
-    ...(phone   ? [['Phone',   phone]]   : []),
-    ...(service ? [['Service', service]] : []),
+    ...(phone         ? [['Phone',          phone]]         : []),
+    ...(preferredDate ? [['Interested Date', preferredDate]] : []),
+    ...(service       ? [['Service',         service]]       : []),
     ['Message', message.replace(/\n/g, '<br/>')],
   ] as [string, string][];
 
@@ -38,7 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
     from: 'Ben Tims Media <info@bentims.com>',
     to:   ['info@bentims.com'],
     reply_to: email,
-    subject:  `New inquiry from ${name}${service ? ` — ${service}` : ''}`,
+    subject:  `New inquiry from ${name}${service ? ` — ${service}` : ''}${preferredDate ? ` (${preferredDate})` : ''}`,
     html,
   });
 
