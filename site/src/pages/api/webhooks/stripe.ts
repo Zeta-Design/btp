@@ -217,6 +217,9 @@ export function buildConfirmationEmail(d: EmailData): string {
           <td style="font-size:13px;color:#78716c;padding-top:8px;">Balance due after shoot</td>
           <td style="font-size:13px;font-weight:500;color:#1c1917;text-align:right;padding-top:8px;">${remaining || 'TBD'}</td>
         </tr>
+        <tr>
+          <td colspan="2" style="padding-top:8px;font-size:12px;color:#a8a29e;">Balance is collected via Zelle after gallery delivery — <strong style="color:#78716c;">benjammintims@icloud.com</strong></td>
+        </tr>
         ${d.price ? `<tr>
           <td style="font-size:13px;color:#78716c;padding-top:8px;">Total</td>
           <td style="font-size:13px;color:#78716c;text-align:right;padding-top:8px;">${d.price}${addonsTotalNum > 0 ? ` + $${addonsTotalNum} add-ons` : ''}</td>
@@ -322,7 +325,7 @@ export function buildConfirmationEmail(d: EmailData): string {
       <p style="margin:0;font-size:14px;color:#44403c;line-height:1.7;">
         ${isVTE
           ? `I'll reach out within <strong>24 hours</strong> to confirm receipt of your photos. Once I have them, edits will be delivered within 24–48 hours via an online gallery link.`
-          : `I'll reach out within <strong>24 hours</strong> to confirm all the details and answer any questions.<br/><br/>On the day of the shoot, please have the property ready and accessible at the scheduled time. I'll take care of the rest.`
+          : `I'll reach out within <strong>24 hours</strong> to confirm all the details and answer any questions.<br/><br/>On the day of the shoot, please have the property ready and accessible at the scheduled time. I'll take care of the rest.${!isPaidInFull ? `<br/><br/>Once your gallery is delivered, I'll send a Zelle request to collect the remaining balance.` : ''}`
         }
       </p>
     </td>
