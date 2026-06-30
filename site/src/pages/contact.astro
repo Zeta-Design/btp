@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
+import { Image } from 'astro:assets';
+import bannerImg from '../assets/portfolio/dornoch-contact-banner.jpg';
 
 const sent = Astro.url.searchParams.get('sent') === '1';
 export const prerender = false;
@@ -23,11 +25,9 @@ export const prerender = false;
 
       <!-- Banner image -->
       <div class="w-full overflow-hidden">
-        <img
-          src="/blog-images/how-to-prepare-for-your-session/contact-form-header.jpg"
+        <Image
+          src={bannerImg}
           alt=""
-          width="1200"
-          height="480"
           class="w-full"
         />
       </div>
