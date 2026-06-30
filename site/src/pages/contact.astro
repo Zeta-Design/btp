@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
-import { Image } from 'astro:assets';
-import bannerImg from '../assets/portfolio/01-dornoch-exterior-twilight.jpg';
 
 const sent = Astro.url.searchParams.get('sent') === '1';
 export const prerender = false;
@@ -25,11 +23,11 @@ export const prerender = false;
 
       <!-- Banner image -->
       <div class="relative h-48 w-full overflow-hidden sm:h-56">
-        <Image
-          src={bannerImg}
+        <img
+          src="/blog-images/how-to-prepare-for-your-session/dubsado-form_header-1200x480.png"
           alt=""
-          width={640}
-          height={224}
+          width="1200"
+          height="480"
           class="h-full w-full object-cover object-center"
         />
         <div class="absolute inset-0 bg-black/30"></div>
