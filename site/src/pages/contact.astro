@@ -1,8 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
-import { Image } from 'astro:assets';
-import bannerImg from '../assets/portfolio/dornoch-contact-banner.jpg';
 
 const sent = Astro.url.searchParams.get('sent') === '1';
 export const prerender = false;
@@ -25,8 +23,8 @@ export const prerender = false;
 
       <!-- Banner image -->
       <div class="w-full overflow-hidden">
-        <Image
-          src={bannerImg}
+        <img
+          src="/blog-images/how-to-prepare-for-your-session/contact-form-header.jpg"
           alt=""
           class="w-full"
         />
@@ -98,12 +96,13 @@ export const prerender = false;
             </div>
 
             <div>
-              <label for="service" class="mb-1.5 block text-sm font-medium text-stone-700">Which service are you interested in?</label>
+              <label for="service" class="mb-1.5 block text-sm font-medium text-stone-700">Which service are you interested in? <span class="text-stone-400">*</span></label>
               <select
-                id="service" name="service"
+                id="service" name="service" required
                 class="w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-2.5 text-sm text-stone-900 transition focus:border-stone-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-500"
               >
                 <option value="">Select</option>
+                <option value="Not sure yet">Not sure yet</option>
                 <option value="Real Estate Photography">Real Estate Photography</option>
                 <option value="Vacation Rental Photography">Vacation Rental Photography</option>
                 <option value="Walkthrough Video">Walkthrough Video</option>
