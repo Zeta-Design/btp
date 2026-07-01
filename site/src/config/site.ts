@@ -57,15 +57,6 @@ export const BRANDS: Record<string, Brand> = {
     dubsadoFormUrl: 'https://app.bentimsmedia.com/public/form/view/6a2489c3971b89d2159a3901',
     clientPortalUrl: 'https://app.bentimsmedia.com/public/client/portal/6a247906a4dda9d09818a8da',
   },
-
-  // Add one brand per category/domain, e.g.:
-  // weddings: {
-  //   slug: 'weddings',
-  //   name: 'Aperture Weddings',
-  //   tagline: 'Wedding photography for couples who love a good story.',
-  //   email: 'weddings@example.com',
-  //   dubsadoFormUrl: 'https://your-form-link-from-dubsado',
-  // },
 };
 
 const active = import.meta.env.PUBLIC_BRAND ?? 'main';
