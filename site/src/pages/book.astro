@@ -56,14 +56,14 @@ const serviceLabel = SERVICE_LABELS[service] || service;
   {!isScheduled && !isFiltered && !isVTE ? (
     /* ── Step 1a: Service type selector ── */
     <section class="mx-auto max-w-3xl px-5 py-14 sm:px-6 sm:py-20">
-      <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Book a shoot</p>
+      <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Book a shoot</p>
       <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">What are you photographing?</h1>
       <p class="mt-4 max-w-xl text-pretty text-stone-600">Choose a service to see packages and pricing.</p>
 
       <div class="mt-10 grid gap-5 sm:grid-cols-2">
         <a href="/book/?type=real-estate" class="group flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-8 transition hover:border-stone-400 hover:shadow-sm">
           <div>
-            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">For sale / MLS</p>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">For sale / MLS</p>
             <p class="mt-3 font-serif text-2xl text-stone-900">Real Estate</p>
             <p class="mt-2 text-sm text-stone-500">Priced by square footage — fast 24–48 hr turnaround for active listings.</p>
           </div>
@@ -71,7 +71,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         </a>
         <a href="/book/?type=vacation-rental" class="group flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-8 transition hover:border-stone-400 hover:shadow-sm">
           <div>
-            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Airbnb / VRBO / STR</p>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Airbnb / VRBO / STR</p>
             <p class="mt-3 font-serif text-2xl text-stone-900">Vacation Rental</p>
             <p class="mt-2 text-sm text-stone-500">Priced by bedrooms — styled to attract bookings on short-term rental platforms.</p>
           </div>
@@ -79,7 +79,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         </a>
       </div>
 
-      <p class="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-stone-400">Standalone &amp; add-on services</p>
+      <p class="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-stone-500">Standalone &amp; add-on services</p>
       <div class="mt-4 grid gap-4 sm:grid-cols-3">
         <a href="/book/?type=walkthrough-video" class="group flex flex-col justify-between rounded-xl border border-stone-200 bg-white p-6 transition hover:border-stone-400 hover:shadow-sm">
           <div>
@@ -112,7 +112,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
     /* ── Step 1b: Filtered package cards ── */
     <section class="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20">
       <a href="/book/" class="inline-flex items-center gap-1.5 text-sm text-stone-500 transition hover:text-stone-900">← Back</a>
-      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-stone-400">Book a shoot</p>
+      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-stone-500">Book a shoot</p>
       <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">
         {type === 'real-estate'       ? 'Real Estate Packages'
          : type === 'vacation-rental' ? 'Vacation Rental Packages'
@@ -127,7 +127,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
     /* ── VTE: Virtual Twilight Edit form (no Calendly needed) ── */
     <section class="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-20">
       <a href="/book/" class="inline-flex items-center gap-1.5 text-sm text-stone-500 transition hover:text-stone-900">← Back</a>
-      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-stone-400">Book a service</p>
+      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-stone-500">Book a service</p>
       <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">Virtual Twilight Edit</h1>
       <p class="mt-4 text-pretty text-stone-600">
         Send your daytime exterior photos and I'll digitally convert them to a realistic twilight look — warm window glow, sky replacement, and exterior lighting. No shoot required.
@@ -161,13 +161,13 @@ const serviceLabel = SERVICE_LABELS[service] || service;
           <div>
             <label for="vte-name" class="block text-sm font-medium text-stone-700">Full name</label>
             <input type="text" id="vte-name" name="name" required autocomplete="name"
-              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
               placeholder="Jane Smith" />
           </div>
           <div>
             <label for="vte-email" class="block text-sm font-medium text-stone-700">Email</label>
             <input type="email" id="vte-email" name="email" required autocomplete="email"
-              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
               placeholder="jane@example.com" />
           </div>
         </div>
@@ -176,16 +176,16 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         <div>
           <label for="vte-phone" class="block text-sm font-medium text-stone-700">Phone</label>
           <input type="tel" id="vte-phone" name="phone" required autocomplete="tel"
-            class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+            class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
             placeholder="(512) 000-0000" />
         </div>
 
         <!-- Notes / photo delivery -->
         <div>
           <label for="vte-notes" class="block text-sm font-medium text-stone-700">How will you send your photos?</label>
-          <p class="mt-0.5 text-xs text-stone-400">Dropbox, Google Drive, WeTransfer, etc. I'll follow up to confirm receipt.</p>
+          <p class="mt-0.5 text-xs text-stone-500">Dropbox, Google Drive, WeTransfer, etc. I'll follow up to confirm receipt.</p>
           <textarea id="vte-notes" name="notes" rows="3" required
-            class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500 resize-none"
+            class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500 resize-none"
             placeholder="I'll share a Dropbox link after payment, or here's a link: ..."></textarea>
         </div>
 
@@ -194,7 +194,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
             class="w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2">
             Pay $35 →
           </button>
-          <p class="mt-3 text-center text-xs text-stone-400">Secure checkout via Stripe · 24–48 hr turnaround after photo delivery</p>
+          <p class="mt-3 text-center text-xs text-stone-500">Secure checkout via Stripe · 24–48 hr turnaround after photo delivery</p>
         </div>
       </form>
     </section>
@@ -203,7 +203,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
     /* ── Step 2: Pay deposit / full ── */
     <section class="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-20">
       <>
-        <p class="text-xs uppercase tracking-[0.25em] text-stone-400">
+        <p class="text-xs uppercase tracking-[0.25em] text-stone-500">
           {isPhotoPackage ? 'Step 2 of 2 — Pay deposit' : 'Confirm your booking'}
         </p>
         <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">Confirm your booking</h1>
@@ -216,7 +216,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         </p>
 
         <div class="mt-6 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
-          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Scheduled</p>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Scheduled</p>
           <p id="btp-tier-label" class="mt-1 font-medium text-stone-900">{utmTier || serviceLabel}</p>
           {shootDateFormatted && <p class="text-sm text-stone-600">{shootDateFormatted}</p>}
           <p id="btp-price-label" class={`mt-0.5 text-sm text-stone-500${utmPrice ? '' : ' hidden'}`}>{utmPrice ? `Package: ${utmPrice}` : ''}</p>
@@ -233,13 +233,13 @@ const serviceLabel = SERVICE_LABELS[service] || service;
             <div>
               <label for="name" class="block text-sm font-medium text-stone-700">Full name</label>
               <input type="text" id="name" name="name" required autocomplete="name" value={prefillName}
-                class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                 placeholder="Jane Smith" />
             </div>
             <div>
               <label for="email" class="block text-sm font-medium text-stone-700">Email</label>
               <input type="email" id="email" name="email" required autocomplete="email" value={prefillEmail}
-                class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                 placeholder="jane@example.com" />
             </div>
           </div>
@@ -248,7 +248,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
           <div>
             <label for="phone" class="block text-sm font-medium text-stone-700">Phone <span class="text-red-500">*</span></label>
             <input type="tel" id="phone" name="phone" required autocomplete="tel"
-              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
               placeholder="(512) 000-0000" />
           </div>
 
@@ -258,32 +258,32 @@ const serviceLabel = SERVICE_LABELS[service] || service;
             <div>
               <label for="address" class="block text-xs text-stone-500">Street address</label>
               <input type="text" id="address" name="address" required autocomplete="address-line1"
-                class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                 placeholder="123 Main St" />
             </div>
             <div>
-              <label for="address2" class="block text-xs text-stone-500">Address line 2 <span class="text-stone-400">(optional)</span></label>
+              <label for="address2" class="block text-xs text-stone-500">Address line 2 <span class="text-stone-500">(optional)</span></label>
               <input type="text" id="address2" name="address2" autocomplete="address-line2"
-                class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                 placeholder="Unit, suite, apt, etc." />
             </div>
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <div class="col-span-2 sm:col-span-1">
                 <label for="city" class="block text-xs text-stone-500">City</label>
                 <input type="text" id="city" name="city" required autocomplete="address-level2"
-                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                   placeholder="Austin" />
               </div>
               <div>
                 <label for="state" class="block text-xs text-stone-500">State</label>
                 <input type="text" id="state" name="state" required maxlength="2" autocomplete="address-level1"
-                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500 uppercase"
+                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500 uppercase"
                   placeholder="TX" />
               </div>
               <div>
                 <label for="zip" class="block text-xs text-stone-500">ZIP code</label>
                 <input type="text" id="zip" name="zip" required autocomplete="postal-code" inputmode="numeric"
-                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
                   placeholder="78701" />
               </div>
             </div>
@@ -292,9 +292,9 @@ const serviceLabel = SERVICE_LABELS[service] || service;
           <!-- Add-ons (photo packages only) -->
           {isPhotoPackage && (
             <div class="space-y-3">
-              <p class="text-sm font-medium text-stone-700">Add-ons <span class="font-normal text-stone-400">(optional)</span></p>
+              <p class="text-sm font-medium text-stone-700">Add-ons <span class="font-normal text-stone-500">(optional)</span></p>
 
-              <p class="pt-1 text-xs font-medium uppercase tracking-widest text-stone-400">Same day as your shoot</p>
+              <p class="pt-1 text-xs font-medium uppercase tracking-widest text-stone-500">Same day as your shoot</p>
               <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
                 <input type="checkbox" name="addon_video" id="btp-addon-video" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
                 <div class="flex-1">
@@ -312,7 +312,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
                 <p class="shrink-0 text-sm font-medium text-stone-900">+$150</p>
               </label>
 
-              <p class="pt-2 text-xs font-medium uppercase tracking-widest text-stone-400">Editing (no appointment needed)</p>
+              <p class="pt-2 text-xs font-medium uppercase tracking-widest text-stone-500">Editing (no appointment needed)</p>
               <div class="rounded-xl border border-stone-200 bg-white p-4">
                 <div class="flex items-start justify-between gap-4">
                   <div class="flex-1">
@@ -337,12 +337,12 @@ const serviceLabel = SERVICE_LABELS[service] || service;
             <p class="text-sm font-medium text-stone-700">Payment option</p>
             <div class="grid gap-3 sm:grid-cols-2">
               <button type="button" id="btp-opt-deposit" class="btp-pay-opt rounded-xl border-2 border-stone-900 bg-white p-4 text-left transition" data-value="deposit">
-                <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Deposit</p>
+                <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">Deposit</p>
                 <p id="btp-deposit-price" class="mt-1 text-xl font-light text-stone-900">$150 <span class="text-sm font-normal text-stone-500">now</span></p>
                 <p class="mt-1 text-xs text-stone-500">Balance due after your shoot</p>
               </button>
               <button type="button" id="btp-opt-full" class="btp-pay-opt rounded-xl border-2 border-stone-200 bg-white p-4 text-left transition hover:border-stone-400" data-value="full">
-                <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">Pay in full</p>
+                <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">Pay in full</p>
                 <p id="btp-full-price" class="mt-1 text-xl font-light text-stone-900">{utmPrice ? `${utmPrice} now` : '—'}</p>
                 <p class="mt-1 text-xs text-stone-500">Everything covered upfront</p>
               </button>
@@ -354,7 +354,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
               class="w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2">
               Pay $150 deposit →
             </button>
-            <p id="btp-submit-note" class="mt-3 text-center text-xs text-stone-400">
+            <p id="btp-submit-note" class="mt-3 text-center text-xs text-stone-500">
               Secure checkout via Stripe · Balance due after your shoot
             </p>
           </div>

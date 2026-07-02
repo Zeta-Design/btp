@@ -4,7 +4,7 @@ import { SITE } from '../config/site';
 ---
 <BaseLayout title="Pricing D" description="Pricing layout D">
   <section class="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20">
-    <p class="text-xs uppercase tracking-[0.25em] text-stone-400">Pricing</p>
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Pricing</p>
     <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">Simple, transparent rates</h1>
     <p class="mt-4 max-w-xl text-pretty text-stone-600">
       No hidden fees. Every shoot includes professional editing and delivery within 24–48 hours.
@@ -35,10 +35,10 @@ import { SITE } from '../config/site';
               </span>
             )}
             <div>
-              <p class:list={['text-sm font-medium', tier.popular ? 'text-stone-400' : 'text-stone-500']}>{tier.label}</p>
+              <p class:list={['text-sm font-medium', tier.popular ? 'text-stone-500' : 'text-stone-500']}>{tier.label}</p>
               <p class:list={['mt-3 font-serif text-4xl', tier.popular ? 'text-white' : 'text-stone-900']}>{tier.price}</p>
             </div>
-            <p class:list={['mt-4 text-sm', tier.popular ? 'text-stone-400' : 'text-stone-500']}>{tier.detail} · 24–48 hr delivery</p>
+            <p class:list={['mt-4 text-sm', tier.popular ? 'text-stone-500' : 'text-stone-500']}>{tier.detail} · 24–48 hr delivery</p>
           </div>
         ))}
       </div>
@@ -68,10 +68,10 @@ import { SITE } from '../config/site';
               </span>
             )}
             <div>
-              <p class:list={['text-sm font-medium', tier.popular ? 'text-stone-400' : 'text-stone-500']}>{tier.label}</p>
+              <p class:list={['text-sm font-medium', tier.popular ? 'text-stone-500' : 'text-stone-500']}>{tier.label}</p>
               <p class:list={['mt-3 font-serif text-4xl', tier.popular ? 'text-white' : 'text-stone-900']}>{tier.price}</p>
             </div>
-            <p class:list={['mt-4 text-sm', tier.popular ? 'text-stone-400' : 'text-stone-500']}>{tier.detail} · 24–48 hr delivery</p>
+            <p class:list={['mt-4 text-sm', tier.popular ? 'text-stone-500' : 'text-stone-500']}>{tier.detail} · 24–48 hr delivery</p>
           </div>
         ))}
       </div>

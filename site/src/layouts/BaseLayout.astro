@@ -25,8 +25,14 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
     {jsonLd && <JsonLd schema={jsonLd} />}
   </head>
   <body class="min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[60] focus:rounded-lg focus:bg-stone-900 focus:px-5 focus:py-3 focus:text-sm focus:font-medium focus:text-white"
+    >
+      Skip to content
+    </a>
     <Header />
-    <main><slot /></main>
+    <main id="main" tabindex="-1"><slot /></main>
     <Footer />
   </body>
 </html>

@@ -70,8 +70,58 @@ const showTwilightSA  = filterType === 'twilight-standalone';
   }
 </style>
 
-{showRE && (
+{(showRE || showSTR) && !filterType && (
   <div class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">Which package is right for me?</h2>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2">
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-info="true"
+        data-category="Which is right for me?"
+        data-label="Real Estate Photography"
+        data-tagline="Priced by sq ft · 2.5 hr shoot"
+        data-detail="For agents & sellers"
+        data-duration="2.5 hr shoot"
+        data-service="real-estate-info"
+        data-scroll-to="re-section"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Selling the property?</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">Real Estate</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">Agents · sellers · MLS listings</p>
+          <span class="text-xs text-stone-500">tap to learn more →</span>
+        </div>
+      </div>
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-info="true"
+        data-category="Which is right for me?"
+        data-label="Vacation Rental Photography"
+        data-tagline="Priced by bedrooms · 4 hr shoot"
+        data-detail="For Airbnb & VRBO hosts"
+        data-duration="4 hr shoot"
+        data-service="vacation-rental-info"
+        data-scroll-to="str-section"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Renting on Airbnb or VRBO?</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">Vacation Rental</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">Airbnb · VRBO · short-term rentals</p>
+          <span class="text-xs text-stone-500">tap to learn more →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+{showRE && (
+  <div id="re-section" class="mt-14">
     <h2 class="font-serif text-2xl sm:text-3xl">Real Estate</h2>
     <p class="mt-2 text-sm text-stone-500">MLS &amp; for-sale listings — priced by square footage</p>
     <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -89,12 +139,12 @@ const showTwilightSA  = filterType === 'twilight-standalone';
           data-calendly="https://calendly.com/benjammintims/30min"
         >
           <div>
-            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">{tier.label}</p>
             <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
           </div>
           <div class="mt-4 flex items-center justify-between">
-            <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
-            <span class="text-xs text-stone-400">tap to book →</span>
+            <p class="text-sm text-stone-500">{tier.detail} · 2.5 hr shoot</p>
+            <span class="text-xs text-stone-500">tap to book →</span>
           </div>
         </div>
       ))}
@@ -103,7 +153,7 @@ const showTwilightSA  = filterType === 'twilight-standalone';
 )}
 
 {showSTR && (
-  <div class="mt-14">
+  <div id="str-section" class="mt-14">
     <h2 class="font-serif text-2xl sm:text-3xl">Vacation Rental &amp; STR</h2>
     <p class="mt-2 text-sm text-stone-500">Airbnb, VRBO &amp; short-term rentals — priced by bedrooms</p>
     <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -121,12 +171,12 @@ const showTwilightSA  = filterType === 'twilight-standalone';
           data-calendly="https://calendly.com/benjammintims/vacation-rental-photography"
         >
           <div>
-            <p class="text-xs font-medium uppercase tracking-widest text-stone-400">{tier.label}</p>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">{tier.label}</p>
             <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
           </div>
           <div class="mt-4 flex items-center justify-between">
-            <p class="text-sm text-stone-500">{tier.detail} · 24–48 hrs</p>
-            <span class="text-xs text-stone-400">tap to book →</span>
+            <p class="text-sm text-stone-500">{tier.detail} · 4 hr shoot</p>
+            <span class="text-xs text-stone-500">tap to book →</span>
           </div>
         </div>
       ))}
@@ -152,12 +202,12 @@ const showTwilightSA  = filterType === 'twilight-standalone';
         data-calendly="https://calendly.com/benjammintims/30min"
       >
         <div>
-          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Standalone</p>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Standalone</p>
           <p class="mt-3 text-2xl font-light text-stone-900">$325</p>
         </div>
         <div class="mt-4 flex items-center justify-between">
           <p class="text-sm text-stone-500">Gimbal walkthrough + social reel · 24–48 hrs</p>
-          <span class="text-xs text-stone-400">tap to book →</span>
+          <span class="text-xs text-stone-500">tap to book →</span>
         </div>
       </div>
     </div>
@@ -182,12 +232,12 @@ const showTwilightSA  = filterType === 'twilight-standalone';
         data-calendly="https://calendly.com/benjammintims/30min"
       >
         <div>
-          <p class="text-xs font-medium uppercase tracking-widest text-stone-400">Standalone</p>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Standalone</p>
           <p class="mt-3 text-2xl font-light text-stone-900">$200</p>
         </div>
         <div class="mt-4 flex items-center justify-between">
           <p class="text-sm text-stone-500">6–8 twilight exterior photos · 24–48 hrs</p>
-          <span class="text-xs text-stone-400">tap to book →</span>
+          <span class="text-xs text-stone-500">tap to book →</span>
         </div>
       </div>
     </div>
@@ -213,7 +263,7 @@ const showTwilightSA  = filterType === 'twilight-standalone';
           </div>
         ))}
       </div>
-      <p class="mt-3 text-xs text-stone-400">Video add-on can be selected during checkout after scheduling.</p>
+      <p class="mt-3 text-xs text-stone-500">Video add-on can be selected during checkout after scheduling.</p>
     </div>
 
     <div class="mt-14">
@@ -233,7 +283,7 @@ const showTwilightSA  = filterType === 'twilight-standalone';
           </div>
         ))}
       </div>
-      <p class="mt-3 text-xs text-stone-400">Add-ons can be selected during checkout after scheduling your shoot.</p>
+      <p class="mt-3 text-xs text-stone-500">Add-ons can be selected during checkout after scheduling your shoot.</p>
     </div>
   </>
 )}
@@ -244,22 +294,23 @@ const showTwilightSA  = filterType === 'twilight-standalone';
 
 <div id="btp-backdrop"></div>
 
-<div id="btp-modal-wrap" aria-hidden="true">
-  <div id="btp-modal-card">
+<div id="btp-modal-wrap" aria-hidden="true" inert>
+  <div id="btp-modal-card" role="dialog" aria-modal="true" aria-labelledby="btm-label">
     <div class="p-8 pb-6">
-      <p id="btm-cat"   class="text-xs font-medium uppercase tracking-widest text-stone-500"></p>
+      <p id="btm-cat"   class="text-xs font-medium uppercase tracking-widest text-stone-400"></p>
       <p id="btm-label" class="mt-3 font-serif text-2xl leading-snug text-white"></p>
       <p id="btm-price" class="mt-2 text-5xl font-light text-white"></p>
+      <p id="btm-tagline" class="mt-2 text-base text-stone-300"></p>
       <div id="btm-badges" class="mt-5 flex flex-wrap gap-2"></div>
-      <p class="mt-4 text-sm text-stone-500">$150 deposit · balance due after shoot</p>
+      <p id="btm-deposit" class="mt-4 text-sm text-stone-400">$150 deposit · balance due after shoot</p>
       <div class="mt-6 border-t border-stone-800 pt-5">
-        <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">What's included</p>
+        <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">What's included</p>
         <ul id="btm-included" class="mt-3 space-y-2"></ul>
       </div>
     </div>
     <div class="border-t border-stone-800 px-8 py-5 flex items-center gap-4">
       <a id="btm-book" href="#" class="flex-1 rounded-xl bg-white py-3.5 text-center text-base font-medium text-stone-900 transition hover:bg-stone-100">Book</a>
-      <button id="btm-close" class="shrink-0 text-sm text-stone-500 transition hover:text-stone-300">← back</button>
+      <button id="btm-close" class="shrink-0 text-sm text-stone-400 transition hover:text-stone-200">← back</button>
     </div>
   </div>
 </div>
@@ -272,12 +323,30 @@ const showTwilightSA  = filterType === 'twilight-standalone';
     const btmCat      = document.getElementById('btm-cat')!;
     const btmLabel    = document.getElementById('btm-label')!;
     const btmPrice    = document.getElementById('btm-price')!;
+    const btmTagline  = document.getElementById('btm-tagline')!;
     const btmBadges   = document.getElementById('btm-badges')!;
     const btmIncluded = document.getElementById('btm-included')!;
+    const btmDeposit  = document.getElementById('btm-deposit')!;
     const btmBook     = document.getElementById('btm-book') as HTMLAnchorElement;
     const btmClose    = document.getElementById('btm-close') as HTMLButtonElement;
 
     const INCLUDED: Record<string, string[]> = {
+      'real-estate-info': [
+        'Best for listing agents, sellers &amp; property managers',
+        'Efficient 2.5 hr shoot — bright, clean, MLS-optimized photos',
+        'Priced by square footage — simple and predictable',
+        'One-time use: your photos get the property sold, fast',
+        'HDR-edited JPEGs licensed for MLS &amp; social media',
+        'Delivery within 24–48 hours',
+      ],
+      'vacation-rental-info': [
+        'Best for Airbnb, VRBO &amp; short-term rental hosts',
+        'Styled 4 hr shoot — staging tips, amenity highlights, lifestyle feel',
+        'Priced by bedrooms — scales with your property',
+        'Long-term investment: photos work for you across years of bookings',
+        'Platform-ready JPEGs licensed for Airbnb, VRBO &amp; all marketing',
+        'Delivery within 24–48 hours',
+      ],
       'real-estate': [
         'Professional HDR editing on every image',
         'MLS-ready JPEGs delivered via online gallery',
@@ -317,17 +386,26 @@ const showTwilightSA  = filterType === 'twilight-standalone';
     function openModal(card: HTMLElement) {
       if (activeCard || closing) return;
       activeCard = card;
-      const { category, label, price, detail, duration, service, tier, calendly } = card.dataset;
+      const { category, label, price, detail, duration, service, tier, calendly, info, tagline, scrollTo } = card.dataset;
+      const isInfo = info === 'true';
       btmCat.textContent   = category!;
       btmLabel.textContent = label!;
-      btmPrice.textContent = price!;
-      btmBadges.innerHTML  = [duration!, detail!, '24–48 hr delivery']
+      btmPrice.textContent = isInfo ? '' : price!;
+      btmPrice.style.display = isInfo ? 'none' : '';
+      btmTagline.textContent = isInfo ? tagline! : '';
+      btmTagline.style.display = isInfo ? '' : 'none';
+      btmDeposit.style.display = isInfo ? 'none' : '';
+      btmBadges.innerHTML  = [duration!, detail!, ...(isInfo ? [] : ['24–48 hr delivery'])]
+        .filter(Boolean)
         .map(b => `<span class="rounded-full bg-stone-800 px-4 py-1.5 text-sm text-stone-300">${b}</span>`)
         .join('');
       btmIncluded.innerHTML = (INCLUDED[service!] ?? INCLUDED['real-estate'])
-        .map(item => `<li class="flex items-start gap-2 text-sm text-stone-300"><span class="mt-0.5 shrink-0 text-stone-500">→</span>${item}</li>`)
+        .map(item => `<li class="flex items-start gap-2 text-sm text-stone-300"><span class="mt-0.5 shrink-0 text-stone-400">→</span>${item}</li>`)
         .join('');
-      btmBook.href             = calendly!;
+      btmBook.textContent      = isInfo ? 'See pricing ↓' : 'Book';
+      btmBook.href             = isInfo ? `#${scrollTo}` : calendly!;
+      btmBook.dataset.isInfo   = isInfo ? 'true' : '';
+      btmBook.dataset.scrollTo = scrollTo ?? '';
       btmBook.dataset.service  = service;
       btmBook.dataset.tier     = tier;
       btmBook.dataset.price    = price;
@@ -335,10 +413,13 @@ const showTwilightSA  = filterType === 'twilight-standalone';
       backdrop.classList.add('active');
       document.body.style.overflow = 'hidden';
       modalWrap.classList.add('active');
+      modalWrap.removeAttribute('inert');
       modalWrap.setAttribute('aria-hidden', 'false');
       modalCard.classList.remove('entering', 'leaving');
       void modalCard.offsetWidth;
       setTimeout(() => modalCard.classList.add('entering'), 130);
+      // Move keyboard focus into the dialog once it's visible
+      setTimeout(() => btmBook.focus(), 200);
     }
 
     function closeModal() {
@@ -346,6 +427,8 @@ const showTwilightSA  = filterType === 'twilight-standalone';
       closing = true;
       const card = activeCard;
       activeCard = null;
+      // Return keyboard focus to the card that opened the dialog
+      setTimeout(() => card.focus(), 0);
       modalCard.classList.remove('entering');
       modalCard.classList.add('leaving');
       backdrop.classList.remove('active');
@@ -357,6 +440,7 @@ const showTwilightSA  = filterType === 'twilight-standalone';
       }, 120);
       setTimeout(() => {
         modalWrap.classList.remove('active');
+        modalWrap.setAttribute('inert', '');
         modalWrap.setAttribute('aria-hidden', 'true');
         modalCard.classList.remove('leaving');
         closing = false;
@@ -364,16 +448,53 @@ const showTwilightSA  = filterType === 'twilight-standalone';
     }
 
     document.querySelectorAll<HTMLElement>('.btp-card').forEach(card => {
+      // Make the div behave as a real button for keyboard + AT users
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-haspopup', 'dialog');
       card.addEventListener('click', () => openModal(card));
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+          e.preventDefault();
+          openModal(card);
+        }
+      });
     });
     modalCard.addEventListener('click', e => e.stopPropagation());
     btmClose.addEventListener('click', closeModal);
     backdrop.addEventListener('click', closeModal);
     modalWrap.addEventListener('click', closeModal);
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+    document.addEventListener('keydown', e => {
+      if (!activeCard && !closing) return;   // dialog not open
+      if (e.key === 'Escape') { closeModal(); return; }
+      // Trap Tab within the dialog's focusable controls
+      if (e.key === 'Tab') {
+        const focusables = [btmBook, btmClose];
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        } else if (!focusables.includes(document.activeElement as any)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    });
 
     btmBook.addEventListener('click', (e) => {
       e.preventDefault();
+      if (btmBook.dataset.isInfo === 'true') {
+        const scrollTo = btmBook.dataset.scrollTo;
+        closeModal();
+        setTimeout(() => {
+          document.getElementById(scrollTo!)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 350);
+        return;
+      }
       const price   = btmBook.dataset.price   ?? '';
       const tier    = btmBook.dataset.tier    ?? '';
       const service = btmBook.dataset.service ?? '';
