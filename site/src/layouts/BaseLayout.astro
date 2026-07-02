@@ -14,14 +14,15 @@ interface Props {
   image?: string;
   type?: 'website' | 'article';
   jsonLd?: Record<string, unknown>;
+  noindex?: boolean;
 }
-const { title, description, image, type, jsonLd } = Astro.props;
+const { title, description, image, type, jsonLd, noindex } = Astro.props;
 const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
 ---
 <!doctype html>
 <html lang="en">
   <head>
-    <BaseHead title={fullTitle} description={description} image={image} type={type} />
+    <BaseHead title={fullTitle} description={description} image={image} type={type} noindex={noindex} />
     {jsonLd && <JsonLd schema={jsonLd} />}
   </head>
   <body class="min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased">
