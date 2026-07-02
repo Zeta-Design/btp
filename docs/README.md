@@ -12,6 +12,7 @@ to graded sources, and opens with a plain-language TL;DR.
 | [Photography CRM Selection](research/photography-crm-selection.md) | Research note | Research only (seed for a later market-research doc) | 2026-06-06 |
 | [Starting a Photography Business](plans/starting-a-photography-business.md) | Plan | Draft (from 45 YouTube transcripts; source-weighted, with timestamps) | 2026-06-06 |
 | [Real Estate Photography Pricing](research/real-estate-photography-pricing.md) | Research note | Research only — input for DR-0001 (pricing decision record) and Dubsado setup | 2026-06-11 |
+| [SEO & Traffic Strategy](plans/seo-strategy.md) | Plan / SOP | Draft — real-estate-first positioning + 4-lever action plan; §3.0 to formalize as DR-0002 | 2026-07-02 |
 
 ## Conventions
 - **Research note** → `research/<topic>.md` — options weighed against the Principle Lens; "research
