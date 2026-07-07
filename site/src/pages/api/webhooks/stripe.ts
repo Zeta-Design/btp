@@ -346,7 +346,7 @@ export function buildConfirmationEmail(d: EmailData): string {
   <!-- Footer -->
   <tr>
     <td style="padding:28px 16px 8px;text-align:center;">
-      <p style="margin:0;font-size:11px;color:#a8a29e;">Ben Tims Media · Austin, TX</p>
+      <p style="margin:0;font-size:11px;color:#a8a29e;">Ben Tims Media</p>
       <p style="margin:6px 0 0;font-size:11px;color:#a8a29e;">
         <a href="https://bentimsmedia.com" style="color:#a8a29e;text-decoration:none;">bentimsmedia.com</a>
         &nbsp;·&nbsp;
