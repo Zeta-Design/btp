@@ -60,9 +60,10 @@ const fmtDate = (d: string) => {
                     alt={p.alt}
                     widths={[400, 800]}
                     sizes="(max-width: 640px) 50vw, 33vw"
-                    format="webp"
+                    format="avif"
                     quality={74}
                     loading="lazy"
+                    decoding="async"
                     class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
                 </button>
