@@ -6,6 +6,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import JsonLd from '../components/JsonLd.astro';
+import Analytics from '@vercel/analytics/astro';
 import { SITE } from '../config/site';
 
 interface Props {
@@ -24,6 +25,7 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
   <head>
     <BaseHead title={fullTitle} description={description} image={image} type={type} noindex={noindex} />
     {jsonLd && <JsonLd schema={jsonLd} />}
+    <Analytics />
   </head>
   <body class="min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased">
     <a
