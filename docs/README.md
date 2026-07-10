@@ -13,6 +13,7 @@ to graded sources, and opens with a plain-language TL;DR.
 | [Starting a Photography Business](plans/starting-a-photography-business.md) | Plan | Draft (from 45 YouTube transcripts; source-weighted, with timestamps) | 2026-06-06 |
 | [Real Estate Photography Pricing](research/real-estate-photography-pricing.md) | Research note | Research only — input for DR-0001 (pricing decision record) and Dubsado setup | 2026-06-11 |
 | [SEO & Traffic Strategy](plans/seo-strategy.md) | Plan / SOP | Draft — real-estate-first positioning + 4-lever action plan; §3.0 to formalize as DR-0002 | 2026-07-02 |
+| [Portfolio / Multi-Property Bundle Pricing](plans/portfolio-bundle-pricing.md) | Plan / SOP | Draft — tiered volume-discount rule for multi-property STR bundles; ratify as DR-000x once CODB floor is set | 2026-07-10 |
 
 ## Conventions
 - **Research note** → `research/<topic>.md` — options weighed against the Principle Lens; "research
