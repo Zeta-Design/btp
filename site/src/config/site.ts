@@ -15,6 +15,8 @@ export interface Brand {
   tagline: string;
   /** contact email shown in footer/inquire (optional) */
   email?: string;
+  /** public business phone — used for tel: links, bundle inquiries, and NAP */
+  phone?: string;
   /** social links shown in the footer */
   social?: { label: string; href: string }[];
   /**
@@ -40,6 +42,7 @@ export const BRANDS: Record<string, Brand> = {
     name: 'Ben Tims Media',
     tagline: 'Real estate & short-term rental photography — available for travel.',
     email: 'info@bentims.com',
+    phone: '512.956.5646',
     social: [
       { label: 'IG', href: 'https://www.instagram.com/bentimsmedia/' },
       { label: 'FB', href: 'https://www.facebook.com/profile.php?id=61590507817692' },

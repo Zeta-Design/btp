@@ -4,6 +4,14 @@ import { SITE } from '../config/site';
 
 const sent = Astro.url.searchParams.get('sent') === '1';
 export const prerender = false;
+
+// Bundle deep-link: /contact/?service=bundle preselects the portfolio-package
+// option and prompts for the details needed to quote (count + bedroom size).
+const BUNDLE = 'Multiple Properties (Portfolio Package)';
+const isBundle = Astro.url.searchParams.get('service') === 'bundle';
+const messagePlaceholder = isBundle
+  ? 'How many properties, which communities, and the bedroom count of each? I’ll reply with an exact bundle quote.'
+  : 'Tell us a bit about what you’re looking for…';
 ---
 <BaseLayout
   title="Contact — Book Real Estate & Airbnb Photography"
@@ -101,10 +109,11 @@ export const prerender = false;
                 id="service" name="service" required
                 class="w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-2.5 text-sm text-stone-900 transition focus:border-stone-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-500"
               >
-                <option value="">Select</option>
+                <option value="" selected={!isBundle}>Select</option>
                 <option value="Not sure yet">Not sure yet</option>
                 <option value="Real Estate Photography">Real Estate Photography</option>
                 <option value="Vacation Rental Photography">Vacation Rental Photography</option>
+                <option value={BUNDLE} selected={isBundle}>Multiple Properties (Portfolio Package)</option>
                 <option value="Walkthrough Video">Walkthrough Video</option>
                 <option value="Twilight Session">Twilight Session</option>
                 <option value="Virtual Twilight Edit">Virtual Twilight Edit</option>
@@ -116,7 +125,7 @@ export const prerender = false;
               <textarea
                 id="message" name="message" required rows="4"
                 class="w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-500 transition focus:border-stone-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-500"
-                placeholder="Tell us a bit about what you're looking for…"
+                placeholder={messagePlaceholder}
               ></textarea>
             </div>
 
