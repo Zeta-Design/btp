@@ -42,7 +42,7 @@ export const BRANDS: Record<string, Brand> = {
     name: 'Ben Tims Media',
     tagline: 'Real estate & short-term rental photography — available for travel.',
     email: 'info@bentims.com',
-    phone: '512.956.5646',
+    phone: '(512) 956-5646',
     social: [
       { label: 'IG', href: 'https://www.instagram.com/bentimsmedia/' },
       { label: 'FB', href: 'https://www.facebook.com/profile.php?id=61590507817692' },

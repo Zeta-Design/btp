@@ -8,6 +8,18 @@ const year = new Date().getFullYear();
       <div>
         <p class="font-serif text-2xl tracking-tight">{SITE.name}</p>
         <p class="mt-2 max-w-xs text-balance text-sm text-stone-500">{SITE.tagline}</p>
+        <div class="mt-4 flex flex-col gap-0.5 text-sm text-stone-600">
+          {SITE.phone && (
+            <a href={`tel:+1${SITE.phone.replace(/\D/g, '')}`} class="inline-flex min-h-[36px] items-center transition hover:text-stone-900">
+              {SITE.phone}
+            </a>
+          )}
+          {SITE.email && (
+            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-[36px] items-center transition hover:text-stone-900">
+              {SITE.email}
+            </a>
+          )}
+        </div>
       </div>
       <a
         href="/contact/"
@@ -41,13 +53,6 @@ const year = new Date().getFullYear();
               {s.label}
             </a>
           ))
-        }
-        {
-          SITE.email && (
-            <a href={`mailto:${SITE.email}`} class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">
-              EMAIL
-            </a>
-          )
         }
         <a href="/blog/" class="inline-flex min-h-[44px] items-center transition hover:text-stone-900">
           BLOG
