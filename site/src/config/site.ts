@@ -46,6 +46,7 @@ export const BRANDS: Record<string, Brand> = {
     social: [
       { label: 'IG', href: 'https://www.instagram.com/bentimsmedia/' },
       { label: 'FB', href: 'https://www.facebook.com/profile.php?id=61590507817692' },
+      { label: 'LI', href: 'https://www.linkedin.com/company/bentimsmedia/' },
     ],
     location: { locality: 'Austin', region: 'TX', postalCode: '78701', country: 'US' },
     areaServed: [
