@@ -5,13 +5,33 @@ import { SITE } from '../config/site';
 const sent = Astro.url.searchParams.get('sent') === '1';
 export const prerender = false;
 
-// Bundle deep-link: /contact/?service=bundle preselects the portfolio-package
-// option and prompts for the details needed to quote (count + bedroom size).
-const BUNDLE = 'Multiple Properties (Portfolio Package)';
-const isBundle = Astro.url.searchParams.get('service') === 'bundle';
-const messagePlaceholder = isBundle
-  ? 'How many properties, which communities, and the bedroom count of each? I’ll reply with an exact bundle quote.'
-  : 'Tell us a bit about what you’re looking for…';
+const copy = SITE.contactCopy ?? {
+  heading: "Let's make your listing shine",
+  intro:
+    "Whether you have a specific listing in mind or are just exploring, I'd love to hear from you. Inquiries are typically answered within 24 hours.",
+  placeholder: 'Tell us a bit about what you’re looking for…',
+};
+
+// Service dropdown is per-brand. `param` allows deep-links from the pricing page
+// (e.g. /contact/?service=events or ?service=bundle) to preselect an option.
+const serviceOptions = SITE.contactServices ?? [
+  { label: 'Not sure yet' },
+  { label: 'Real Estate Photography' },
+  { label: 'Vacation Rental Photography' },
+  { label: 'Multiple Properties (Portfolio Package)', param: 'bundle' },
+  { label: 'Walkthrough Video' },
+  { label: 'Twilight Session' },
+  { label: 'Virtual Twilight Edit' },
+];
+
+const serviceParam = Astro.url.searchParams.get('service');
+const preselected = serviceOptions.find((o) => o.param && o.param === serviceParam)?.label ?? '';
+
+// The portfolio-package enquiry needs specifics to quote against.
+const messagePlaceholder =
+  serviceParam === 'bundle'
+    ? 'How many properties, which communities, and the bedroom count of each? I’ll reply with an exact bundle quote.'
+    : copy.placeholder;
 ---
 <BaseLayout
   title="Contact — Book Real Estate & Airbnb Photography"
@@ -20,12 +40,9 @@ const messagePlaceholder = isBundle
   <section class="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-20">
     <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Get in touch</p>
     <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">
-      Let's make your listing shine
+      {copy.heading}
     </h1>
-    <p class="mt-4 text-pretty text-stone-600">
-      Whether you have a specific listing in mind or are just exploring, I'd love to
-      hear from you. Inquiries are typically answered within 24 hours.
-    </p>
+    <p class="mt-4 text-pretty text-stone-600">{copy.intro}</p>
 
     <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:gap-10">
       {SITE.phone && (
@@ -128,14 +145,10 @@ const messagePlaceholder = isBundle
                 id="service" name="service" required
                 class="w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-2.5 text-sm text-stone-900 transition focus:border-stone-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-stone-500"
               >
-                <option value="" selected={!isBundle}>Select</option>
-                <option value="Not sure yet">Not sure yet</option>
-                <option value="Real Estate Photography">Real Estate Photography</option>
-                <option value="Vacation Rental Photography">Vacation Rental Photography</option>
-                <option value={BUNDLE} selected={isBundle}>Multiple Properties (Portfolio Package)</option>
-                <option value="Walkthrough Video">Walkthrough Video</option>
-                <option value="Twilight Session">Twilight Session</option>
-                <option value="Virtual Twilight Edit">Virtual Twilight Edit</option>
+                <option value="" selected={!preselected}>Select</option>
+                {serviceOptions.map((o) => (
+                  <option value={o.label} selected={preselected === o.label}>{o.label}</option>
+                ))}
               </select>
             </div>
 

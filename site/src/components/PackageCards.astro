@@ -1,9 +1,19 @@
 ---
+import { SITE } from '../config/site';
+
 interface Props {
   showInfoSections?: boolean;
   filterType?: 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone';
 }
 const { showInfoSections = true, filterType } = Astro.props;
+
+/* Brands that define their own pricing sections (e.g. The BT Photography) render
+   those generically below and skip every real-estate-specific section. */
+const groups = SITE.pricingGroups;
+const depositNote = SITE.depositNote ?? '$150 deposit · balance due after shoot';
+const includedMap = groups
+  ? Object.fromEntries(groups.map((g) => [g.service, g.included]))
+  : null;
 
 const reEstate = [
   { label: 'Up to 1,500 sq ft',    price: '$185', detail: 'Up to 25 photos' },
@@ -22,10 +32,11 @@ const vacRental = [
   { label: '6+ Bedrooms — Premium', price: '$650', detail: 'Up to 70 photos incl. themed rooms, game room & pool' },
 ];
 
-const showRE          = !filterType || filterType === 'real-estate';
-const showSTR         = !filterType || filterType === 'vacation-rental';
-const showVideo       = filterType === 'walkthrough-video';
-const showTwilightSA  = filterType === 'twilight-standalone';
+const showRE          = !groups && (!filterType || filterType === 'real-estate');
+const showSTR         = !groups && (!filterType || filterType === 'vacation-rental');
+const showVideo       = !groups && filterType === 'walkthrough-video';
+const showTwilightSA  = !groups && filterType === 'twilight-standalone';
+const showAddOns      = !groups && showInfoSections;
 ---
 <style is:global>
   #btp-backdrop {
@@ -69,6 +80,42 @@ const showTwilightSA  = filterType === 'twilight-standalone';
     opacity: 0; transform: perspective(1400px) rotateY(90deg);
   }
 </style>
+
+{groups && groups.map((g) => (
+  <div id={g.id} class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">{g.title}</h2>
+    <p class="mt-2 text-sm text-stone-500">{g.subtitle}</p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {g.tiers.map((tier) => (
+        <div
+          class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+          style="min-height:180px;"
+          data-category={g.title}
+          data-label={tier.label}
+          data-price={tier.price}
+          data-detail={tier.detail}
+          data-duration={g.duration ?? ''}
+          data-service={g.service}
+          data-tier={`${g.title} – ${tier.label}`}
+          data-calendly={g.bookUrl}
+        >
+          <div>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">{tier.label}</p>
+            <p class="mt-3 text-2xl font-light text-stone-900">{tier.price}</p>
+          </div>
+          <div class="mt-4 flex items-center justify-between">
+            <p class="text-sm text-stone-500">{tier.detail}</p>
+            <span class="text-xs text-stone-500">tap to book →</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+))}
+
+{includedMap && (
+  <script type="application/json" id="btp-included" set:html={JSON.stringify(includedMap)} />
+)}
 
 {(showRE || showSTR) && !filterType && (
   <div class="mt-14">
@@ -244,7 +291,7 @@ const showTwilightSA  = filterType === 'twilight-standalone';
   </div>
 )}
 
-{showInfoSections && (
+{showAddOns && (
   <>
     <div class="mt-14">
       <h2 class="font-serif text-2xl sm:text-3xl">Walkthrough Video</h2>
@@ -302,7 +349,7 @@ const showTwilightSA  = filterType === 'twilight-standalone';
       <p id="btm-price" class="mt-2 text-5xl font-light text-white"></p>
       <p id="btm-tagline" class="mt-2 text-base text-stone-300"></p>
       <div id="btm-badges" class="mt-5 flex flex-wrap gap-2"></div>
-      <p id="btm-deposit" class="mt-4 text-sm text-stone-400">$150 deposit · balance due after shoot</p>
+      <p id="btm-deposit" class="mt-4 text-sm text-stone-400">{depositNote}</p>
       <div class="mt-6 border-t border-stone-800 pt-5">
         <p class="text-xs font-semibold uppercase tracking-widest text-stone-400">What's included</p>
         <ul id="btm-included" class="mt-3 space-y-2"></ul>
@@ -379,6 +426,11 @@ const showTwilightSA  = filterType === 'twilight-standalone';
         'Unlimited downloads — no watermarks',
       ],
     };
+
+    // Brands with their own pricing sections ship their "What's included" lists
+    // as JSON so this map covers whatever services that brand defines.
+    const includedEl = document.getElementById('btp-included');
+    if (includedEl) Object.assign(INCLUDED, JSON.parse(includedEl.textContent || '{}'));
 
     let activeCard: HTMLElement | null = null;
     let closing = false;
@@ -499,6 +551,15 @@ const showTwilightSA  = filterType === 'twilight-standalone';
       const tier    = btmBook.dataset.tier    ?? '';
       const service = btmBook.dataset.service ?? '';
       localStorage.setItem('btpBooking', JSON.stringify({ service, tier, price }));
+
+      // Brands without Calendly scheduling (e.g. The BT Photography) point their
+      // Book button at an inquiry page — just follow the link.
+      if (!btmBook.href.includes('calendly.com')) {
+        const dest = btmBook.href;
+        closeModal();
+        window.location.href = dest;
+        return;
+      }
 
       const calendlyUrl = new URL(btmBook.href);
       calendlyUrl.searchParams.set('utm_content', price);

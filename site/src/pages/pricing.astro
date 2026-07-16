@@ -2,22 +2,29 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PackageCards from '../components/PackageCards.astro';
 import { SITE } from '../config/site';
+
+const isCustomPricing = !!SITE.pricingGroups;
+const copy = SITE.pricingCopy ?? {
+  heading: 'Simple, transparent rates',
+  intro:
+    'No hidden fees. Every shoot includes professional editing and delivery within 24–48 hours. Click any package to book.',
+};
 ---
 <BaseLayout
-  title="Real Estate & Airbnb Photography Pricing"
-  description={`Transparent real estate & short-term rental photography pricing. Priced by square footage or bedrooms — editing and 24–48 hr delivery included.`}
+  title={isCustomPricing ? 'Event & Portrait Photography Pricing' : 'Real Estate & Airbnb Photography Pricing'}
+  description={isCustomPricing
+    ? `Event, portrait & headshot photography pricing from ${SITE.name} — editing and a private online gallery included.`
+    : `Transparent real estate & short-term rental photography pricing. Priced by square footage or bedrooms — editing and 24–48 hr delivery included.`}
 >
   <section class="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20">
     <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Pricing</p>
-    <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">Simple, transparent rates</h1>
-    <p class="mt-4 max-w-xl text-pretty text-stone-600">
-      No hidden fees. Every shoot includes professional editing and delivery within 24–48 hours.
-      <strong class="font-medium text-stone-800"> Click any package to book.</strong>
-    </p>
+    <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">{copy.heading}</h1>
+    <p class="mt-4 max-w-xl text-pretty text-stone-600">{copy.intro}</p>
 
     <PackageCards />
 
-    <!-- Bundle / portfolio package -->
+    <!-- Bundle / portfolio package (real-estate brands only) -->
+    {!isCustomPricing && (
     <div class="mt-14 rounded-2xl border border-stone-200 bg-white px-8 py-10 text-center shadow-sm">
       <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Portfolio packages</p>
       <h2 class="mt-3 font-serif text-2xl text-stone-900 sm:text-3xl">Multiple properties?</h2>
@@ -43,16 +50,21 @@ import { SITE } from '../config/site';
         )}
       </div>
     </div>
+    )}
 
     <!-- CTA -->
     <div class="mt-8 rounded-2xl bg-stone-900 px-8 py-10 text-center">
       <h2 class="font-serif text-2xl text-stone-50 sm:text-3xl">Ready to book?</h2>
-      <p class="mt-3 text-stone-400">Secure your date with a $150 deposit — balance due after your shoot.</p>
+      <p class="mt-3 text-stone-400">
+        {isCustomPricing
+          ? SITE.depositNote ?? 'Get in touch to lock in your date.'
+          : 'Secure your date with a $150 deposit — balance due after your shoot.'}
+      </p>
       <a
-        href="/book/"
+        href={isCustomPricing ? '/contact/' : '/book/'}
         class="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-white px-8 text-sm font-medium text-stone-900 transition hover:bg-stone-100"
       >
-        Book &amp; pay deposit →
+        {isCustomPricing ? 'Check availability →' : 'Book & pay deposit →'}
       </a>
     </div>
   </section>

@@ -12,9 +12,101 @@ html {
   text-rendering: optimizeLegibility;
 }
 
+/* ── Dark theme (brands with theme: 'dark' — e.g. The BT Photography) ──────────
+   Tailwind v4 utilities resolve the palette through CSS variables, so remapping
+   the stone scale here flips every surface and text colour at once rather than
+   re-writing each component. The scale is reversed: stone-50 becomes the darkest
+   (page background) and stone-900 the lightest (headings).
+
+   Tailwind's `stone` is a *warm* grey, which reads brown on dark surfaces, so the
+   dark theme remaps it onto a true neutral grey (no colour temperature).
+
+   Contrast against the #171717 page background (WCAG 2.2):
+     stone-900 #fafafa ≈ 17.8:1  (AAA body/headings)
+     stone-600 #d4d4d4 ≈ 12.2:1  (AAA body copy)
+     stone-500 #a3a3a3 ≈  7.2:1  (AAA muted labels)
+     stone-300 #737373 ≈  3.8:1  (meets 1.4.11 non-text 3:1 for input borders) */
+[data-theme^="dark"] {
+  color-scheme: dark;
+}
+
+/* A — Neutral graphite. The gallery/darkroom standard: no colour cast, so photos
+   read true. Safest for a portfolio. */
+[data-theme="dark"] {
+  --btp-bg: #171717;
+  --btp-card: #262626;
+  --color-stone-50: #171717;
+  --color-stone-100: #262626;
+  --color-stone-200: #3d3d3d;
+  --color-stone-300: #737373;
+  --color-stone-400: #8a8a8a;
+  --color-stone-500: #a3a3a3;
+  --color-stone-600: #d4d4d4;
+  --color-stone-700: #e5e5e5;
+  --color-stone-800: #f5f5f5;
+  --color-stone-900: #fafafa;
+  --color-stone-950: #ffffff;
+}
+
+
+/* Panels authored as `bg-stone-900` + `text-white` invert into light panels, so
+   plain white text/surfaces must flip too. The hero is the exception: it sits on
+   top of a photograph, so it stays true white in both themes. */
+[data-theme^="dark"] .text-white {
+  color: var(--btp-bg);
+}
+[data-theme^="dark"] .bg-white {
+  background-color: var(--btp-card);
+}
+[data-theme^="dark"] .hero-shell .text-white {
+  color: #ffffff;
+}
+[data-theme^="dark"] .hero-shell .bg-white {
+  background-color: #ffffff;
+}
+[data-theme^="dark"] .hero-shell .text-stone-900 {
+  color: var(--btp-bg);
+}
+
 ::selection {
   background: #1c1917;
   color: #fafaf9;
+}
+
+/* Form fields brighten to white on focus in the light theme; keep them on the
+   dark card surface here instead of flashing to white. */
+[data-theme^="dark"] .focus\:bg-white:focus {
+  background-color: var(--btp-card);
+}
+
+/* The booking modal is a dark panel in BOTH themes (see #btp-modal-card above),
+   so the palette flip must not apply inside it — otherwise its white title/price
+   go dark-on-dark and its dark badges turn into white pills. Restore a normal
+   light-on-dark scale (neutral, to match this theme) within the dialog. */
+[data-theme^="dark"] #btp-modal-card {
+  background: var(--btp-bg);
+  --color-stone-200: #e5e5e5;
+  --color-stone-300: #d4d4d4;
+  --color-stone-400: #a3a3a3;
+  --color-stone-500: #737373;
+  --color-stone-600: #525252;
+  --color-stone-800: var(--btp-card);
+  --color-stone-900: var(--btp-bg);
+}
+[data-theme^="dark"] #btp-modal-card .text-white {
+  color: #ffffff;
+}
+[data-theme^="dark"] #btp-modal-card .bg-white {
+  background-color: #ffffff;
+}
+
+[data-theme^="dark"] ::selection {
+  background: #fafafa;
+  color: var(--btp-bg);
+}
+
+[data-theme^="dark"] :focus-visible {
+  outline-color: #fafafa;
 }
 
 /* Keyboard-only focus ring (don't remove focus visibility) */
