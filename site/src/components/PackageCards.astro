@@ -344,6 +344,7 @@ const showAddOns      = !groups && showInfoSections;
 <div id="btp-modal-wrap" aria-hidden="true" inert>
   <div id="btp-modal-card" role="dialog" aria-modal="true" aria-labelledby="btm-label">
     <div class="p-8 pb-6">
+      <button id="btm-close" class="-ml-1 mb-4 inline-flex items-center text-sm text-stone-400 transition hover:text-stone-200">← back</button>
       <p id="btm-cat"   class="text-xs font-medium uppercase tracking-widest text-stone-400"></p>
       <p id="btm-label" class="mt-3 font-serif text-2xl leading-snug text-white"></p>
       <p id="btm-price" class="mt-2 text-5xl font-light text-white"></p>
@@ -355,9 +356,8 @@ const showAddOns      = !groups && showInfoSections;
         <ul id="btm-included" class="mt-3 space-y-2"></ul>
       </div>
     </div>
-    <div class="border-t border-stone-800 px-8 py-5 flex items-center gap-4">
-      <a id="btm-book" href="#" class="flex-1 rounded-xl bg-white py-3.5 text-center text-base font-medium text-stone-900 transition hover:bg-stone-100">Book</a>
-      <button id="btm-close" class="shrink-0 text-sm text-stone-400 transition hover:text-stone-200">← back</button>
+    <div class="border-t border-stone-800 px-8 py-5">
+      <a id="btm-book" href="#" class="block w-full rounded-full bg-white py-3.5 text-center text-base font-medium text-stone-900 transition hover:bg-stone-100">Book</a>
     </div>
   </div>
 </div>
