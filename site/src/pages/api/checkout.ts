@@ -114,6 +114,11 @@ export const POST: APIRoute = async ({ request }) => {
     payment_method_types: ['card'],
     line_items: lineItems,
     mode: 'payment',
+    // Stripe's collapsed "Add promotion code" field — shown ONLY on pay-in-full,
+    // where a code discounts the true total. Hidden on the deposit path so a code
+    // can't shave the $150 deposit (promo codes require paying in full). Manage
+    // the actual codes in the Stripe dashboard.
+    allow_promotion_codes: isFullPayment,
     customer_email: email,
     metadata: {
       name, phone, service, tier, price, paymentOption,
