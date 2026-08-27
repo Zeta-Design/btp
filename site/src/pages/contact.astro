@@ -22,6 +22,7 @@ const serviceOptions = SITE.contactServices ?? [
   { label: 'Walkthrough Video' },
   { label: 'Twilight Session' },
   { label: 'Virtual Twilight Edit' },
+  { label: 'Custom / other project', param: 'custom' },
 ];
 
 const serviceParam = Astro.url.searchParams.get('service');
@@ -31,6 +32,8 @@ const preselected = serviceOptions.find((o) => o.param && o.param === servicePar
 const messagePlaceholder =
   serviceParam === 'bundle'
     ? 'How many properties, which communities, and the bedroom count of each? I’ll reply with an exact bundle quote.'
+    : serviceParam === 'custom'
+    ? 'Tell me what you’d like photographed, the location, and any timing — I’ll reply with a custom quote.'
     : copy.placeholder;
 ---
 <BaseLayout

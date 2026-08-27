@@ -23,6 +23,23 @@ const copy = SITE.pricingCopy ?? {
 
     <PackageCards />
 
+    <!-- Custom / one-off shoot (real-estate brands only) -->
+    {!isCustomPricing && (
+    <div class="mt-10 rounded-2xl border border-stone-200 bg-white px-8 py-8 text-center shadow-sm">
+      <h2 class="font-serif text-2xl text-stone-900">Need just one thing?</h2>
+      <p class="mx-auto mt-2 max-w-lg text-pretty text-stone-600">
+        A pool, a single room, one exterior, a renovation reveal — anything that isn't a standard
+        package. Tell me what you have in mind and I'll send a custom quote.
+      </p>
+      <a
+        href="/contact/?service=custom"
+        class="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-full bg-stone-900 px-8 text-sm font-medium text-white transition hover:bg-stone-700"
+      >
+        Get a custom quote →
+      </a>
+    </div>
+    )}
+
     <!-- Bundle / portfolio package (real-estate brands only) -->
     {!isCustomPricing && (
     <div class="mt-14 rounded-2xl border border-stone-200 bg-white px-8 py-10 text-center shadow-sm">
