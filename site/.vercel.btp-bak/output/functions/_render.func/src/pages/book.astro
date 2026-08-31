@@ -1,0 +1,497 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PackageCards from '../components/PackageCards.astro';
+import { SITE } from '../config/site';
+
+const CALENDLY: Record<string, string> = {
+  'real-estate':         'https://calendly.com/benjammintims/30min',
+  'vacation-rental':     'https://calendly.com/benjammintims/vacation-rental-photography',
+  'walkthrough-video':   'https://calendly.com/benjammintims/30min',
+  'twilight-standalone': 'https://calendly.com/benjammintims/30min',
+};
+
+const SERVICE_LABELS: Record<string, string> = {
+  'real-estate':         'Real Estate Photography',
+  'vacation-rental':     'Vacation Rental Photography',
+  'walkthrough-video':   'Walkthrough Video',
+  'twilight-standalone': 'Twilight Session',
+};
+
+const params      = Astro.url.searchParams;
+const service     = params.get('service') ?? '';
+const type        = params.get('type') ?? '';
+const isScheduled = !!CALENDLY[service];
+const isVTE       = !isScheduled && type === 'virtual-twilight-edit';
+const isFiltered  = !isScheduled && !isVTE &&
+  ['real-estate', 'vacation-rental', 'walkthrough-video', 'twilight-standalone'].includes(type);
+const isPhotoPackage = service === 'real-estate' || service === 'vacation-rental';
+
+// Pre-filled from Calendly redirect
+const prefillName  = params.get('invitee_full_name') ?? '';
+const prefillEmail = params.get('invitee_email') ?? '';
+const eventStart   = params.get('event_start_time') ?? '';
+
+// UTM fallback: Calendly passes these through from the modal click
+const utmPrice = params.get('utm_content') ?? '';
+const utmTier  = params.get('utm_term')    ?? '';
+
+let shootDateFormatted = '';
+if (eventStart) {
+  try {
+    shootDateFormatted = new Date(eventStart).toLocaleString('en-US', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+    });
+  } catch {}
+}
+
+const serviceLabel = SERVICE_LABELS[service] || service;
+---
+<BaseLayout
+  title="Book a Real Estate or Airbnb Photography Shoot"
+  description={`Reserve your real estate or short-term rental shoot with ${SITE.name}. A $150 deposit holds your date — balance due after your session.`}
+>
+  {!isScheduled && !isFiltered && !isVTE ? (
+    /* ── Step 1a: Service type selector ── */
+    <section class="mx-auto max-w-3xl px-5 py-14 sm:px-6 sm:py-20">
+      <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Book a shoot</p>
+      <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">What are you photographing?</h1>
+      <p class="mt-4 max-w-xl text-pretty text-stone-600">Choose a service to see packages and pricing.</p>
+
+      <div class="mt-10 grid gap-5 sm:grid-cols-2">
+        <a href="/book/?type=real-estate" class="group flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-8 transition hover:border-stone-400 hover:shadow-sm">
+          <div>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">For sale / MLS</p>
+            <p class="mt-3 font-serif text-2xl text-stone-900">Real Estate</p>
+            <p class="mt-2 text-sm text-stone-500">Priced by square footage — fast 24–48 hr turnaround for active listings.</p>
+          </div>
+          <p class="mt-8 text-sm font-medium text-stone-900 group-hover:underline">View packages →</p>
+        </a>
+        <a href="/book/?type=vacation-rental" class="group flex flex-col justify-between rounded-2xl border border-stone-200 bg-white p-8 transition hover:border-stone-400 hover:shadow-sm">
+          <div>
+            <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Airbnb / VRBO / STR</p>
+            <p class="mt-3 font-serif text-2xl text-stone-900">Vacation Rental</p>
+            <p class="mt-2 text-sm text-stone-500">Priced by bedrooms — styled to attract bookings on short-term rental platforms.</p>
+          </div>
+          <p class="mt-8 text-sm font-medium text-stone-900 group-hover:underline">View packages →</p>
+        </a>
+      </div>
+
+      <p class="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-stone-500">Standalone &amp; add-on services</p>
+      <div class="mt-4 grid gap-4 sm:grid-cols-3">
+        <a href="/book/?type=walkthrough-video" class="group flex flex-col justify-between rounded-xl border border-stone-200 bg-white p-6 transition hover:border-stone-400 hover:shadow-sm">
+          <div>
+            <p class="font-medium text-stone-900">Walkthrough Video</p>
+            <p class="mt-1 text-sm text-stone-500">Gimbal walkthrough + social reel</p>
+            <p class="mt-2 text-base font-light text-stone-900">$325</p>
+          </div>
+          <p class="mt-5 text-xs font-medium text-stone-900 group-hover:underline">Book →</p>
+        </a>
+        <a href="/book/?type=twilight-standalone" class="group flex flex-col justify-between rounded-xl border border-stone-200 bg-white p-6 transition hover:border-stone-400 hover:shadow-sm">
+          <div>
+            <p class="font-medium text-stone-900">Twilight Session</p>
+            <p class="mt-1 text-sm text-stone-500">6–8 dusk/twilight exterior photos</p>
+            <p class="mt-2 text-base font-light text-stone-900">$200</p>
+          </div>
+          <p class="mt-5 text-xs font-medium text-stone-900 group-hover:underline">Book →</p>
+        </a>
+        <a href="/book/?type=virtual-twilight-edit" class="group flex flex-col justify-between rounded-xl border border-stone-200 bg-white p-6 transition hover:border-stone-400 hover:shadow-sm">
+          <div>
+            <p class="font-medium text-stone-900">Virtual Twilight Edit</p>
+            <p class="mt-1 text-sm text-stone-500">Daytime exterior → twilight look</p>
+            <p class="mt-2 text-base font-light text-stone-900">$35 / image</p>
+          </div>
+          <p class="mt-5 text-xs font-medium text-stone-900 group-hover:underline">Book →</p>
+        </a>
+      </div>
+    </section>
+
+  ) : isFiltered ? (
+    /* ── Step 1b: Filtered package cards ── */
+    <section class="mx-auto max-w-5xl px-5 py-14 sm:px-6 sm:py-20">
+      <a href="/book/" class="inline-flex items-center gap-1.5 text-sm text-stone-500 transition hover:text-stone-900">← Back</a>
+      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-stone-500">Book a shoot</p>
+      <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">
+        {type === 'real-estate'       ? 'Real Estate Packages'
+         : type === 'vacation-rental' ? 'Vacation Rental Packages'
+         : type === 'walkthrough-video' ? 'Walkthrough Video'
+         : 'Twilight Session'}
+      </h1>
+      <p class="mt-4 max-w-xl text-pretty text-stone-600">Click any package to see what's included and lock in your date.</p>
+      <PackageCards filterType={type as 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone'} showInfoSections={false} />
+    </section>
+
+  ) : isVTE ? (
+    /* ── VTE: Virtual Twilight Edit form (no Calendly needed) ── */
+    <section class="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-20">
+      <a href="/book/" class="inline-flex items-center gap-1.5 text-sm text-stone-500 transition hover:text-stone-900">← Back</a>
+      <p class="mt-6 text-xs uppercase tracking-[0.25em] text-stone-500">Book a service</p>
+      <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">Virtual Twilight Edit</h1>
+      <p class="mt-4 text-pretty text-stone-600">
+        Send your daytime exterior photos and I'll digitally convert them to a realistic twilight look — warm window glow, sky replacement, and exterior lighting. No shoot required.
+      </p>
+      <div class="mt-4 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
+        <p class="text-sm text-stone-600">$35 per image · professional edit · delivery within 24–48 hrs of receiving your photos</p>
+      </div>
+
+      <form method="POST" action="/api/checkout" class="mt-8 space-y-6">
+        <input type="hidden" name="serviceCategory" value="editing" />
+        <input type="hidden" name="service"        value="Virtual Twilight Edit" />
+        <input type="hidden" name="tier"    id="vte-tier"  value="Virtual Twilight Edit" />
+        <input type="hidden" name="price"   id="vte-price" value="35" />
+        <input type="hidden" name="paymentOption"  value="full" />
+        <input type="hidden" name="shootDate"      value="N/A – editing service" />
+
+        <!-- Quantity -->
+        <div>
+          <label for="vte-qty" class="block text-sm font-medium text-stone-700">Number of images to edit</label>
+          <div class="mt-1.5 flex items-center gap-3">
+            <input
+              type="number" id="vte-qty" name="vte_qty" min="1" max="50" value="1" required
+              class="w-24 rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+            />
+            <p class="text-sm text-stone-600">× $35 = <strong id="vte-total" class="text-stone-900">$35</strong></p>
+          </div>
+        </div>
+
+        <!-- Name + Email -->
+        <div class="grid gap-6 sm:grid-cols-2">
+          <div>
+            <label for="vte-name" class="block text-sm font-medium text-stone-700">Full name</label>
+            <input type="text" id="vte-name" name="name" required autocomplete="name"
+              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+              placeholder="Jane Smith" />
+          </div>
+          <div>
+            <label for="vte-email" class="block text-sm font-medium text-stone-700">Email</label>
+            <input type="email" id="vte-email" name="email" required autocomplete="email"
+              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+              placeholder="jane@example.com" />
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label for="vte-phone" class="block text-sm font-medium text-stone-700">Phone</label>
+          <input type="tel" id="vte-phone" name="phone" required autocomplete="tel"
+            class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+            placeholder="(512) 000-0000" />
+        </div>
+
+        <!-- Notes / photo delivery -->
+        <div>
+          <label for="vte-notes" class="block text-sm font-medium text-stone-700">How will you send your photos?</label>
+          <p class="mt-0.5 text-xs text-stone-500">Dropbox, Google Drive, WeTransfer, etc. I'll follow up to confirm receipt.</p>
+          <textarea id="vte-notes" name="notes" rows="3" required
+            class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500 resize-none"
+            placeholder="I'll share a Dropbox link after payment, or here's a link: ..."></textarea>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="vte-submit"
+            class="w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2">
+            Pay $35 →
+          </button>
+          <p class="mt-3 text-center text-xs text-stone-500">Secure checkout via Stripe · 24–48 hr turnaround after photo delivery</p>
+        </div>
+      </form>
+    </section>
+
+  ) : (
+    /* ── Step 2: Pay deposit / full ── */
+    <section class="mx-auto max-w-2xl px-5 py-14 sm:px-6 sm:py-20">
+      <>
+        <p class="text-xs uppercase tracking-[0.25em] text-stone-500">
+          {isPhotoPackage ? 'Step 2 of 2 — Pay deposit' : 'Confirm your booking'}
+        </p>
+        <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">Confirm your booking</h1>
+        <p class="mt-4 text-pretty text-stone-600">
+          Your shoot date is scheduled.{' '}
+          {isPhotoPackage
+            ? <>Pay the <strong class="font-medium text-stone-800">$150 deposit</strong> below to lock it in — balance due after your session.</>
+            : <>Complete payment below to lock in your date.</>
+          }
+        </p>
+
+        <div class="mt-6 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Scheduled</p>
+          <p id="btp-tier-label" class="mt-1 font-medium text-stone-900">{utmTier || serviceLabel}</p>
+          {shootDateFormatted && <p class="text-sm text-stone-600">{shootDateFormatted}</p>}
+          <p id="btp-price-label" class={`mt-0.5 text-sm text-stone-500${utmPrice ? '' : ' hidden'}`}>{utmPrice ? `Package: ${utmPrice}` : ''}</p>
+        </div>
+
+        <form method="POST" action="/api/checkout" class="mt-8 space-y-6">
+          <input type="hidden" name="service"   id="btp-service-input" value={serviceLabel} />
+          <input type="hidden" name="shootDate" value={eventStart || 'To be confirmed'} />
+          <input type="hidden" name="tier"      id="btp-tier-input"   value={utmTier} />
+          <input type="hidden" name="price"     id="btp-price-input"  value={utmPrice} />
+
+          <!-- Name + Email -->
+          <div class="grid gap-6 sm:grid-cols-2">
+            <div>
+              <label for="name" class="block text-sm font-medium text-stone-700">Full name</label>
+              <input type="text" id="name" name="name" required autocomplete="name" value={prefillName}
+                class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                placeholder="Jane Smith" />
+            </div>
+            <div>
+              <label for="email" class="block text-sm font-medium text-stone-700">Email</label>
+              <input type="email" id="email" name="email" required autocomplete="email" value={prefillEmail}
+                class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                placeholder="jane@example.com" />
+            </div>
+          </div>
+
+          <!-- Phone -->
+          <div>
+            <label for="phone" class="block text-sm font-medium text-stone-700">Phone <span class="text-red-500">*</span></label>
+            <input type="tel" id="phone" name="phone" required autocomplete="tel"
+              class="mt-1.5 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+              placeholder="(512) 000-0000" />
+          </div>
+
+          <!-- Property address -->
+          <div class="space-y-4">
+            <p class="text-sm font-medium text-stone-700">Property address</p>
+            <div>
+              <label for="address" class="block text-xs text-stone-500">Street address</label>
+              <input type="text" id="address" name="address" required autocomplete="address-line1"
+                class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                placeholder="123 Main St" />
+            </div>
+            <div>
+              <label for="address2" class="block text-xs text-stone-500">Address line 2 <span class="text-stone-500">(optional)</span></label>
+              <input type="text" id="address2" name="address2" autocomplete="address-line2"
+                class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                placeholder="Unit, suite, apt, etc." />
+            </div>
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+              <div class="col-span-2 sm:col-span-1">
+                <label for="city" class="block text-xs text-stone-500">City</label>
+                <input type="text" id="city" name="city" required autocomplete="address-level2"
+                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                  placeholder="City" />
+              </div>
+              <div>
+                <label for="state" class="block text-xs text-stone-500">State</label>
+                <input type="text" id="state" name="state" required maxlength="2" autocomplete="address-level1"
+                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500 uppercase"
+                  placeholder="State" />
+              </div>
+              <div>
+                <label for="zip" class="block text-xs text-stone-500">ZIP code</label>
+                <input type="text" id="zip" name="zip" required autocomplete="postal-code" inputmode="numeric"
+                  class="mt-1 w-full rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                  placeholder="78701" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Add-ons (photo packages only) -->
+          {isPhotoPackage && (
+            <div class="space-y-3">
+              <p class="text-sm font-medium text-stone-700">Add-ons <span class="font-normal text-stone-500">(optional)</span></p>
+
+              <p class="pt-1 text-xs font-medium uppercase tracking-widest text-stone-500">Same day as your shoot</p>
+              <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
+                <input type="checkbox" name="addon_video" id="btp-addon-video" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-stone-900">Walkthrough Video</p>
+                  <p class="mt-0.5 text-xs text-stone-500">Gimbal walkthrough + 30–60 sec vertical social reel</p>
+                </div>
+                <p class="shrink-0 text-sm font-medium text-stone-900">+$200</p>
+              </label>
+              <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
+                <input type="checkbox" name="addon_twilight" id="btp-addon-twilight" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-stone-900">Twilight Session</p>
+                  <p class="mt-0.5 text-xs text-stone-500">6–8 dusk/twilight exterior photos, same day as main shoot</p>
+                </div>
+                <p class="shrink-0 text-sm font-medium text-stone-900">+$150</p>
+              </label>
+
+              <p class="pt-2 text-xs font-medium uppercase tracking-widest text-stone-500">Editing (no appointment needed)</p>
+              <div class="rounded-xl border border-stone-200 bg-white p-4">
+                <div class="flex items-start justify-between gap-4">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-stone-900">Virtual Twilight Edit</p>
+                    <p class="mt-0.5 text-xs text-stone-500">Daytime exterior digitally converted to a twilight look</p>
+                  </div>
+                  <p class="shrink-0 text-sm text-stone-500">$35 / image</p>
+                </div>
+                <div class="mt-3 flex items-center gap-2">
+                  <input type="number" name="addon_vte_qty" id="btp-addon-vte-qty" min="0" max="20" value="0"
+                    class="w-20 rounded-lg border border-stone-300 bg-white px-3 py-2 text-stone-900 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500" />
+                  <p class="text-sm text-stone-600">images × $35 = <strong id="btp-vte-addon-total" class="text-stone-900">$0</strong></p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <!-- Payment option selector -->
+          <input type="hidden" name="paymentOption" id="btp-payment-option" value="deposit" />
+
+          <div class="space-y-3">
+            <p class="text-sm font-medium text-stone-700">Payment option</p>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <button type="button" id="btp-opt-deposit" class="btp-pay-opt rounded-xl border-2 border-stone-900 bg-white p-4 text-left transition" data-value="deposit">
+                <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">Deposit</p>
+                <p id="btp-deposit-price" class="mt-1 text-xl font-light text-stone-900">$150 <span class="text-sm font-normal text-stone-500">now</span></p>
+                <p class="mt-1 text-xs text-stone-500">Balance due after your shoot</p>
+              </button>
+              <button type="button" id="btp-opt-full" class="btp-pay-opt rounded-xl border-2 border-stone-200 bg-white p-4 text-left transition hover:border-stone-400" data-value="full">
+                <p class="text-xs font-semibold uppercase tracking-widest text-stone-500">Pay in full</p>
+                <p id="btp-full-price" class="mt-1 text-xl font-light text-stone-900">{utmPrice ? `${utmPrice} now` : '—'}</p>
+                <p class="mt-1 text-xs text-stone-500">Everything covered upfront</p>
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button type="submit" id="btp-submit-btn"
+              class="w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium tracking-wide text-white transition hover:bg-stone-700 focus:outline-none focus:ring-2 focus:ring-stone-900 focus:ring-offset-2">
+              Pay $150 deposit →
+            </button>
+            <p id="btp-submit-note" class="mt-3 text-center text-xs text-stone-500">
+              Secure checkout via Stripe · Balance due after your shoot
+            </p>
+          </div>
+        </form>
+      </>
+    </section>
+  )}
+<script>
+  /* ── VTE standalone form ── */
+  const vteQtyEl   = document.getElementById('vte-qty')    as HTMLInputElement | null;
+  const vtePriceEl = document.getElementById('vte-price')  as HTMLInputElement | null;
+  const vteTierEl  = document.getElementById('vte-tier')   as HTMLInputElement | null;
+  const vteTotalEl = document.getElementById('vte-total');
+  const vteSubmit  = document.getElementById('vte-submit') as HTMLButtonElement | null;
+
+  if (vteQtyEl) {
+    function updateVTE() {
+      const qty = Math.max(1, parseInt(vteQtyEl!.value || '1'));
+      const total = qty * 35;
+      if (vteTotalEl)  vteTotalEl.textContent  = `$${total}`;
+      if (vtePriceEl)  vtePriceEl.value        = String(total);
+      if (vteTierEl)   vteTierEl.value         = `Virtual Twilight Edit – ${qty} image${qty !== 1 ? 's' : ''}`;
+      if (vteSubmit)   vteSubmit.textContent    = `Pay $${total} →`;
+    }
+    vteQtyEl.addEventListener('input', updateVTE);
+    updateVTE();
+  }
+
+  /* ── Step 2 payment form ── */
+  const ADDON_VIDEO_PRICE    = 200;
+  const ADDON_TWILIGHT_PRICE = 150;
+  const ADDON_VTE_PRICE      = 35;
+
+  const addonVideo    = document.getElementById('btp-addon-video')    as HTMLInputElement | null;
+  const addonTwilight = document.getElementById('btp-addon-twilight') as HTMLInputElement | null;
+  const addonVteQty   = document.getElementById('btp-addon-vte-qty')  as HTMLInputElement | null;
+  const addonVteTotal   = document.getElementById('btp-vte-addon-total');
+  const depositPriceEl  = document.getElementById('btp-deposit-price');
+  const fullPriceEl     = document.getElementById('btp-full-price');
+  const optDeposit      = document.getElementById('btp-opt-deposit')      as HTMLButtonElement | null;
+  const optFull         = document.getElementById('btp-opt-full')         as HTMLButtonElement | null;
+  const paymentInput    = document.getElementById('btp-payment-option')   as HTMLInputElement | null;
+  const submitBtn       = document.getElementById('btp-submit-btn')       as HTMLButtonElement | null;
+  const submitNote      = document.getElementById('btp-submit-note')      as HTMLParagraphElement | null;
+  const priceInputEl    = document.getElementById('btp-price-input')      as HTMLInputElement | null;
+
+  let basePriceNum = priceInputEl?.value
+    ? parseFloat(priceInputEl.value.replace(/[^0-9.]/g, ''))
+    : 0;
+
+  function getAddonTotal(): number {
+    return (addonVideo?.checked    ? ADDON_VIDEO_PRICE    : 0)
+         + (addonTwilight?.checked ? ADDON_TWILIGHT_PRICE : 0)
+         + (addonVteQty            ? parseInt(addonVteQty.value || '0') * ADDON_VTE_PRICE : 0);
+  }
+
+  function updateDisplay() {
+    const addonAmt  = getAddonTotal();
+    const fullTotal = basePriceNum > 0 ? basePriceNum + addonAmt : 0;
+    const isDeposit = (paymentInput?.value ?? 'deposit') === 'deposit';
+
+    if (addonVteTotal) {
+      const vteAmt = addonVteQty ? parseInt(addonVteQty.value || '0') * ADDON_VTE_PRICE : 0;
+      addonVteTotal.textContent = `$${vteAmt}`;
+    }
+    if (depositPriceEl) {
+      depositPriceEl.innerHTML = `$150 <span style="font-size:0.875rem;font-weight:400;color:#78716c;">now</span>`;
+    }
+    if (fullPriceEl) {
+      fullPriceEl.innerHTML = fullTotal > 0
+        ? `$${fullTotal} <span style="font-size:0.875rem;font-weight:400;color:#78716c;">now</span>`
+        : '—';
+    }
+    if (submitBtn) {
+      submitBtn.textContent = isDeposit
+        ? 'Pay $150 deposit →'
+        : fullTotal > 0 ? `Pay $${fullTotal} in full →` : submitBtn.textContent;
+    }
+    if (submitNote) {
+      if (isDeposit) {
+        submitNote.textContent = addonAmt > 0
+          ? 'Secure checkout via Stripe · Add-ons included in final balance'
+          : 'Secure checkout via Stripe · Balance due after your shoot';
+      } else {
+        submitNote.textContent = 'Secure checkout via Stripe · No balance due after your shoot';
+      }
+    }
+  }
+
+  function selectOption(value: string) {
+    if (!paymentInput || !optDeposit || !optFull) return;
+    paymentInput.value = value;
+    if (value === 'deposit') {
+      optDeposit.classList.add('border-stone-900');    optDeposit.classList.remove('border-stone-200');
+      optFull.classList.remove('border-stone-900');    optFull.classList.add('border-stone-200');
+    } else {
+      optFull.classList.add('border-stone-900');       optFull.classList.remove('border-stone-200');
+      optDeposit.classList.remove('border-stone-900'); optDeposit.classList.add('border-stone-200');
+    }
+    updateDisplay();
+  }
+
+  optDeposit?.addEventListener('click', () => selectOption('deposit'));
+  optFull?.addEventListener('click',    () => selectOption('full'));
+  addonVideo?.addEventListener('change',    updateDisplay);
+  addonTwilight?.addEventListener('change', updateDisplay);
+  addonVteQty?.addEventListener('input',    updateDisplay);
+
+  // Populate from localStorage (set by PackageCards before Calendly redirect)
+  const raw = localStorage.getItem('btpBooking');
+  if (raw) {
+    try {
+      const { service, tier, price } = JSON.parse(raw);
+      const SVC_LABELS: Record<string, string> = {
+        'real-estate':         'Real Estate Photography',
+        'vacation-rental':     'Vacation Rental Photography',
+        'walkthrough-video':   'Walkthrough Video',
+        'twilight-standalone': 'Twilight Session',
+      };
+      const tierLabel  = document.getElementById('btp-tier-label');
+      const priceLabel = document.getElementById('btp-price-label');
+      const tierInput  = document.getElementById('btp-tier-input')    as HTMLInputElement | null;
+      const svcInput   = document.getElementById('btp-service-input') as HTMLInputElement | null;
+      const priceInput = document.getElementById('btp-price-input')   as HTMLInputElement | null;
+      if (tierLabel && tier)   tierLabel.textContent = tier;
+      if (tierInput && tier)   tierInput.value = tier;
+      if (priceInput && price) priceInput.value = price;
+      if (svcInput && service) svcInput.value = SVC_LABELS[service] ?? service;
+      if (priceLabel && price) {
+        priceLabel.textContent = `Package: ${price}`;
+        priceLabel.classList.remove('hidden');
+      }
+      localStorage.removeItem('btpBooking');
+      if (price) basePriceNum = parseFloat(price.replace(/[^0-9.]/g, ''));
+    } catch {}
+  }
+
+  updateDisplay();
+</script>
+</BaseLayout>
