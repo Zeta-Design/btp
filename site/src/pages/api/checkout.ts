@@ -73,19 +73,19 @@ export const POST: APIRoute = async ({ request }) => {
   // In deposit mode, add-ons are tracked in metadata and billed with the final balance.
   if (isFullPayment) {
     if (addonVideo) lineItems.push({
-      price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Same Day)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, same day as photo shoot' }, unit_amount: 20000 },
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Same Day)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, same day as photo shoot' }, unit_amount: 21000 },
       quantity: 1,
     });
     if (addonTwilight) lineItems.push({
-      price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Same Day)', description: '6–8 dusk/twilight exterior photos, same day as main shoot' }, unit_amount: 15000 },
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Same Day)', description: '6–8 dusk/twilight exterior photos, same day as main shoot' }, unit_amount: 15500 },
       quantity: 1,
     });
     if (addonVideoSA) lineItems.push({
-      price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Standalone)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, separate appointment' }, unit_amount: 32500 },
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Standalone)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, separate appointment' }, unit_amount: 34000 },
       quantity: 1,
     });
     if (addonTwilightSA) lineItems.push({
-      price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Standalone)', description: '6–8 dusk/twilight exterior photos, separate appointment' }, unit_amount: 20000 },
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Standalone)', description: '6–8 dusk/twilight exterior photos, separate appointment' }, unit_amount: 21000 },
       quantity: 1,
     });
     if (addonVteQty > 0) lineItems.push({
@@ -95,18 +95,18 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const addons = [
-    addonVideo      ? 'Walkthrough Video — Same Day (+$200)'      : null,
-    addonTwilight   ? 'Twilight Session — Same Day (+$150)'       : null,
-    addonVideoSA    ? 'Walkthrough Video — Standalone (+$325)'    : null,
-    addonTwilightSA ? 'Twilight Session — Standalone (+$200)'     : null,
+    addonVideo      ? 'Walkthrough Video — Same Day (+$210)'      : null,
+    addonTwilight   ? 'Twilight Session — Same Day (+$155)'       : null,
+    addonVideoSA    ? 'Walkthrough Video — Standalone (+$340)'    : null,
+    addonTwilightSA ? 'Twilight Session — Standalone (+$210)'     : null,
     addonVteQty > 0 ? `Virtual Twilight Edit ×${addonVteQty} (+$${addonVteQty * 35})` : null,
   ].filter(Boolean).join('; ');
 
   const addonsTotal = String(
-    (addonVideo      ? 200 : 0)
-    + (addonTwilight   ? 150 : 0)
-    + (addonVideoSA    ? 325 : 0)
-    + (addonTwilightSA ? 200 : 0)
+    (addonVideo      ? 210 : 0)
+    + (addonTwilight   ? 155 : 0)
+    + (addonVideoSA    ? 340 : 0)
+    + (addonTwilightSA ? 210 : 0)
     + (addonVteQty     * 35),
   );
 

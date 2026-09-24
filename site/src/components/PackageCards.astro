@@ -16,20 +16,20 @@ const includedMap = groups
   : null;
 
 const reEstate = [
-  { label: 'Up to 1,500 sq ft',    price: '$185', detail: 'Up to 25 photos' },
-  { label: '1,500 – 2,500 sq ft',  price: '$225', detail: 'Up to 35 photos' },
-  { label: '2,500 – 4,000 sq ft',  price: '$295', detail: 'Up to 40 photos' },
-  { label: '4,000 – 5,500 sq ft',  price: '$375', detail: 'Up to 50 photos' },
-  { label: '5,500 – 8,000 sq ft',  price: '$475', detail: 'Up to 60 photos' },
-  { label: '8,000+ sq ft',          price: '$595', detail: 'Up to 70 photos' },
+  { label: 'Up to 1,500 sq ft',    price: '$195', detail: 'Up to 25 photos' },
+  { label: '1,500 – 2,500 sq ft',  price: '$235', detail: 'Up to 35 photos' },
+  { label: '2,500 – 4,000 sq ft',  price: '$310', detail: 'Up to 40 photos' },
+  { label: '4,000 – 5,500 sq ft',  price: '$395', detail: 'Up to 50 photos' },
+  { label: '5,500 – 8,000 sq ft',  price: '$495', detail: 'Up to 60 photos' },
+  { label: '8,000+ sq ft',          price: '$625', detail: 'Up to 70 photos' },
 ];
 
 const vacRental = [
-  { label: '1 – 2 Bedrooms',        price: '$265', detail: 'Up to 30 photos' },
-  { label: '3 – 4 Bedrooms',        price: '$335', detail: 'Up to 40 photos' },
-  { label: '4 – 5 Bedrooms',        price: '$425', detail: 'Up to 50 photos' },
-  { label: '6+ Bedrooms',           price: '$550', detail: 'Up to 60 photos' },
-  { label: '6+ Bedrooms — Premium', price: '$650', detail: 'Up to 70 photos incl. themed rooms, game room & pool' },
+  { label: '1 – 2 Bedrooms',        price: '$280', detail: 'Up to 30 photos' },
+  { label: '3 – 4 Bedrooms',        price: '$350', detail: 'Up to 40 photos' },
+  { label: '4 – 5 Bedrooms',        price: '$445', detail: 'Up to 50 photos' },
+  { label: '6+ Bedrooms',           price: '$575', detail: 'Up to 60 photos' },
+  { label: '6+ Bedrooms — Premium', price: '$680', detail: 'Up to 70 photos incl. themed rooms, game room & pool' },
 ];
 
 const showRE          = !groups && (!filterType || filterType === 'real-estate');
@@ -241,7 +241,7 @@ const showAddOns      = !groups && showInfoSections;
         style="min-height:180px;"
         data-category="Walkthrough Video"
         data-label="Standalone Shoot"
-        data-price="$325"
+        data-price="$340"
         data-detail="Full walkthrough + social reel"
         data-duration="~2 hr"
         data-service="walkthrough-video"
@@ -250,7 +250,7 @@ const showAddOns      = !groups && showInfoSections;
       >
         <div>
           <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Standalone</p>
-          <p class="mt-3 text-2xl font-light text-stone-900">$325</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">$340</p>
         </div>
         <div class="mt-4 flex items-center justify-between">
           <p class="text-sm text-stone-500">Gimbal walkthrough + social reel · 24–48 hrs</p>
@@ -271,7 +271,7 @@ const showAddOns      = !groups && showInfoSections;
         style="min-height:180px;"
         data-category="Twilight Session"
         data-label="Standalone Shoot"
-        data-price="$200"
+        data-price="$210"
         data-detail="6–8 dusk/twilight exterior photos"
         data-duration="~1 hr"
         data-service="twilight-standalone"
@@ -280,7 +280,7 @@ const showAddOns      = !groups && showInfoSections;
       >
         <div>
           <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Standalone</p>
-          <p class="mt-3 text-2xl font-light text-stone-900">$200</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">$210</p>
         </div>
         <div class="mt-4 flex items-center justify-between">
           <p class="text-sm text-stone-500">6–8 twilight exterior photos · 24–48 hrs</p>
@@ -298,8 +298,8 @@ const showAddOns      = !groups && showInfoSections;
       <p class="mt-2 text-sm text-stone-500">Gimbal walkthrough + a 30–60 sec vertical social reel — one shoot, two deliverables</p>
       <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
         {[
-          { label: 'Add-on — same day as photo shoot', price: '$200', detail: 'Booked alongside any photo package — full walkthrough edit + social reel cut' },
-          { label: 'Standalone shoot',                 price: '$325', detail: 'Separate appointment — full walkthrough edit + social reel cut' },
+          { label: 'Add-on — same day as photo shoot', price: '$210', detail: 'Booked alongside any photo package — full walkthrough edit + social reel cut' },
+          { label: 'Standalone shoot',                 price: '$340', detail: 'Separate appointment — full walkthrough edit + social reel cut' },
         ].map((item) => (
           <div class="flex items-center justify-between gap-6 px-6 py-5">
             <div>
@@ -317,8 +317,8 @@ const showAddOns      = !groups && showInfoSections;
       <h2 class="font-serif text-2xl sm:text-3xl">Add-ons</h2>
       <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
         {[
-          { label: 'Twilight Session — Add-on',    price: '$150',        detail: '6–8 dusk/twilight exterior photos, booked same day as main shoot' },
-          { label: 'Twilight Session — Standalone', price: '$200',        detail: '6–8 dusk/twilight exterior photos, separate appointment' },
+          { label: 'Twilight Session — Add-on',    price: '$155',        detail: '6–8 dusk/twilight exterior photos, booked same day as main shoot' },
+          { label: 'Twilight Session — Standalone', price: '$210',        detail: '6–8 dusk/twilight exterior photos, separate appointment' },
           { label: 'Virtual Twilight Edit',         price: '$35 / image', detail: 'Daytime exterior digitally converted to a twilight look' },
         ].map((item) => (
           <div class="flex items-center justify-between gap-6 px-6 py-5">
