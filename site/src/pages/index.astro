@@ -30,6 +30,27 @@ const heroMods = import.meta.glob<{ default: ImageMetadata }>(
 );
 const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 
+// Hero carousel — trying out an auto-rotating hero: the default shot plus two
+// portfolio picks, cross-fading every 5s. Picked by filename; falls back to
+// just the single default hero if a pick isn't found.
+// Each slide carries its own crop anchor (Tailwind object-position classes) so
+// the subject stays in frame at every viewport width instead of a blind
+// center-crop — 00-59th-pl-exterior is a wide 16:9 shot with the house pushed
+// into the left third, so it needs a left-biased anchor or a narrow/mobile
+// crop loses the house entirely.
+const findPortfolio = (needle: string) => portfolio.find((p) => p.key.includes(needle))?.meta;
+const heroSlideDefs: { meta: ImageMetadata | undefined; position: string }[] = [
+  { meta: hero, position: 'object-center' },
+  { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center' },
+  {
+    meta: findPortfolio('00-59th-pl-exterior'),
+    position: 'object-[20%_45%] sm:object-[35%_45%]',
+  },
+];
+const heroSlides = heroSlideDefs.filter(
+  (s): s is { meta: ImageMetadata; position: string } => Boolean(s.meta),
+);
+
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
@@ -89,19 +110,24 @@ const services = SITE.services ?? [
   description="Professional real estate, Airbnb & short-term rental photography, available for travel. Bright, magazine-quality listing photos and walkthrough video, delivered in 24–48 hours."
   jsonLd={jsonLd}
 >
-  <!-- Hero — LCP image: eager + high priority, AVIF/WebP via <Picture> -->
+  <!-- Hero — LCP image: eager + high priority, AVIF/WebP via <Picture>.
+       Auto-rotating carousel: cross-fades between heroSlides every 5s. -->
   <section class="hero-shell relative isolate flex min-h-[88svh] items-center overflow-hidden bg-stone-900 py-24">
-    <Picture
-      src={hero}
-      alt=""
-      formats={['avif', 'webp']}
-      widths={[640, 960, 1280]}
-      sizes="100vw"
-      loading="eager"
-      decoding="async"
-      fetchpriority="high"
-      class="hero-img absolute inset-x-0 top-0 -z-10 h-full w-full object-cover object-center sm:-top-[32%] sm:h-[165%]"
-    />
+    {
+      heroSlides.map((slide, i) => (
+        <Picture
+          src={slide.meta}
+          alt=""
+          formats={['avif', 'webp']}
+          widths={[640, 960, 1280]}
+          sizes="100vw"
+          loading="eager"
+          decoding="async"
+          fetchpriority={i === 0 ? 'high' : 'auto'}
+          class={`hero-img hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} sm:-top-[32%] sm:h-[165%] ${i === 0 ? 'is-active' : ''}`}
+        />
+      ))
+    }
     <div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/50 to-black/75"></div>
     <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
       <div class="max-w-3xl text-center text-white sm:text-left">
@@ -289,7 +315,30 @@ const services = SITE.services ?? [
     }, { passive: true });
   </script>
 
+  <!-- Hero carousel: cross-fade auto-rotate every 5s. Static (first slide only)
+       for prefers-reduced-motion users. -->
+  <script>
+    const heroSlides = Array.from(document.querySelectorAll<HTMLElement>('.hero-slide'));
+    if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let heroIdx = 0;
+      setInterval(() => {
+        heroSlides[heroIdx].classList.remove('is-active');
+        heroIdx = (heroIdx + 1) % heroSlides.length;
+        heroSlides[heroIdx].classList.add('is-active');
+      }, 5000);
+    }
+  </script>
+
 <style is:inline>
+  /* Hero carousel — cross-fade between stacked slides; JS toggles .is-active. */
+  .hero-slide {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .hero-slide.is-active {
+    opacity: 1;
+  }
+
   /* Hero parallax — pure CSS scroll-driven animation (compositor thread, no JS,
      no jank). Progressive enhancement: only runs where supported and when the
      user hasn't asked for reduced motion; otherwise the hero is simply static.
