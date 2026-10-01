@@ -4,6 +4,7 @@ export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../config/site';
 import Stripe from 'stripe';
+import { formatCents } from '../lib/booking-emails';
 
 const sessionId = Astro.url.searchParams.get('session_id') ?? '';
 
@@ -11,19 +12,24 @@ let serviceTitle = 'Photography Session';
 let tierTitle    = '';
 let address      = '';
 let isPaidInFull = false;
+let isHeld       = false;
+let heldAmount   = '';
 let gcalUrl: string | null = null;
 let icsDataUri:  string | null = null;
 
 if (sessionId) {
   try {
     const stripe  = new Stripe(import.meta.env.STRIPE_SECRET_KEY as string);
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const session = await stripe.checkout.sessions.retrieve(sessionId, { expand: ['payment_intent'] });
     const meta    = session.metadata ?? {};
+    const pi      = session.payment_intent as Stripe.PaymentIntent | null;
 
     serviceTitle = meta.service ?? 'Photography Session';
     tierTitle    = meta.tier    ?? '';
     address      = meta.address ?? '';
     isPaidInFull = meta.paymentOption === 'full';
+    isHeld       = pi?.status === 'requires_capture';
+    heldAmount   = pi ? formatCents(pi.amount) : '';
 
     const shootDate = meta.shootDate ?? '';
     const isRealDate = shootDate && !shootDate.startsWith('N/A') && shootDate !== 'To be confirmed';
@@ -71,11 +77,11 @@ if (sessionId) {
 }
 
 const showCal = !!(gcalUrl && icsDataUri);
-const heroTitle = isPaidInFull ? 'Payment received!' : 'Deposit received!';
+const heroTitle = isHeld ? "You're almost booked!" : isPaidInFull ? 'Payment received!' : 'Deposit received!';
 ---
 <BaseLayout
-  title="Booking Confirmed"
-  description="Your deposit was received. Ben Tims Media will be in touch shortly."
+  title={isHeld ? 'Booking Request Received' : 'Booking Confirmed'}
+  description="Your booking was received. Ben Tims Media will be in touch shortly."
 >
   <section class="mx-auto max-w-2xl px-5 py-20 sm:px-6 sm:py-32 text-center">
     <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-stone-100">
@@ -84,13 +90,21 @@ const heroTitle = isPaidInFull ? 'Payment received!' : 'Deposit received!';
       </svg>
     </div>
 
-    <p class="text-xs uppercase tracking-[0.25em] text-stone-500">You're booked</p>
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-500">{isHeld ? 'Request received' : "You're booked"}</p>
     <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2rem,5vw,3rem)]">{heroTitle}</h1>
     <p class="mt-4 text-pretty text-stone-600">
-      {isPaidInFull
-        ? 'Your payment has been processed and your shoot date is confirmed.'
-        : 'Your $150 deposit has been processed and your shoot date is held.'}
-      {' '}I'll reach out within 24 hours to confirm the details and answer any questions.
+      {isHeld ? (
+        <>
+          Your card has been authorized for {heldAmount || 'your payment'}, but not charged yet. I personally confirm every booking. You'll get a confirmation email within 24 hours, and that's when your card is charged. If I can't take it, the hold is released and you won't be charged.
+        </>
+      ) : (
+        <>
+          {isPaidInFull
+            ? 'Your payment has been processed and your shoot date is confirmed.'
+            : 'Your $150 deposit has been processed and your shoot date is held.'}
+          {' '}I'll reach out within 24 hours to confirm the details and answer any questions.
+        </>
+      )}
     </p>
 
     {showCal && (

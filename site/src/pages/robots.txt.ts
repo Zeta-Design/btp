@@ -7,6 +7,7 @@ Allow: /
 Disallow: /admin
 Disallow: /keystatic
 Disallow: /api/keystatic
+Disallow: /approve-booking
 
 Sitemap: ${new URL('sitemap-index.xml', site).href}
 `;

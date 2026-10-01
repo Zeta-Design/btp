@@ -1,0 +1,225 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Stripe from 'stripe';
+import { Resend } from 'resend';
+import { verifyApproval } from '../lib/booking-approval';
+import {
+  FROM_ADDRESS,
+  OWNER_EMAIL,
+  bookingFromMetadata,
+  buildConfirmationEmail,
+  buildDeclineEmail,
+  formatCents,
+  formatDeadline,
+  formatShootDate,
+} from '../lib/booking-emails';
+
+// Reached from the "Review & approve" button in the owner email. Access is the
+// HMAC-signed link. GET only displays, so email link-scanners can't trigger
+// anything; the decision is a POST that carries the same signature.
+
+const isPost = Astro.request.method === 'POST';
+const form = isPost ? await Astro.request.formData() : null;
+const piId = String(form?.get('pi') ?? Astro.url.searchParams.get('pi') ?? '');
+const sig = String(form?.get('sig') ?? Astro.url.searchParams.get('sig') ?? '');
+const linkOk = piId !== '' && sig !== '' && verifyApproval(piId, sig);
+
+const stripe = new Stripe(import.meta.env.STRIPE_SECRET_KEY as string);
+
+async function decide(action: string, note: string): Promise<string> {
+  if (action !== 'approve' && action !== 'decline') return 'error';
+  const current = await stripe.paymentIntents.retrieve(piId);
+  if (current.status !== 'requires_capture') return 'already';
+
+  const booking = bookingFromMetadata(current.metadata);
+  const amount = current.amount_capturable;
+  if (action === 'approve') await stripe.paymentIntents.capture(piId);
+  else await stripe.paymentIntents.cancel(piId);
+
+  // The Stripe action already happened — an email failure is reported, not fatal.
+  const outcome = action === 'approve' ? 'approved' : 'declined';
+  if (!booking.email) return `${outcome}-noemail`;
+  try {
+    const { error } = await new Resend(import.meta.env.RESEND_API_KEY as string).emails.send({
+      from: FROM_ADDRESS,
+      to: [booking.email],
+      bcc: [OWNER_EMAIL],
+      subject: `${action === 'approve' ? 'Booking Confirmed' : 'Booking Update'} – ${booking.service ?? 'Your Photography Session'}`,
+      html: action === 'approve' ? buildConfirmationEmail(booking, amount) : buildDeclineEmail(booking, amount, note),
+    });
+    return error ? `${outcome}-noemail` : outcome;
+  } catch {
+    return `${outcome}-noemail`;
+  }
+}
+
+if (isPost && linkOk) {
+  let result: string;
+  try {
+    result = await decide(String(form!.get('action') ?? ''), String(form!.get('note') ?? '').trim().slice(0, 1000));
+  } catch {
+    result = 'error';
+  }
+  const back = new URL('/approve-booking/', Astro.url);
+  back.searchParams.set('pi', piId);
+  back.searchParams.set('sig', sig);
+  back.searchParams.set('result', result);
+  return Astro.redirect(back.pathname + back.search, 303);
+}
+
+let pi: Stripe.PaymentIntent | null = null;
+let loadFailed = false;
+if (linkOk) {
+  try {
+    pi = await stripe.paymentIntents.retrieve(piId, { expand: ['latest_charge'] });
+  } catch {
+    loadFailed = true;
+  }
+} else {
+  Astro.response.status = 404;
+}
+
+const booking = pi ? bookingFromMetadata(pi.metadata) : null;
+const status = pi?.status;
+const pending = status === 'requires_capture';
+const heldAmount = pi ? formatCents(pi.amount) : '';
+const chargedAmount = pi ? formatCents(pi.amount_received) : '';
+const charge = (pi?.latest_charge ?? null) as Stripe.Charge | null;
+const deadline = formatDeadline(charge?.payment_method_details?.card?.capture_before);
+
+const statusLine =
+  pending ? `Waiting for your approval · ${heldAmount} on hold`
+  : status === 'succeeded' ? `Approved · ${chargedAmount} charged`
+  : status === 'canceled' && pi?.cancellation_reason === 'automatic' ? 'Hold expired · nothing was charged'
+  : status === 'canceled' ? 'Declined · nothing was charged'
+  : status ? `Stripe status: ${status}` : '';
+
+// Only show a result banner when it matches the real Stripe state.
+const result = Astro.url.searchParams.get('result') ?? '';
+const noEmail = result.endsWith('-noemail');
+const banner =
+  result.startsWith('approved') && status === 'succeeded'
+    ? { tone: noEmail ? 'warn' : 'ok', text: `Approved — ${chargedAmount} charged. ${noEmail ? "The confirmation email didn't send, so reach out to the client directly." : 'The client has been emailed their confirmation.'}` }
+  : result.startsWith('declined') && status === 'canceled'
+    ? { tone: noEmail ? 'warn' : 'ok', text: `Declined — the hold was released and nothing was charged. ${noEmail ? "The email to the client didn't send, so reach out to them directly." : 'The client has been notified.'} Remember to cancel the Calendly event so the slot opens back up.` }
+  : result === 'already'
+    ? { tone: 'warn', text: 'This booking was already handled — its current status is below.' }
+  : result === 'error'
+    ? { tone: 'error', text: "Stripe didn't accept that change. Check this payment in your Stripe dashboard." }
+  : null;
+
+const bannerClass = {
+  ok: 'border-green-200 bg-green-50 text-green-900',
+  warn: 'border-amber-200 bg-amber-50 text-amber-900',
+  error: 'border-red-200 bg-red-50 text-red-900',
+};
+
+const rows: { label: string; value: string; href?: string }[] = booking
+  ? [
+      { label: 'Client', value: booking.name ?? '' },
+      { label: 'Email', value: booking.email ?? '', href: booking.email ? `mailto:${booking.email}` : undefined },
+      { label: 'Phone', value: booking.phone ?? '', href: booking.phone ? `tel:${booking.phone.replace(/[^\d+]/g, '')}` : undefined },
+      { label: 'Package', value: booking.tier && booking.tier !== booking.service ? booking.tier : '' },
+      { label: 'Price', value: booking.price ?? '' },
+      { label: 'Date & time', value: booking.service === 'Virtual Twilight Edit' ? '' : formatShootDate(booking.shootDate) },
+      { label: 'Property', value: booking.address ?? '', href: booking.address ? `https://maps.google.com/?q=${encodeURIComponent(booking.address)}` : undefined },
+      { label: 'Payment', value: pi ? `${booking.paymentOption === 'full' ? 'Pay in full' : 'Deposit'} · ${heldAmount}` : '' },
+      { label: 'Add-ons', value: booking.addons ?? '' },
+      { label: 'Notes', value: booking.notes ?? '' },
+    ].filter((r) => r.value)
+  : [];
+---
+<BaseLayout title="Review booking" description="Approve or decline a booking request." noindex>
+  <section class="mx-auto max-w-xl px-5 py-12 sm:px-6 sm:py-20">
+    {!linkOk ? (
+      <>
+        <h1 class="font-serif text-3xl">This link isn't valid</h1>
+        <p class="mt-3 text-stone-600">Open the booking from the "Review &amp; approve" button in your email.</p>
+      </>
+    ) : loadFailed || !booking ? (
+      <>
+        <h1 class="font-serif text-3xl">Couldn't load this booking</h1>
+        <p class="mt-3 text-stone-600">Stripe didn't return this payment. Check it in your Stripe dashboard under Payments.</p>
+      </>
+    ) : (
+      <>
+        {banner && (
+          <div class={`mb-8 rounded-xl border px-5 py-4 text-sm ${bannerClass[banner.tone as keyof typeof bannerClass]}`} role="status">
+            {banner.text}
+          </div>
+        )}
+
+        <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Booking request</p>
+        <h1 class="mt-3 font-serif leading-tight text-[clamp(2rem,6vw,2.75rem)]">{booking.service || 'Booking'}</h1>
+        <p class="mt-3 font-medium text-stone-800">{statusLine}</p>
+        {pending && deadline && (
+          <p class="mt-1 text-sm text-stone-500">Approve by {deadline}. After that the hold cancels on its own.</p>
+        )}
+
+        <dl class="mt-8 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+          {rows.map((r) => (
+            <div class="flex gap-4 px-5 py-3 text-sm">
+              <dt class="w-24 shrink-0 text-stone-500">{r.label}</dt>
+              <dd class="min-w-0 whitespace-pre-line break-words font-medium text-stone-900">
+                {r.href ? (
+                  <a href={r.href} class="underline underline-offset-2" {...(r.href.startsWith('https:') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>{r.value}</a>
+                ) : r.value}
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        {pending && (
+          <div class="mt-8 space-y-4">
+            <form method="post" data-decision="approve">
+              <input type="hidden" name="pi" value={piId} />
+              <input type="hidden" name="sig" value={sig} />
+              <input type="hidden" name="action" value="approve" />
+              <button type="submit" class="min-h-[52px] w-full rounded-full bg-stone-900 px-6 text-sm font-medium text-white transition hover:bg-stone-700 disabled:opacity-60">
+                Approve &amp; charge {heldAmount}
+              </button>
+            </form>
+
+            <form method="post" data-decision="decline" class="rounded-xl border border-stone-200 bg-white p-5">
+              <input type="hidden" name="pi" value={piId} />
+              <input type="hidden" name="sig" value={sig} />
+              <input type="hidden" name="action" value="decline" />
+              <label for="note" class="block text-sm font-medium text-stone-700">
+                Message to the client <span class="font-normal text-stone-500">(optional)</span>
+              </label>
+              <textarea
+                id="note" name="note" rows="3" maxlength="1000"
+                class="mt-1.5 w-full resize-none rounded-lg border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-900 placeholder:text-stone-500 focus:border-stone-500 focus:outline-none focus:ring-1 focus:ring-stone-500"
+                placeholder="e.g. I'm booked that day, but I'm free the following Tuesday."
+              ></textarea>
+              <button type="submit" class="mt-3 min-h-[48px] w-full rounded-full border border-stone-300 px-6 text-sm font-medium text-stone-700 transition hover:border-red-400 hover:text-red-700 disabled:opacity-60">
+                Decline &amp; release hold
+              </button>
+            </form>
+
+            <p class="text-xs text-stone-500">
+              Approving charges the card and emails the client their confirmation. Declining releases the hold (nothing is charged) and emails them that you can't take it.
+            </p>
+          </div>
+        )}
+      </>
+    )}
+  </section>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLFormElement>('form[data-decision]').forEach((form) => {
+    form.addEventListener('submit', (e) => {
+      if (
+        form.dataset.decision === 'decline' &&
+        !confirm("Decline this booking and release the hold? This can't be undone.")
+      ) {
+        e.preventDefault();
+        return;
+      }
+      form.querySelector('button')?.setAttribute('disabled', '');
+    });
+  });
+</script>

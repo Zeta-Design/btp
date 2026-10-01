@@ -110,6 +110,14 @@ export const POST: APIRoute = async ({ request }) => {
     + (addonVteQty     * 35),
   );
 
+  const metadata = {
+    name, email, phone, service, tier, price, paymentOption,
+    shootDate: shootDate || '',
+    address: fullAddress,
+    addons, addonsTotal,
+    notes: notes.slice(0, 490),
+  };
+
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     line_items: lineItems,
@@ -120,12 +128,13 @@ export const POST: APIRoute = async ({ request }) => {
     // the actual codes in the Stripe dashboard.
     allow_promotion_codes: isFullPayment,
     customer_email: email,
-    metadata: {
-      name, phone, service, tier, price, paymentOption,
-      shootDate: shootDate || '',
-      address: fullAddress,
-      addons, addonsTotal,
-      notes: notes.slice(0, 490),
+    metadata,
+    // Authorize only: the card is held, and charged when Ben approves the booking
+    // on /approve-booking (or released if he declines / the hold expires in 7 days).
+    payment_intent_data: {
+      capture_method: 'manual',
+      description: [productName, fullAddress].filter(Boolean).join(' – '),
+      metadata,
     },
     success_url: `${siteUrl}/booking-confirmed?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url:  `${siteUrl}/book`,

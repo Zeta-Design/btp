@@ -39,7 +39,7 @@ export default defineConfig({
     mdx(),
     sitemap({
       filter: (page) =>
-        !['/gallery-lab', '/keystatic', '/admin', '/api/', '/pricing-b', '/pricing-c', '/pricing-d'].some((p) => page.includes(p)),
+        !['/gallery-lab', '/keystatic', '/admin', '/api/', '/pricing-b', '/pricing-c', '/pricing-d', '/approve-booking'].some((p) => page.includes(p)),
     }),
     react(),
     keystatic(),

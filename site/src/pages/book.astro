@@ -41,6 +41,7 @@ let shootDateFormatted = '';
 if (eventStart) {
   try {
     shootDateFormatted = new Date(eventStart).toLocaleString('en-US', {
+      timeZone: 'America/Chicago',
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
       hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
     });
@@ -195,6 +196,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
             Pay $35 →
           </button>
           <p class="mt-3 text-center text-xs text-stone-500">Secure checkout via Stripe · 24–48 hr turnaround after photo delivery</p>
+          <p class="mt-1 text-center text-xs text-stone-500">You won't be charged until I confirm your order.</p>
         </div>
       </form>
     </section>
@@ -208,11 +210,12 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         </p>
         <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,6vw,3.5rem)]">Confirm your booking</h1>
         <p class="mt-4 text-pretty text-stone-600">
-          Your shoot date is scheduled.{' '}
+          Your time slot is saved.{' '}
           {isPhotoPackage
-            ? <>Pay the <strong class="font-medium text-stone-800">$150 deposit</strong> below to lock it in — balance due after your session.</>
-            : <>Complete payment below to lock in your date.</>
+            ? <>Pay the <strong class="font-medium text-stone-800">$150 deposit</strong> below to reserve it — balance due after your session.</>
+            : <>Complete payment below to reserve your date.</>
           }
+          {' '}Your card is only charged once I confirm your booking, usually within 24 hours.
         </p>
 
         <div class="mt-6 rounded-xl border border-stone-200 bg-stone-50 px-5 py-4">
@@ -357,6 +360,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
             <p id="btp-submit-note" class="mt-3 text-center text-xs text-stone-500">
               Secure checkout via Stripe · Balance due after your shoot
             </p>
+            <p class="mt-1 text-center text-xs text-stone-500">You won't be charged until I confirm your booking.</p>
           </div>
         </form>
       </>
