@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { esc } from '../../lib/booking-emails';
 
 export const prerender = false;
 
@@ -22,12 +23,12 @@ export const POST: APIRoute = async ({ request }) => {
   const name = `${firstName} ${lastName}`;
 
   const rows = [
-    ['Name',    name],
-    ['Email',   email],
-    ...(phone         ? [['Phone',          phone]]         : []),
-    ...(preferredDate ? [['Interested Date', preferredDate]] : []),
-    ...(service       ? [['Service',         service]]       : []),
-    ['Message', message.replace(/\n/g, '<br/>')],
+    ['Name',    esc(name)],
+    ['Email',   esc(email)],
+    ...(phone         ? [['Phone',          esc(phone)]]         : []),
+    ...(preferredDate ? [['Interested Date', esc(preferredDate)]] : []),
+    ...(service       ? [['Service',         esc(service)]]       : []),
+    ['Message', esc(message).replace(/\n/g, '<br/>')],
   ] as [string, string][];
 
   const html = `
@@ -42,7 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
   await resend.emails.send({
     from: 'Ben Tims Media <info@bentims.com>',
     to:   ['info@bentims.com'],
-    reply_to: email,
+    replyTo: email,
     subject:  `New inquiry from ${name}${service ? ` — ${service}` : ''}${preferredDate ? ` (${preferredDate})` : ''}`,
     html,
   });
