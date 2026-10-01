@@ -35,7 +35,7 @@ const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 // just the single default hero if a pick isn't found.
 // Each slide carries its own crop anchor (Tailwind object-position classes) so
 // the subject stays in frame at every viewport width instead of a blind
-// center-crop — 00-59th-pl-exterior is a wide 16:9 shot with the house pushed
+// center-crop — the 59th Pl exterior is a wide 16:9 shot with the house pushed
 // into the left third, so it needs a left-biased anchor or a narrow/mobile
 // crop loses the house entirely.
 const findPortfolio = (needle: string) => portfolio.find((p) => p.key.includes(needle))?.meta;
@@ -43,7 +43,7 @@ const heroSlideDefs: { meta: ImageMetadata | undefined; position: string }[] = [
   { meta: hero, position: 'object-center' },
   { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center' },
   {
-    meta: findPortfolio('00-59th-pl-exterior'),
+    meta: findPortfolio('59th-pl-exterior'),
     position: 'object-[20%_45%] sm:object-[35%_45%]',
   },
 ];
@@ -112,7 +112,9 @@ const services = SITE.services ?? [
 >
   <!-- Hero — LCP image: eager + high priority, AVIF/WebP via <Picture>.
        Auto-rotating carousel: cross-fades between heroSlides every 5s. -->
-  <section class="hero-shell relative isolate flex min-h-[88svh] items-center overflow-hidden bg-stone-900 py-24">
+  <!-- Shorter on phones: a tall, narrow hero forces object-cover to show only a
+       thin middle slice of these landscape photos. -->
+  <section class="hero-shell relative isolate flex min-h-[60svh] items-center overflow-hidden bg-stone-900 py-12 sm:min-h-[88svh] sm:py-24">
     {
       heroSlides.map((slide, i) => (
         <Picture
@@ -140,16 +142,16 @@ const services = SITE.services ?? [
         <p class="mx-auto mt-6 max-w-lg text-pretty text-base text-white/85 sm:mx-0 sm:text-lg">
           {hero_copy.sub}
         </p>
-        <div class="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:items-center">
+        <div class="mt-7 flex flex-row items-center justify-center gap-3 sm:mt-9 sm:justify-start">
           <a
             href="/portfolio/"
-            class="inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-full bg-white px-7 text-sm font-medium text-stone-900 transition hover:bg-stone-200 sm:w-auto sm:max-w-none"
+            class="inline-flex min-h-[48px] max-w-[11rem] flex-1 items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-stone-900 transition hover:bg-stone-200 sm:max-w-none sm:flex-none sm:px-7"
           >
             View work
           </a>
           <a
             href="/contact/"
-            class="inline-flex min-h-[48px] w-full max-w-xs items-center justify-center rounded-full border border-white/60 px-7 text-sm text-white transition hover:bg-white/10 sm:w-auto sm:max-w-none"
+            class="inline-flex min-h-[48px] max-w-[11rem] flex-1 items-center justify-center rounded-full border border-white/60 px-5 text-sm text-white transition hover:bg-white/10 sm:max-w-none sm:flex-none sm:px-7"
           >
             Book a session
           </a>
