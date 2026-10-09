@@ -39,21 +39,21 @@ const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 // into the left third, so it needs a left-biased anchor or a narrow/mobile
 // crop loses the house entirely.
 const findPortfolio = (needle: string) => portfolio.find((p) => p.key.includes(needle))?.meta;
-// `fit` is the desktop parallax overscan (taller than the section so it can
-// drift on scroll). Tall, centered subjects like the farmhouse need less of it
-// or the roof and driveway get cropped off.
-const PARALLAX_FIT = 'sm:-top-[32%] sm:h-[165%]';
-const heroSlideDefs: { meta: ImageMetadata | undefined; position: string; fit?: string }[] = [
-  { meta: findPortfolio('00-farmhouse-exterior-twilight') ?? hero, position: 'object-center sm:object-top', fit: 'sm:h-[108%]' },
-  { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center' },
+// On desktop every slide pans top→bottom as you scroll (.hero-pan) so the whole
+// photo is revealed. `position` is the static crop (phones, and browsers without
+// scroll-driven animations); `panX` keeps a slide's horizontal anchor during the pan.
+const heroSlideDefs: { meta: ImageMetadata | undefined; position: string; panX?: string }[] = [
+  { meta: findPortfolio('00-farmhouse-exterior-twilight') ?? hero, position: 'object-center sm:object-top' },
+  { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center sm:object-top' },
   {
     meta: findPortfolio('59th-pl-exterior'),
-    position: 'object-[20%_45%] sm:object-[35%_45%]',
+    position: 'object-[20%_45%] sm:object-[35%_0%]',
+    panX: '[--pan-x:35%]',
   },
 ];
-const heroSlides = heroSlideDefs
-  .filter((s): s is { meta: ImageMetadata; position: string; fit?: string } => Boolean(s.meta))
-  .map((s) => ({ ...s, fit: s.fit ?? PARALLAX_FIT }));
+const heroSlides = heroSlideDefs.filter(
+  (s): s is { meta: ImageMetadata; position: string; panX?: string } => Boolean(s.meta),
+);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -130,7 +130,7 @@ const services = SITE.services ?? [
           loading="eager"
           decoding="async"
           fetchpriority={i === 0 ? 'high' : 'auto'}
-          class={`hero-img hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} ${slide.fit} ${i === 0 ? 'is-active' : ''}`}
+          class={`hero-pan hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} ${slide.panX ?? ''} ${i === 0 ? 'is-active' : ''}`}
         />
       ))
     }
@@ -345,25 +345,25 @@ const services = SITE.services ?? [
     opacity: 1;
   }
 
-  /* Hero parallax — pure CSS scroll-driven animation (compositor thread, no JS,
-     no jank). Progressive enhancement: only runs where supported and when the
-     user hasn't asked for reduced motion; otherwise the hero is simply static.
+  /* Hero pan — pure CSS scroll-driven animation: each photo slides from its top
+     to its bottom over the first half-screen of scrolling, revealing the whole
+     subject. Progressive enhancement: only where supported and when the user
+     hasn't asked for reduced motion; otherwise the slide keeps its static crop.
      is:inline so Astro's CSS minifier doesn't prune `animation-timeline: scroll()`. */
-  @keyframes hero-parallax {
+  @keyframes hero-pan {
     from {
-      transform: translate3d(0, 0, 0);
+      object-position: var(--pan-x, 50%) 0%;
     }
     to {
-      transform: translate3d(0, 30%, 0);
+      object-position: var(--pan-x, 50%) 100%;
     }
   }
   @media (min-width: 640px) and (prefers-reduced-motion: no-preference) {
     @supports (animation-timeline: scroll()) {
-      .hero-img {
-        will-change: transform;
-        animation: hero-parallax linear both;
+      .hero-pan {
+        animation: hero-pan linear both;
         animation-timeline: scroll(root block);
-        animation-range: 0 100vh;
+        animation-range: 0 50vh;
       }
     }
   }
