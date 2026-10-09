@@ -39,17 +39,21 @@ const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 // into the left third, so it needs a left-biased anchor or a narrow/mobile
 // crop loses the house entirely.
 const findPortfolio = (needle: string) => portfolio.find((p) => p.key.includes(needle))?.meta;
-const heroSlideDefs: { meta: ImageMetadata | undefined; position: string }[] = [
-  { meta: findPortfolio('00-farmhouse-exterior-twilight') ?? hero, position: 'object-center' },
+// `fit` is the desktop parallax overscan (taller than the section so it can
+// drift on scroll). Tall, centered subjects like the farmhouse need less of it
+// or the roof and driveway get cropped off.
+const PARALLAX_FIT = 'sm:-top-[32%] sm:h-[165%]';
+const heroSlideDefs: { meta: ImageMetadata | undefined; position: string; fit?: string }[] = [
+  { meta: findPortfolio('00-farmhouse-exterior-twilight') ?? hero, position: 'object-center sm:object-top', fit: 'sm:h-[108%]' },
   { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center' },
   {
     meta: findPortfolio('59th-pl-exterior'),
     position: 'object-[20%_45%] sm:object-[35%_45%]',
   },
 ];
-const heroSlides = heroSlideDefs.filter(
-  (s): s is { meta: ImageMetadata; position: string } => Boolean(s.meta),
-);
+const heroSlides = heroSlideDefs
+  .filter((s): s is { meta: ImageMetadata; position: string; fit?: string } => Boolean(s.meta))
+  .map((s) => ({ ...s, fit: s.fit ?? PARALLAX_FIT }));
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -126,7 +130,7 @@ const services = SITE.services ?? [
           loading="eager"
           decoding="async"
           fetchpriority={i === 0 ? 'high' : 'auto'}
-          class={`hero-img hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} sm:-top-[32%] sm:h-[165%] ${i === 0 ? 'is-active' : ''}`}
+          class={`hero-img hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} ${slide.fit} ${i === 0 ? 'is-active' : ''}`}
         />
       ))
     }
