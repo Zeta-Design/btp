@@ -4,12 +4,14 @@ export const prerender = false;
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PackageCards from '../components/PackageCards.astro';
 import { SITE } from '../config/site';
+import { LIVE } from '../config/launch';
 
 const CALENDLY: Record<string, string> = {
   'real-estate':         'https://calendly.com/benjammintims/30min',
   'vacation-rental':     'https://calendly.com/benjammintims/vacation-rental-photography',
   'walkthrough-video':   'https://calendly.com/benjammintims/30min',
   'twilight-standalone': 'https://calendly.com/benjammintims/30min',
+  ...(LIVE.drone ? { 'drone-standalone': 'https://calendly.com/benjammintims/30min' } : {}),
 };
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -17,6 +19,7 @@ const SERVICE_LABELS: Record<string, string> = {
   'vacation-rental':     'Vacation Rental Photography',
   'walkthrough-video':   'Walkthrough Video',
   'twilight-standalone': 'Twilight Session',
+  'drone-standalone':    'Drone / Aerial Session',
 };
 
 const params      = Astro.url.searchParams;
@@ -25,7 +28,7 @@ const type        = params.get('type') ?? '';
 const isScheduled = !!CALENDLY[service];
 const isVTE       = !isScheduled && type === 'virtual-twilight-edit';
 const isFiltered  = !isScheduled && !isVTE &&
-  ['real-estate', 'vacation-rental', 'walkthrough-video', 'twilight-standalone'].includes(type);
+  ['real-estate', 'vacation-rental', 'walkthrough-video', 'twilight-standalone', ...(LIVE.drone ? ['drone-standalone'] : [])].includes(type);
 const isPhotoPackage = service === 'real-estate' || service === 'vacation-rental';
 
 // Pre-filled from Calendly redirect
@@ -81,7 +84,17 @@ const serviceLabel = SERVICE_LABELS[service] || service;
       </div>
 
       <p class="mt-12 text-xs font-medium uppercase tracking-[0.2em] text-stone-500">Standalone &amp; add-on services</p>
-      <div class="mt-4 grid gap-4 sm:grid-cols-3">
+      <div class={`mt-4 grid gap-4 ${LIVE.drone ? 'sm:grid-cols-2 lg:grid-cols-4' : 'sm:grid-cols-3'}`}>
+        {LIVE.drone && (
+          <a href="/book/?type=drone-standalone" class="group flex flex-col justify-between rounded-xl border border-stone-200 bg-white p-6 transition hover:border-stone-400 hover:shadow-sm">
+            <div>
+              <p class="font-medium text-stone-900">Drone / Aerial</p>
+              <p class="mt-1 text-sm text-stone-500">Aerial photos of the property</p>
+              <p class="mt-2 text-base font-light text-stone-900">$150</p>
+            </div>
+            <p class="mt-5 text-xs font-medium text-stone-900 group-hover:underline">Book →</p>
+          </a>
+        )}
         <a href="/book/?type=walkthrough-video" class="group flex flex-col justify-between rounded-xl border border-stone-200 bg-white p-6 transition hover:border-stone-400 hover:shadow-sm">
           <div>
             <p class="font-medium text-stone-900">Walkthrough Video</p>
@@ -118,10 +131,11 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         {type === 'real-estate'       ? 'Real Estate Packages'
          : type === 'vacation-rental' ? 'Vacation Rental Packages'
          : type === 'walkthrough-video' ? 'Walkthrough Video'
+         : type === 'drone-standalone' ? 'Drone / Aerial'
          : 'Twilight Session'}
       </h1>
       <p class="mt-4 max-w-xl text-pretty text-stone-600">Click any package to see what's included and lock in your date.</p>
-      <PackageCards filterType={type as 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone'} showInfoSections={false} />
+      <PackageCards filterType={type as 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone' | 'drone-standalone'} showInfoSections={false} />
     </section>
 
   ) : isVTE ? (
@@ -314,6 +328,16 @@ const serviceLabel = SERVICE_LABELS[service] || service;
                 </div>
                 <p class="shrink-0 text-sm font-medium text-stone-900">+$155</p>
               </label>
+              {LIVE.drone && (
+                <label class="flex cursor-pointer items-start gap-4 rounded-xl border border-stone-200 bg-white p-4 transition hover:border-stone-400 has-[:checked]:border-stone-900 has-[:checked]:bg-stone-50">
+                  <input type="checkbox" name="addon_drone" id="btp-addon-drone" value="1" class="mt-0.5 h-4 w-4 accent-stone-900" />
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-stone-900">Drone Aerials</p>
+                    <p class="mt-0.5 text-xs text-stone-500">Aerial photos of the property, flown the same day as your shoot</p>
+                  </div>
+                  <p class="shrink-0 text-sm font-medium text-stone-900">+$125</p>
+                </label>
+              )}
 
               <p class="pt-2 text-xs font-medium uppercase tracking-widest text-stone-500">Editing (no appointment needed)</p>
               <div class="rounded-xl border border-stone-200 bg-white p-4">
@@ -390,10 +414,12 @@ const serviceLabel = SERVICE_LABELS[service] || service;
   /* ── Step 2 payment form ── */
   const ADDON_VIDEO_PRICE    = 210;
   const ADDON_TWILIGHT_PRICE = 155;
+  const ADDON_DRONE_PRICE    = 125;
   const ADDON_VTE_PRICE      = 35;
 
   const addonVideo    = document.getElementById('btp-addon-video')    as HTMLInputElement | null;
   const addonTwilight = document.getElementById('btp-addon-twilight') as HTMLInputElement | null;
+  const addonDrone    = document.getElementById('btp-addon-drone')    as HTMLInputElement | null;
   const addonVteQty   = document.getElementById('btp-addon-vte-qty')  as HTMLInputElement | null;
   const addonVteTotal   = document.getElementById('btp-vte-addon-total');
   const depositPriceEl  = document.getElementById('btp-deposit-price');
@@ -412,6 +438,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
   function getAddonTotal(): number {
     return (addonVideo?.checked    ? ADDON_VIDEO_PRICE    : 0)
          + (addonTwilight?.checked ? ADDON_TWILIGHT_PRICE : 0)
+         + (addonDrone?.checked    ? ADDON_DRONE_PRICE    : 0)
          + (addonVteQty            ? parseInt(addonVteQty.value || '0') * ADDON_VTE_PRICE : 0);
   }
 
@@ -465,6 +492,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
   optFull?.addEventListener('click',    () => selectOption('full'));
   addonVideo?.addEventListener('change',    updateDisplay);
   addonTwilight?.addEventListener('change', updateDisplay);
+  addonDrone?.addEventListener('change',    updateDisplay);
   addonVteQty?.addEventListener('input',    updateDisplay);
 
   // Populate from localStorage (set by PackageCards before Calendly redirect)
@@ -477,6 +505,7 @@ const serviceLabel = SERVICE_LABELS[service] || service;
         'vacation-rental':     'Vacation Rental Photography',
         'walkthrough-video':   'Walkthrough Video',
         'twilight-standalone': 'Twilight Session',
+        'drone-standalone':    'Drone / Aerial Session',
       };
       const tierLabel  = document.getElementById('btp-tier-label');
       const priceLabel = document.getElementById('btp-price-label');

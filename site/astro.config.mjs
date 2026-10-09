@@ -43,6 +43,17 @@ export default defineConfig({
     }),
     react(),
     keystatic(),
+    // Unlaunched sections, previewable under `astro dev` only — never built for production.
+    {
+      name: 'dev-preview-pages',
+      hooks: {
+        'astro:config:setup': ({ command, injectRoute }) => {
+          if (command !== 'dev') return;
+          injectRoute({ pattern: '/portfolio/virtual-staging', entrypoint: './src/previews/virtual-staging.astro' });
+          injectRoute({ pattern: '/portfolio/aerials', entrypoint: './src/previews/aerials.astro' });
+        },
+      },
+    },
   ],
   vite: {
     plugins: [tailwindcss(), glsl()],

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import Stripe from 'stripe';
+import { LIVE } from '../../config/launch';
 
 export const prerender = false;
 
@@ -26,6 +27,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Add-ons: same day
   const addonVideo      = body.get('addon_video')       === '1';
   const addonTwilight   = body.get('addon_twilight')    === '1';
+  const addonDrone      = LIVE.drone && body.get('addon_drone') === '1';
   // Add-ons: standalone (separate appointment)
   const addonVideoSA    = body.get('addon_video_sa')    === '1';
   const addonTwilightSA = body.get('addon_twilight_sa') === '1';
@@ -80,6 +82,10 @@ export const POST: APIRoute = async ({ request }) => {
       price_data: { currency: 'usd', product_data: { name: 'Add-on: Twilight Session (Same Day)', description: '6–8 dusk/twilight exterior photos, same day as main shoot' }, unit_amount: 15500 },
       quantity: 1,
     });
+    if (addonDrone) lineItems.push({
+      price_data: { currency: 'usd', product_data: { name: 'Add-on: Drone Aerials (Same Day)', description: 'Aerial photos of the property, flown the same day as the photo shoot' }, unit_amount: 12500 },
+      quantity: 1,
+    });
     if (addonVideoSA) lineItems.push({
       price_data: { currency: 'usd', product_data: { name: 'Add-on: Walkthrough Video (Standalone)', description: 'Gimbal walkthrough + 30–60 sec vertical social reel, separate appointment' }, unit_amount: 34000 },
       quantity: 1,
@@ -97,6 +103,7 @@ export const POST: APIRoute = async ({ request }) => {
   const addons = [
     addonVideo      ? 'Walkthrough Video — Same Day (+$210)'      : null,
     addonTwilight   ? 'Twilight Session — Same Day (+$155)'       : null,
+    addonDrone      ? 'Drone Aerials — Same Day (+$125)'          : null,
     addonVideoSA    ? 'Walkthrough Video — Standalone (+$340)'    : null,
     addonTwilightSA ? 'Twilight Session — Standalone (+$210)'     : null,
     addonVteQty > 0 ? `Virtual Twilight Edit ×${addonVteQty} (+$${addonVteQty * 35})` : null,
@@ -105,6 +112,7 @@ export const POST: APIRoute = async ({ request }) => {
   const addonsTotal = String(
     (addonVideo      ? 210 : 0)
     + (addonTwilight   ? 155 : 0)
+    + (addonDrone      ? 125 : 0)
     + (addonVideoSA    ? 340 : 0)
     + (addonTwilightSA ? 210 : 0)
     + (addonVteQty     * 35),

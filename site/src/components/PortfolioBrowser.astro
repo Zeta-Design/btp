@@ -1,0 +1,99 @@
+---
+// All work + its tag categories as one page that switches in place: clicking a
+// tab swaps the heading, intro and <title>, filters the photos, and updates the
+// URL (pushState), so there's no page load. Each category URL still renders its
+// own full page for direct visits, search engines and no-JS.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortfolioCategoryNav from './PortfolioCategoryNav.astro';
+import PortfolioGallery from './PortfolioGallery.astro';
+import { SITE } from '../config/site';
+import { portfolio } from '../lib/portfolio';
+import { categoriesOf, visibleCategories } from '../lib/portfolio-categories';
+
+interface Props {
+  /** 'all' or a tag category id */
+  active: string;
+}
+const { active } = Astro.props;
+
+const views = [
+  {
+    id: 'all',
+    href: '/portfolio/',
+    title: 'All work',
+    intro: 'Real estate and short-term rental work — tap any image to view it larger.',
+    seoTitle: 'Real Estate & Airbnb Photography Portfolio',
+    description: `A portfolio of real estate, Airbnb & short-term rental photography by ${SITE.name} — available for travel.`,
+  },
+  ...visibleCategories
+    .filter((c) => c.source === 'tags')
+    .map((c) => ({ id: c.id, href: `/portfolio/${c.id}/`, title: c.title, intro: c.intro, seoTitle: c.seoTitle, description: c.description })),
+];
+const current = views.find((v) => v.id === active) ?? views[0];
+
+// Mirrors BaseLayout's <title> format so switching tabs matches a full load.
+const docTitle = (t: string) => (t === SITE.name ? t : `${t} · ${SITE.name}`);
+const viewData = Object.fromEntries(
+  views.map((v) => [v.id, { href: v.href, title: v.title, intro: v.intro, docTitle: docTitle(v.seoTitle) }]),
+);
+const photos = portfolio.map((e) => ({ meta: e.meta, alt: e.alt, cats: categoriesOf(e.key) }));
+---
+<BaseLayout title={current.seoTitle} description={current.description}>
+  <section class="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Portfolio</p>
+    <h1 id="pf-title" class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">{current.title}</h1>
+    <p id="pf-intro" class="mt-4 max-w-xl text-pretty text-stone-600">{current.intro}</p>
+    <PortfolioCategoryNav active={current.id} />
+
+    <PortfolioGallery photos={photos} filter={current.id} />
+  </section>
+
+  <script type="application/json" id="pf-views" set:html={JSON.stringify(viewData)} />
+
+  <script>
+    import { TAB_ACTIVE, TAB_INACTIVE } from '../lib/portfolio-tabs';
+
+    type View = { href: string; title: string; intro: string; docTitle: string };
+    const views: Record<string, View> = JSON.parse(document.getElementById('pf-views')?.textContent || '{}');
+    const titleEl = document.getElementById('pf-title');
+    const introEl = document.getElementById('pf-intro');
+    const tabs = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-filter]'));
+    const activeCls = TAB_ACTIVE.split(' ');
+    const inactiveCls = TAB_INACTIVE.split(' ');
+
+    const setView = (id: string) => {
+      const v = views[id];
+      if (!v) return;
+      if (titleEl) titleEl.textContent = v.title;
+      if (introEl) introEl.textContent = v.intro;
+      document.title = v.docTitle;
+      tabs.forEach((t) => {
+        const on = t.dataset.filter === id;
+        if (on) t.setAttribute('aria-current', 'page');
+        else t.removeAttribute('aria-current');
+        t.classList.remove(...(on ? inactiveCls : activeCls));
+        t.classList.add(...(on ? activeCls : inactiveCls));
+      });
+      document.dispatchEvent(new CustomEvent('portfolio:filter', { detail: id }));
+    };
+
+    tabs.forEach((t) =>
+      t.addEventListener('click', (e) => {
+        // Let cmd/ctrl/shift-click open the category in a new tab as usual.
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+        e.preventDefault();
+        const id = t.dataset.filter!;
+        if (t.getAttribute('aria-current') === 'page') return;
+        setView(id);
+        history.pushState({ pf: id }, '', views[id].href);
+      }),
+    );
+
+    // Back/forward between categories.
+    window.addEventListener('popstate', () => {
+      const path = location.pathname.endsWith('/') ? location.pathname : `${location.pathname}/`;
+      const id = Object.keys(views).find((k) => views[k].href === path);
+      if (id) setView(id);
+    });
+  </script>
+</BaseLayout>

@@ -179,6 +179,15 @@ const whatsIncluded = (d: Booking): string[] =>
         'Delivery within 24–48 hours of receiving your photos',
         'Licensed for all marketing and listing use',
       ]
+    : (d.service ?? '').includes('Drone')
+      ? [
+          'Aerial photos of the property, lot &amp; surrounding area',
+          'Professional editing on every image',
+          'High-res JPEGs delivered via online gallery',
+          'Delivery within 24–48 hours of your shoot',
+          'Licensed for MLS, listing sites &amp; social media',
+          'Unlimited downloads — no watermarks',
+        ]
     : (d.service ?? '').includes('Walkthrough')
       ? [
           'Full gimbal stabilizer walkthrough of the property',

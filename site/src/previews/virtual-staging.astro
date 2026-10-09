@@ -1,0 +1,35 @@
+---
+// DEV-ONLY PREVIEW, injected at /portfolio/virtual-staging/ under `astro dev`
+// only (astro.config.mjs), so it doesn't exist in production builds. Its
+// photos live in their own folder and are only imported here, so they stay out
+// of production too. To launch: move this file to
+// src/pages/portfolio/virtual-staging.astro (fix the import paths, drop the
+// injectRoute and the `preview` prop) and set LIVE.virtualStaging = true.
+import type { ImageMetadata } from 'astro';
+import PortfolioCategoryLayout from '../components/PortfolioCategoryLayout.astro';
+
+const mods = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/virtual-staging/*.{jpg,jpeg,png,webp}',
+  { eager: true },
+);
+const photos = Object.keys(mods)
+  .sort()
+  .map((key) => {
+    const room = key.split('/').pop()!.replace(/\.\w+$/, '').replace(/^\d+-/, '').replace(/-/g, ' ');
+    return { meta: mods[key].default, alt: `Virtually staged ${room}` };
+  });
+---
+<PortfolioCategoryLayout categoryId="virtual-staging" photos={photos} badge="Virtually staged" preview>
+  <div class="mt-14 rounded-2xl border border-stone-200 bg-white px-8 py-8 text-center shadow-sm">
+    <h2 class="font-serif text-2xl text-stone-900">Have a vacant listing?</h2>
+    <p class="mx-auto mt-2 max-w-lg text-pretty text-stone-600">
+      Send the empty-room photos and I'll stage them digitally — no furniture rental, no movers.
+    </p>
+    <a
+      href="/contact/?service=custom"
+      class="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-full bg-stone-900 px-8 text-sm font-medium text-white transition hover:bg-stone-700"
+    >
+      Get a staging quote →
+    </a>
+  </div>
+</PortfolioCategoryLayout>

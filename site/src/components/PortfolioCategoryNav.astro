@@ -1,0 +1,40 @@
+---
+// Category tabs for the portfolio pages. Categories (and which are launched)
+// live in src/lib/portfolio-categories.ts. Tabs with data-filter are switched
+// in place by PortfolioBrowser; the rest are ordinary links.
+import { visibleCategories } from '../lib/portfolio-categories';
+import { TAB_ACTIVE, TAB_BASE, TAB_INACTIVE } from '../lib/portfolio-tabs';
+
+interface Props {
+  active: string;
+}
+const { active } = Astro.props;
+
+const tabs = [
+  { id: 'all', label: 'All', href: '/portfolio/', filterable: true },
+  ...visibleCategories.map((c) => ({
+    id: c.id,
+    label: c.label,
+    href: `/portfolio/${c.id}/`,
+    filterable: c.source === 'tags',
+  })),
+];
+---
+{tabs.length > 1 && (
+  <nav aria-label="Portfolio categories" class="mt-8">
+    <ul class="flex flex-wrap gap-2">
+      {tabs.map((t) => (
+        <li>
+          <a
+            href={t.href}
+            data-filter={t.filterable ? t.id : undefined}
+            aria-current={t.id === active ? 'page' : undefined}
+            class={`${TAB_BASE} ${t.id === active ? TAB_ACTIVE : TAB_INACTIVE}`}
+          >
+            {t.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}

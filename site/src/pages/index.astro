@@ -40,7 +40,7 @@ const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 // crop loses the house entirely.
 const findPortfolio = (needle: string) => portfolio.find((p) => p.key.includes(needle))?.meta;
 const heroSlideDefs: { meta: ImageMetadata | undefined; position: string }[] = [
-  { meta: hero, position: 'object-center' },
+  { meta: findPortfolio('00-farmhouse-exterior-twilight') ?? hero, position: 'object-center' },
   { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center' },
   {
     meta: findPortfolio('59th-pl-exterior'),

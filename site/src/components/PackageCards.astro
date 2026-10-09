@@ -1,9 +1,10 @@
 ---
 import { SITE } from '../config/site';
+import { LIVE } from '../config/launch';
 
 interface Props {
   showInfoSections?: boolean;
-  filterType?: 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone';
+  filterType?: 'real-estate' | 'vacation-rental' | 'walkthrough-video' | 'twilight-standalone' | 'drone-standalone';
 }
 const { showInfoSections = true, filterType } = Astro.props;
 
@@ -36,6 +37,7 @@ const showRE          = !groups && (!filterType || filterType === 'real-estate')
 const showSTR         = !groups && (!filterType || filterType === 'vacation-rental');
 const showVideo       = !groups && filterType === 'walkthrough-video';
 const showTwilightSA  = !groups && filterType === 'twilight-standalone';
+const showDroneSA     = !groups && filterType === 'drone-standalone' && LIVE.drone;
 const showAddOns      = !groups && showInfoSections;
 ---
 <style is:global>
@@ -291,6 +293,36 @@ const showAddOns      = !groups && showInfoSections;
   </div>
 )}
 
+{showDroneSA && (
+  <div class="mt-14">
+    <h2 class="font-serif text-2xl sm:text-3xl">Drone / Aerial</h2>
+    <p class="mt-2 text-sm text-stone-500">Standalone drone session — separate appointment</p>
+    <div class="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div
+        class="btp-card rounded-xl border border-stone-200 bg-white p-6 flex flex-col justify-between hover:border-stone-400 hover:shadow-sm transition-shadow"
+        style="min-height:180px;"
+        data-category="Drone / Aerial"
+        data-label="Standalone Session"
+        data-price="$150"
+        data-detail="Aerial photos of the property and surroundings"
+        data-duration="~1 hr"
+        data-service="drone-standalone"
+        data-tier="Drone / Aerial – Standalone"
+        data-calendly="https://calendly.com/benjammintims/30min"
+      >
+        <div>
+          <p class="text-xs font-medium uppercase tracking-widest text-stone-500">Standalone</p>
+          <p class="mt-3 text-2xl font-light text-stone-900">$150</p>
+        </div>
+        <div class="mt-4 flex items-center justify-between">
+          <p class="text-sm text-stone-500">Aerial property photos · 24–48 hrs</p>
+          <span class="text-xs text-stone-500">tap to book →</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
 {showAddOns && (
   <>
     <div class="mt-14">
@@ -312,6 +344,28 @@ const showAddOns      = !groups && showInfoSections;
       </div>
       <p class="mt-3 text-xs text-stone-500">Video add-on can be selected during checkout after scheduling.</p>
     </div>
+
+    {LIVE.drone && (
+      <div class="mt-14">
+        <h2 class="font-serif text-2xl sm:text-3xl">Drone / Aerial</h2>
+        <p class="mt-2 text-sm text-stone-500">Aerial photos that show the whole property, the lot and the neighborhood</p>
+        <div class="mt-6 divide-y divide-stone-100 rounded-xl border border-stone-200 bg-white">
+          {[
+            { label: 'Add-on — same day as photo shoot', price: '$125', detail: 'Flown alongside any photo package' },
+            { label: 'Standalone session',               price: '$150', detail: 'Separate appointment — aerial photos only' },
+          ].map((item) => (
+            <div class="flex items-center justify-between gap-6 px-6 py-5">
+              <div>
+                <p class="font-medium text-stone-900">{item.label}</p>
+                <p class="mt-0.5 text-sm text-stone-500">{item.detail}</p>
+              </div>
+              <p class="shrink-0 text-base font-light text-stone-900">{item.price}</p>
+            </div>
+          ))}
+        </div>
+        <p class="mt-3 text-xs text-stone-500">Drone add-on can be selected during checkout after scheduling.</p>
+      </div>
+    )}
 
     <div class="mt-14">
       <h2 class="font-serif text-2xl sm:text-3xl">Add-ons</h2>
@@ -415,6 +469,14 @@ const showAddOns      = !groups && showInfoSections;
         'Professional color grade and background music',
         'Delivery within 24–48 hours',
         'Licensed for all platforms — Instagram, Facebook, TikTok, MLS',
+        'Unlimited downloads — no watermarks',
+      ],
+      'drone-standalone': [
+        'Aerial photos of the property, lot &amp; surrounding area',
+        'Professional editing on every image',
+        'High-res JPEGs delivered via online gallery',
+        'Delivery within 24–48 hours of your shoot',
+        'Licensed for MLS, listing sites &amp; social media',
         'Unlimited downloads — no watermarks',
       ],
       'twilight-standalone': [

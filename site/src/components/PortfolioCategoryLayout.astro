@@ -1,0 +1,42 @@
+---
+// Shared page for a portfolio category (/portfolio/<id>/). Extra content
+// (e.g. a call to action) goes in the default slot below the gallery.
+import type { ImageMetadata } from 'astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PortfolioCategoryNav from './PortfolioCategoryNav.astro';
+import PortfolioGallery from './PortfolioGallery.astro';
+import { getCategory } from '../lib/portfolio-categories';
+
+interface Props {
+  categoryId: string;
+  photos: { meta: ImageMetadata; alt: string }[];
+  badge?: string;
+  /** unlaunched page shown on the local dev server only */
+  preview?: boolean;
+}
+const { categoryId, photos, badge, preview = false } = Astro.props;
+const category = getCategory(categoryId);
+---
+<BaseLayout title={category.seoTitle} description={category.description} noindex={preview}>
+  <section class="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
+    {preview && (
+      <div class="mb-8 rounded-xl border border-amber-200 bg-amber-50 px-5 py-3 text-sm text-amber-900">
+        Preview — only visible on your local dev server. This page and its tab don't exist on the live site.
+      </div>
+    )}
+    <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Portfolio</p>
+    <h1 class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">{category.title}</h1>
+    <p class="mt-4 max-w-xl text-pretty text-stone-600">{category.intro}</p>
+    <PortfolioCategoryNav active={category.id} />
+
+    {photos.length > 0 ? (
+      <PortfolioGallery photos={photos} badge={badge} />
+    ) : (
+      <div class="mt-10 rounded-xl border border-dashed border-stone-300 px-6 py-16 text-center text-stone-500">
+        New {category.label.toLowerCase()} work is on the way.
+      </div>
+    )}
+
+    <slot />
+  </section>
+</BaseLayout>

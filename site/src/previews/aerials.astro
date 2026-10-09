@@ -1,0 +1,31 @@
+---
+// DEV-ONLY PREVIEW, injected at /portfolio/aerials/ under `astro dev` only
+// (astro.config.mjs). Drop drone photos into src/assets/aerials/ — they're only
+// imported here, so they stay out of production until launch. To launch: move
+// this file to src/pages/portfolio/aerials.astro (fix the import paths, drop
+// the injectRoute and the `preview` prop) and set LIVE.aerials = true.
+import type { ImageMetadata } from 'astro';
+import PortfolioCategoryLayout from '../components/PortfolioCategoryLayout.astro';
+
+const mods = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/aerials/*.{jpg,jpeg,png,webp}',
+  { eager: true },
+);
+const photos = Object.keys(mods)
+  .sort()
+  .map((key) => ({ meta: mods[key].default, alt: 'Aerial drone photo of a property' }));
+---
+<PortfolioCategoryLayout categoryId="aerials" photos={photos} preview>
+  <div class="mt-14 rounded-2xl border border-stone-200 bg-white px-8 py-8 text-center shadow-sm">
+    <h2 class="font-serif text-2xl text-stone-900">Add aerials to your shoot</h2>
+    <p class="mx-auto mt-2 max-w-lg text-pretty text-stone-600">
+      $125 added to any photo package, or $150 as a standalone drone session.
+    </p>
+    <a
+      href="/pricing/"
+      class="mt-5 inline-flex min-h-[48px] items-center justify-center rounded-full bg-stone-900 px-8 text-sm font-medium text-white transition hover:bg-stone-700"
+    >
+      See pricing →
+    </a>
+  </div>
+</PortfolioCategoryLayout>
