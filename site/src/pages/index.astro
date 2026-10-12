@@ -351,8 +351,11 @@ const services = SITE.services ?? [
      hasn't asked for reduced motion; otherwise the slide keeps its static crop.
      is:inline so Astro's CSS minifier doesn't prune `animation-timeline: scroll()`. */
   @keyframes hero-pan {
+    /* Start a touch into the photo (sky trimmed so the farmhouse peak just
+       meets the top edge); max() caps it at the photo's overflow so short
+       crops never show a gap. */
     from {
-      object-position: var(--pan-x, 50%) 0%;
+      object-position: var(--pan-x, 50%) max(-1.5vw, 100%);
     }
     to {
       object-position: var(--pan-x, 50%) 100%;
