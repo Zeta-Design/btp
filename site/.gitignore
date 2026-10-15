@@ -8,8 +8,9 @@ node_modules/
 .env
 .env.production
 .env*.local
-# vercel
+# vercel (incl. backups like .vercel.btp-bak — build output embeds env secrets)
 .vercel
+.vercel*
 # misc
 .DS_Store
 npm-debug.log*
