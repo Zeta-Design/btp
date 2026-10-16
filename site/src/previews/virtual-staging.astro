@@ -5,21 +5,54 @@
 // of production too. To launch: move this file to
 // src/pages/portfolio/virtual-staging.astro (fix the import paths, drop the
 // injectRoute and the `preview` prop) and set LIVE.virtualStaging = true.
+//
+// Rooms with a before photo get a drag-to-compare slider. Pairs live in
+// before-after/<name>/{before,after}.jpg, where <name> matches the staged
+// photo's filename; both are pixel-aligned and cropped to the same frame, so
+// only the staging changes under the divider. Staged photos without a before
+// yet still show, in the usual grid below the sliders.
 import type { ImageMetadata } from 'astro';
+import BeforeAfterSlider from '../components/BeforeAfterSlider.astro';
 import PortfolioCategoryLayout from '../components/PortfolioCategoryLayout.astro';
+import PortfolioGallery from '../components/PortfolioGallery.astro';
 
-const mods = import.meta.glob<{ default: ImageMetadata }>(
+const staged = import.meta.glob<{ default: ImageMetadata }>(
   '../assets/virtual-staging/*.{jpg,jpeg,png,webp}',
   { eager: true },
 );
-const photos = Object.keys(mods)
+const befores = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/virtual-staging/before-after/*/before.{jpg,jpeg,png,webp}',
+  { eager: true },
+);
+const afters = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/virtual-staging/before-after/*/after.{jpg,jpeg,png,webp}',
+  { eager: true },
+);
+
+const folderOf = (path: string) => path.split('/').at(-2)!;
+const roomOf = (name: string) => name.replace(/^\d+-/, '').replace(/-/g, ' ');
+const afterByName = Object.fromEntries(Object.entries(afters).map(([k, m]) => [folderOf(k), m.default]));
+const pairs = Object.entries(befores)
+  .map(([k, m]) => ({ name: folderOf(k), before: m.default, after: afterByName[folderOf(k)] }))
+  .filter((p) => p.after)
+  .sort((a, b) => a.name.localeCompare(b.name));
+const paired = new Set(pairs.map((p) => p.name));
+const singles = Object.keys(staged)
   .sort()
   .map((key) => {
-    const room = key.split('/').pop()!.replace(/\.\w+$/, '').replace(/^\d+-/, '').replace(/-/g, ' ');
-    return { meta: mods[key].default, alt: `Virtually staged ${room}` };
-  });
+    const name = key.split('/').pop()!.replace(/\.\w+$/, '');
+    return { name, meta: staged[key].default, alt: `Virtually staged ${roomOf(name)}` };
+  })
+  .filter((p) => !paired.has(p.name));
 ---
-<PortfolioCategoryLayout categoryId="virtual-staging" photos={photos} badge="Virtually staged" preview>
+<PortfolioCategoryLayout categoryId="virtual-staging" photos={singles} badge="Virtually staged" preview>
+  <div slot="gallery">
+    <div class="mt-10 space-y-14">
+      {pairs.map((p, i) => <BeforeAfterSlider before={p.before} after={p.after} room={roomOf(p.name)} eager={i === 0} />)}
+    </div>
+    {singles.length > 0 && <PortfolioGallery photos={singles} badge="Virtually staged" />}
+  </div>
+
   <div class="mt-14 rounded-2xl border border-stone-200 bg-white px-8 py-8 text-center shadow-sm">
     <h2 class="font-serif text-2xl text-stone-900">Have a vacant listing?</h2>
     <p class="mx-auto mt-2 max-w-lg text-pretty text-stone-600">

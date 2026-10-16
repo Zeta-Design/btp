@@ -1,0 +1,171 @@
+---
+// Drag-to-compare before/after for virtual staging. Both photos must be the
+// same size and pixel-aligned (see src/assets/virtual-staging/before-after/),
+// so the only thing that changes under the divider is the staging. The
+// "before" sits on top, clipped to the divider's left. One script drives every
+// slider on the page: drag (mouse, touch, pen), click to jump, and arrow keys on
+// the handle.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  before: ImageMetadata;
+  after: ImageMetadata;
+  /** room name, e.g. "living room" */
+  room: string;
+  /** load right away (the first slider on the page) */
+  eager?: boolean;
+}
+const { before, after, room, eager = false } = Astro.props;
+const title = room.replace(/^\w/, (c) => c.toUpperCase());
+const shared = {
+  widths: [640, 1024, 1600, 2000],
+  sizes: '(max-width: 1152px) 100vw, 1104px',
+  format: 'avif' as const,
+  quality: 78,
+  loading: eager ? ('eager' as const) : ('lazy' as const),
+  decoding: 'async' as const,
+  draggable: false,
+};
+---
+<figure>
+  <div
+    data-ba
+    class="ba-frame relative cursor-ew-resize touch-pan-y select-none overflow-hidden rounded-sm bg-stone-200 shadow-sm"
+    style={`aspect-ratio: ${after.width} / ${after.height}`}
+  >
+    <Image src={after} alt={`${title}, virtually staged`} class="absolute inset-0 h-full w-full object-cover" {...shared} />
+    <Image src={before} alt={`${title}, empty, before staging`} class="ba-before absolute inset-0 h-full w-full object-cover" {...shared} />
+
+    <span data-ba-label="before" class="ba-label pointer-events-none absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white">
+      Before
+    </span>
+    <span data-ba-label="after" class="ba-label pointer-events-none absolute right-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-white">
+      Virtually staged
+    </span>
+
+    <div class="ba-divider pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white" aria-hidden="true"></div>
+    <div
+      role="slider"
+      tabindex="0"
+      aria-label={`Before and after: ${room}`}
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="50"
+      aria-valuetext="50% before"
+      class="ba-handle absolute top-1/2 inline-flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white text-stone-900 shadow-lg outline-none ring-stone-900/40 transition-shadow focus-visible:ring-4"
+    >
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6 3 12l6 6M15 6l6 6-6 6" />
+      </svg>
+    </div>
+  </div>
+  <figcaption class="mt-4 flex items-baseline justify-between gap-4 border-b border-stone-200 pb-2">
+    <span class="font-serif text-xl sm:text-2xl">{title}</span>
+    <span class="text-sm text-stone-500">Drag to compare</span>
+  </figcaption>
+</figure>
+
+<!-- Global: these reach the <img> elements Astro's Image component renders,
+     which scoped styles don't. The ba-* names are unique to this component. -->
+<style is:global>
+  .ba-frame {
+    --ba-pos: 50%;
+  }
+  .ba-before {
+    clip-path: inset(0 calc(100% - var(--ba-pos)) 0 0);
+  }
+  .ba-divider,
+  .ba-handle {
+    left: var(--ba-pos);
+  }
+  .ba-divider {
+    box-shadow: 0 0 6px rgb(0 0 0 / 0.35); /* stays visible over white walls */
+  }
+  .ba-label {
+    transition: opacity 0.2s ease;
+  }
+  /* Clicks and keys glide; drags follow the pointer exactly. */
+  .ba-frame.is-gliding :is(.ba-before, .ba-divider, .ba-handle) {
+    transition: clip-path 0.3s ease, left 0.3s ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ba-frame.is-gliding :is(.ba-before, .ba-divider, .ba-handle) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-ba]').forEach((frame) => {
+    const handle = frame.querySelector<HTMLElement>('[role="slider"]')!;
+    const labels = frame.querySelectorAll<HTMLElement>('[data-ba-label]');
+    let pos = 50;
+    let frameReq = 0;
+
+    const render = () => {
+      frameReq = 0;
+      frame.style.setProperty('--ba-pos', `${pos}%`);
+      handle.setAttribute('aria-valuenow', String(Math.round(pos)));
+      handle.setAttribute('aria-valuetext', `${Math.round(pos)}% before`);
+      // Each label fades as the divider closes in on it.
+      labels.forEach((l) => {
+        const near = l.dataset.baLabel === 'before' ? pos < 18 : pos > 82;
+        l.style.opacity = near ? '0' : '1';
+      });
+    };
+    const set = (p: number, glide: boolean) => {
+      pos = Math.min(100, Math.max(0, p));
+      frame.classList.toggle('is-gliding', glide);
+      if (!frameReq) frameReq = requestAnimationFrame(render);
+    };
+    const fromPointer = (e: PointerEvent) => {
+      const r = frame.getBoundingClientRect();
+      return ((e.clientX - r.left) / r.width) * 100;
+    };
+
+    frame.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      // A mouse click jumps (glides) straight to the spot. A finger waits: if it
+      // turns out to be a vertical swipe the page scrolls (touch-action: pan-y)
+      // and the divider stays put; a sideways drag or a tap moves it.
+      const touch = e.pointerType === 'touch';
+      if (!touch) set(fromPointer(e), true);
+      frame.setPointerCapture(e.pointerId);
+      let moved = false;
+      const move = (ev: PointerEvent) => {
+        moved = true;
+        set(fromPointer(ev), false); // a drag follows the pointer exactly
+      };
+      const cleanup = () => {
+        frame.removeEventListener('pointermove', move);
+        frame.removeEventListener('pointerup', up);
+        frame.removeEventListener('pointercancel', cleanup);
+      };
+      const up = (ev: PointerEvent) => {
+        if (touch && !moved) set(fromPointer(ev), true); // a tap jumps too
+        cleanup();
+      };
+      frame.addEventListener('pointermove', move);
+      frame.addEventListener('pointerup', up);
+      frame.addEventListener('pointercancel', cleanup); // the touch became a page scroll
+    });
+
+    handle.addEventListener('keydown', (e) => {
+      const step = e.shiftKey ? 10 : 2;
+      const keys: Record<string, number> = {
+        ArrowLeft: pos - step,
+        ArrowDown: pos - step,
+        ArrowRight: pos + step,
+        ArrowUp: pos + step,
+        PageDown: pos - 10,
+        PageUp: pos + 10,
+        Home: 0,
+        End: 100,
+      };
+      if (!(e.key in keys)) return;
+      e.preventDefault();
+      set(keys[e.key], true);
+    });
+  });
+</script>
