@@ -63,7 +63,7 @@ const jsonLd = {
   description: SITE.tagline,
   url: Astro.site?.href,
   logo: new URL('/logo.png', Astro.site).href,
-  image: new URL('/social-share.png', Astro.site).href,
+  image: new URL('/social-share.jpg', Astro.site).href,
   ...(SITE.email && { email: SITE.email }),
   ...(SITE.phone && { telephone: SITE.phone }),
   ...(SITE.social?.length && { sameAs: SITE.social.map((s) => s.href) }),
