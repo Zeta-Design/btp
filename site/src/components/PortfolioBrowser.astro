@@ -42,7 +42,21 @@ const photos = portfolio.map((e) => ({ meta: e.meta, alt: e.alt, cats: categorie
   <section class="mx-auto max-w-6xl px-5 py-14 sm:px-6 sm:py-20">
     <p class="text-xs uppercase tracking-[0.25em] text-stone-500">Portfolio</p>
     <h1 id="pf-title" class="mt-3 font-serif leading-[1.05] text-[clamp(2.25rem,7vw,4rem)]">{current.title}</h1>
-    <p id="pf-intro" class="mt-4 max-w-xl text-pretty text-stone-600">{current.intro}</p>
+    <!-- Every view's intro sits in the same grid cell, so the space is always as
+         tall as the longest one at any width and switching never shifts the
+         tabs or photos. -->
+    <div class="mt-4 grid max-w-xl">
+      {
+        views.map((v) => (
+          <p
+            data-intro={v.id}
+            class:list={['col-start-1 row-start-1 text-pretty text-stone-600', v.id !== current.id && 'invisible']}
+          >
+            {v.intro}
+          </p>
+        ))
+      }
+    </div>
     <PortfolioCategoryNav active={current.id} />
 
     <PortfolioGallery photos={photos} filter={current.id} />
@@ -56,7 +70,7 @@ const photos = portfolio.map((e) => ({ meta: e.meta, alt: e.alt, cats: categorie
     type View = { href: string; title: string; intro: string; docTitle: string };
     const views: Record<string, View> = JSON.parse(document.getElementById('pf-views')?.textContent || '{}');
     const titleEl = document.getElementById('pf-title');
-    const introEl = document.getElementById('pf-intro');
+    const intros = Array.from(document.querySelectorAll<HTMLElement>('[data-intro]'));
     const tabs = Array.from(document.querySelectorAll<HTMLAnchorElement>('a[data-filter]'));
     const activeCls = TAB_ACTIVE.split(' ');
     const inactiveCls = TAB_INACTIVE.split(' ');
@@ -65,7 +79,7 @@ const photos = portfolio.map((e) => ({ meta: e.meta, alt: e.alt, cats: categorie
       const v = views[id];
       if (!v) return;
       if (titleEl) titleEl.textContent = v.title;
-      if (introEl) introEl.textContent = v.intro;
+      intros.forEach((p) => p.classList.toggle('invisible', p.dataset.intro !== id));
       document.title = v.docTitle;
       tabs.forEach((t) => {
         const on = t.dataset.filter === id;

@@ -71,8 +71,7 @@ const inFilter = (cats?: string[]) => filter === 'all' || (cats ?? []).includes(
 <script>
   const fulls: string[] = JSON.parse(document.getElementById('gallery-full')?.textContent || '[]');
   const alts: string[] = JSON.parse(document.getElementById('gallery-alts')?.textContent || '[]');
-  const gallery = document.getElementById('gallery');
-  const cards = Array.from(document.querySelectorAll<HTMLElement>('#gallery .pg-card'));
+  const cards =Array.from(document.querySelectorAll<HTMLElement>('#gallery .pg-card'));
   const visible = () => cards.filter((c) => !c.hidden);
 
   // Lightbox — prev/next step through the photos currently shown.
@@ -107,40 +106,58 @@ const inFilter = (cats?: string[]) => filter === 'all' || (cats ?? []).includes(
     if (Math.abs(dx) > 50) show(pos + (dx < 0 ? 1 : -1));
   }, { passive: true });
 
-  // Skeleton: reveal shown cards in display order (1,2,3...) so caching never
-  // lets a later card jump ahead of an earlier one.
-  const reveal = (card: HTMLElement) => {
-    const img = card.querySelector<HTMLImageElement>('.pg-img')!;
+  // Skeleton: each card reveals as it comes on screen. Cards arriving together
+  // cascade in display order (1,2,3...), so caching never lets a later card
+  // jump ahead of an earlier one, and cards further down never wait behind a
+  // long queue.
+  const imgOf = (card: HTMLElement) => card.querySelector<HTMLImageElement>('.pg-img')!;
+  const loaded = (card: HTMLElement) => imgOf(card).complete && imgOf(card).naturalWidth > 0;
+  const reveal = (card: HTMLElement, instant = false) => {
+    if (!card.classList.contains('animate-pulse')) return; // already shown
+    const img = imgOf(card);
+    if (instant) img.style.transition = 'none';
     card.classList.remove('animate-pulse', 'bg-stone-200');
     img.classList.remove('opacity-0');
     img.classList.add('opacity-100');
+    if (instant) requestAnimationFrame(() => requestAnimationFrame(() => img.style.removeProperty('transition')));
   };
-  const revealInOrder = () => {
-    visible()
-      .filter((c) => !c.dataset.queued)
-      .forEach((card, n) => {
-        card.dataset.queued = '1';
-        const img = card.querySelector<HTMLImageElement>('.pg-img')!;
-        setTimeout(() => {
-          if (img.complete && img.naturalWidth > 0) reveal(card);
-          else img.addEventListener('load', () => reveal(card), { once: true });
-        }, n * 150);
-      });
+  const revealWhenLoaded = (card: HTMLElement) => {
+    if (loaded(card)) reveal(card);
+    else imgOf(card).addEventListener('load', () => reveal(card), { once: true });
   };
-  let started = false;
   const obs = new IntersectionObserver((entries) => {
-    if (!entries[0].isIntersecting) return;
-    obs.disconnect();
-    started = true;
-    revealInOrder();
-  }, { threshold: 0.1 });
-  if (gallery) obs.observe(gallery);
+    entries
+      .filter((e) => e.isIntersecting)
+      .map((e) => e.target as HTMLElement)
+      .sort((a, b) => Number(a.dataset.i) - Number(b.dataset.i))
+      .forEach((card, n) => {
+        obs.unobserve(card);
+        setTimeout(() => revealWhenLoaded(card), n * 120);
+      });
+  });
+  cards.forEach((card) => obs.observe(card));
 
-  // In-place category filter.
+  // One initial load: once the page has loaded, fetch the rest of the photos
+  // (lazy until now) in the background, so switching categories never waits on
+  // the network. Skipped when the visitor's browser asks to save data.
+  const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
+  if (!saveData) {
+    const preloadRest = () => cards.forEach((c) => { imgOf(c).loading = 'eager'; });
+    const whenIdle = () => ('requestIdleCallback' in window ? requestIdleCallback(preloadRest, { timeout: 2000 }) : setTimeout(preloadRest, 300));
+    if (document.readyState === 'complete') whenIdle();
+    else addEventListener('load', whenIdle, { once: true });
+  }
+
+  // In-place category filter, instant like a filter: photos that have loaded
+  // just appear (no skeleton, no fade); any still loading reveal when ready.
   document.addEventListener('portfolio:filter', (e) => {
     const id = (e as CustomEvent<string>).detail;
-    cards.forEach((c) => { c.hidden = !(id === 'all' || (c.dataset.cats ?? '').split(' ').includes(id)); });
-    gallery?.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
-    if (started) revealInOrder();
+    cards.forEach((c) => {
+      c.hidden = !(id === 'all' || (c.dataset.cats ?? '').split(' ').includes(id));
+      if (!c.hidden && loaded(c)) {
+        obs.unobserve(c);
+        reveal(c, true);
+      }
+    });
   });
 </script>
