@@ -36,7 +36,8 @@ Project guide for working in this repo. Read before making changes.
   **⚠️ If the admin portal's instructions OR implementation change, update the "Admin portal"
   section in the root `README.md` to match (keep them in sync).**
 - **3D gallery:** `/gallery-lab` — vendored Codrops depth gallery (`src/Experience/`, Three.js +
-  GLSL via `vite-plugin-glsl`); isolated so its JS loads only on that page.
+  GLSL via `vite-plugin-glsl`); isolated so its JS loads only on that page. **Dev-only for now**
+  (`src/previews/gallery-lab.astro`, injected under `astro dev`; footer link shows in dev only).
 - **CRM:** Dubsado lead form embedded on `/contact`. **Books:** QuickBooks Online (manual).
 
 ## Build / deploy gotchas

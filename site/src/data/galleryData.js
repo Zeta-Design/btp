@@ -1,5 +1,5 @@
 // Gallery items are injected per-page (computed at build from the real photos +
-// their sampled mood colors). See src/pages/gallery-lab.astro.
+// their sampled mood colors). See src/previews/gallery-lab.astro.
 // Engine: Codrops "Atmospheric Depth Gallery" by Houmahani Kane (MIT).
 const injected =
   typeof window !== 'undefined' && Array.isArray(window.__GALLERY_DATA__)

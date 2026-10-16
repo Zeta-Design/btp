@@ -34,14 +34,17 @@ const year = new Date().getFullYear();
     >
       <p>© {year} {SITE.name}</p>
       <div class="flex flex-wrap items-center gap-x-6">
-        <a
-          href="/gallery-lab/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex min-h-[44px] items-center transition hover:text-stone-900"
-        >
-          3D Gallery
-        </a>
+        {/* 3D gallery is dev-only for now (src/previews/gallery-lab.astro). */}
+        {import.meta.env.DEV && (
+          <a
+            href="/gallery-lab/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex min-h-[44px] items-center transition hover:text-stone-900"
+          >
+            3D Gallery
+          </a>
+        )}
         {
           SITE.social?.map((s) => (
             <a
