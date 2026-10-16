@@ -1,5 +1,6 @@
 import { portfolio } from './portfolio';
 import { LIVE } from '../config/launch';
+import { TAGS } from '../config/portfolio-tags';
 
 export interface PortfolioCategory {
   id: string;
@@ -102,68 +103,8 @@ export const getCategory = (id: string): PortfolioCategory => {
   return c;
 };
 
-// Which categories each photo in src/assets/portfolio belongs to, by filename.
-// Every photo gets exactly one place category (exteriors, interiors,
-// themed-rooms, pools); twilight is added on top for dusk and night shots.
-// Untagged photos still show under All work. Renaming a photo file means
-// renaming its key here too.
-const TAGS: Record<string, string[]> = {
-  // Exteriors: fronts, entries and the home from the yard
-  '00-farmhouse-exterior-twilight.jpg': ['exteriors', 'twilight'],
-  '00a-palm-exterior-sunset.jpg': ['exteriors', 'twilight'],
-  '01-dornoch-exterior-twilight.jpg': ['exteriors', 'twilight'],
-  '01-troon-exterior-twilight.jpg': ['exteriors', 'twilight'],
-  '01z-p3-DSC_8792.jpg': ['exteriors', 'twilight'],
-  '01za-59th-pl-exterior.jpg': ['exteriors'],
-  '09-continental-ave-exterior.jpg': ['exteriors'],
-  '10-59th-pl-exterior-twilight.jpg': ['exteriors', 'twilight'],
-  '13a-continental-ave-front-entry.jpg': ['exteriors'],
-  '18c-farmhouse-front-entry.jpg': ['exteriors', 'twilight'],
-  '18d-az-exterior-front.jpg': ['exteriors'],
-
-  // Interiors: the regular rooms
-  '02-0-troon-bedroom-navy.jpg': ['interiors'],
-  '02-troon-cir-bedroom-green.jpg': ['interiors'],
-  '04a-eaton-st-38.jpg': ['interiors'],
-  '04c-az-great-room.jpg': ['interiors'],
-  '04d-az-kitchen.jpg': ['interiors'],
-  '04e-az-master-bedroom.jpg': ['interiors'],
-  '05-dornoch-64.jpg': ['interiors'],
-  '05a-juliet-dr-living-dining.jpg': ['interiors'],
-  '06-dornoch-62.jpg': ['interiors'],
-  '06-dornoch-dining-open-plan.jpg': ['interiors'],
-  '08-dornoch-46.jpg': ['interiors'],
-  '11-dornoch-8.jpg': ['interiors'],
-  '14-dornoch-living-room.jpg': ['interiors'],
-  '16-dornoch-66.jpg': ['interiors'],
-  '17-troon-living-room.jpg': ['interiors'],
-
-  // Themed rooms: game rooms, theaters and character bedrooms
-  '03-dornoch-71.jpg': ['themed-rooms'],
-  '03z-dornoch-bedroom-harry-potter.jpg': ['themed-rooms'],
-  '04a-juliet-dr-bunk-room.jpg': ['themed-rooms'],
-  '13-troon-bedroom-encanto.jpg': ['themed-rooms'],
-  '15-dornoch-game-room.jpg': ['themed-rooms'],
-  '18f-oakmoss-loop-game-room.jpg': ['themed-rooms'],
-  '19c-oakmoss-loop-movie-night.jpg': ['themed-rooms'],
-  '20b-scooby-doo-bedroom.jpg': ['themed-rooms'],
-  'p3-DSC_0580.jpg': ['themed-rooms'],
-  'p3-DSC_0772.jpg': ['themed-rooms'],
-
-  // Pools & outdoor living: pools, hot tubs, lanais, fire pits, backyards
-  '01zb-hot-tub-couple.jpg': ['pools'],
-  '03-troon-fire-pit-night.jpg': ['pools', 'twilight'],
-  '04-dornoch-23.jpg': ['pools'],
-  '04-game-room-pool.jpg': ['pools'],
-  '04a-eaton-st-26.jpg': ['pools', 'twilight'],
-  '04b-az-backyard-pool.jpg': ['pools'],
-  '05-troon-pool-fire-pit.jpg': ['pools'],
-  '07-oakmoss-loop-resort-pool.jpg': ['pools', 'twilight'],
-  '18e-az-putting-green.jpg': ['pools'],
-  '19b-hot-tub-night.jpg': ['pools', 'twilight'],
-  'dornoch-contact-banner.jpg': ['pools'],
-};
-
+// Which categories each photo belongs to, and their order: see
+// src/config/portfolio-tags.ts.
 const fileName = (key: string) => key.split('/').pop() ?? key;
 
 /** Category ids a portfolio photo is tagged with (by its glob key). */

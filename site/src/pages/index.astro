@@ -5,15 +5,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import NavBar from '../components/NavBar.astro';
 import { SITE } from '../config/site';
 
-// Home "Selected work" shows the photos featured in /admin; falls back to the
-// existing set until any are featured.
+// Home "Recent work" shows the photos featured in /admin once there are 6+;
+// until then, the RECENT_WORK list (src/config/portfolio-tags.ts), which also
+// leads the portfolio order.
 import { featured } from '../lib/gallery';
 import { portfolio } from '../lib/portfolio';
+import { RECENT_WORK } from '../config/portfolio-tags';
 const workEntries = (
   featured.length >= 6
     ? featured.map((p) => ({ meta: p.meta, alt: p.alt }))
     : portfolio.map((e) => ({ meta: e.meta, alt: e.alt }))
-).slice(0, 15);
+).slice(0, RECENT_WORK.length);
 const work = workEntries.map((e) => e.meta);
 const workAlts = workEntries.map((e) => e.alt);
 const workFull = await Promise.all(
