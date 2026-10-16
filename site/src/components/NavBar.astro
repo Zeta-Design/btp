@@ -1,0 +1,66 @@
+---
+import { SITE } from '../config/site';
+import { navLinks, isActive } from '../config/nav';
+
+interface Props {
+  /** 'clear': white type and logo for sitting on a photo (the home hero's
+      see-through bar). Its links stay out of the tab order; the real header is
+      the accessible one. */
+  variant?: 'solid' | 'clear';
+}
+const { variant = 'solid' } = Astro.props;
+const clear = variant === 'clear';
+const path = Astro.url.pathname;
+---
+<nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-6 sm:py-4">
+  <a
+    href="/"
+    class="flex items-center gap-3"
+    aria-label={`${SITE.name} — home`}
+    tabindex={clear ? -1 : undefined}
+  >
+    <!-- logo-mark.png: logo.png's ink on a transparent background, so it can also
+         sit on a photo (inverted to white). -->
+    <img
+      src="/logo-mark.png"
+      alt=""
+      width="144"
+      height="144"
+      class:list={['h-9 w-9 object-contain', clear && 'invert']}
+    />
+    <span class:list={['font-serif text-lg tracking-tight sm:text-xl', clear && 'text-white']}>
+      {SITE.name}
+    </span>
+  </a>
+
+  <!-- Desktop nav — gaps open up on wide screens so the links don't bunch. -->
+  <ul class="hidden items-center gap-8 text-sm md:flex lg:gap-10 xl:gap-12">
+    {
+      navLinks.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            target={l.newTab ? '_blank' : undefined}
+            rel={l.newTab ? 'noopener noreferrer' : undefined}
+            tabindex={clear ? -1 : undefined}
+            aria-current={!clear && !l.newTab && isActive(path, l.href) ? 'page' : undefined}
+            class:list={[
+              l.cta
+                ? clear
+                  ? 'inline-flex min-h-[36px] items-center rounded-full bg-white px-5 text-stone-900 transition hover:bg-stone-200'
+                  : 'inline-flex min-h-[36px] items-center rounded-full bg-stone-900 px-5 text-white transition hover:bg-stone-700'
+                : clear
+                  ? 'inline-flex min-h-[44px] items-center text-white/85 transition-colors hover:text-white'
+                  : 'inline-flex min-h-[44px] items-center text-stone-600 transition-colors hover:text-stone-900',
+              !l.cta && isActive(path, l.href) && (clear ? 'font-medium text-white' : 'font-medium text-stone-900'),
+            ]}
+          >
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <slot />
+</nav>

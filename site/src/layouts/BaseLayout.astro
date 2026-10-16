@@ -25,6 +25,7 @@ const fullTitle = title === SITE.name ? title : `${title} · ${SITE.name}`;
   <head>
     <BaseHead title={fullTitle} description={description} image={image} type={type} noindex={noindex} />
     {jsonLd && <JsonLd schema={jsonLd} />}
+    <slot name="head" />
     <Analytics />
   </head>
   <body class="min-h-dvh bg-stone-50 font-sans text-stone-900 antialiased">

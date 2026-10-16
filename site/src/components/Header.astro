@@ -1,51 +1,13 @@
 ---
-import { SITE } from '../config/site';
+import NavBar from './NavBar.astro';
+import { navLinks, isActive } from '../config/nav';
 
-const links: { href: string; label: string; newTab?: boolean; cta?: boolean }[] = [
-  { href: '/about/', label: 'About' },
-  { href: '/portfolio/', label: 'Portfolio' },
-  { href: '/pricing/', label: 'Pricing' },
-  { href: '/contact/', label: 'Contact' },
-  { href: '/book/', label: 'Book now', cta: true },
-];
-// Client portal hidden until fully built out
-// if (SITE.clientPortalUrl) {
-//   links.push({ href: SITE.clientPortalUrl, label: 'Client Portal', newTab: true });
-// }
 const path = Astro.url.pathname;
-const isActive = (href: string) => path === href || path.startsWith(href);
 ---
-<header class="sticky top-0 z-40 border-b border-stone-200/80 bg-stone-50 backdrop-blur-md">
-  <nav class="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-6 sm:py-4">
-    <a href="/" class="flex items-center gap-3" aria-label={`${SITE.name} — home`}>
-      <img src="/logo.png" alt="" width="144" height="144" class="h-9 w-9 object-contain" />
-      <span class="font-serif text-lg tracking-tight sm:text-xl">{SITE.name}</span>
-    </a>
-
-    <!-- Desktop nav -->
-    <ul class="hidden items-center gap-8 text-sm md:flex">
-      {
-        links.map((l) => (
-          <li>
-            <a
-              href={l.href}
-              target={l.newTab ? '_blank' : undefined}
-              rel={l.newTab ? 'noopener noreferrer' : undefined}
-              aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
-              class:list={[
-                l.cta
-                  ? 'inline-flex min-h-[36px] items-center rounded-full bg-stone-900 px-5 text-white transition hover:bg-stone-700'
-                  : 'inline-flex min-h-[44px] items-center text-stone-600 transition-colors hover:text-stone-900',
-                !l.cta && isActive(l.href) && 'font-medium text-stone-900',
-              ]}
-            >
-              {l.label}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-
+<!-- focus-within:z-50 — on the home page the hero's see-through bar sits over this
+     header at first; keyboard focus lifts the real one back on top. -->
+<header class="sticky top-0 z-40 border-b border-stone-200/80 bg-stone-50 backdrop-blur-md focus-within:z-50">
+  <NavBar>
     <!-- Mobile menu toggle -->
     <button
       id="menu-toggle"
@@ -62,23 +24,23 @@ const isActive = (href: string) => path === href || path.startsWith(href);
         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
       </svg>
     </button>
-  </nav>
+  </NavBar>
 
   <!-- Mobile panel -->
   <div id="mobile-menu" hidden class="border-t border-stone-200 bg-stone-50 md:hidden">
     <ul class="mx-auto max-w-6xl divide-y divide-stone-100 px-5 py-2">
       {
-        links.map((l) => (
+        navLinks.map((l) => (
           <li>
             <a
               href={l.href}
               target={l.newTab ? '_blank' : undefined}
               rel={l.newTab ? 'noopener noreferrer' : undefined}
-              aria-current={!l.newTab && isActive(l.href) ? 'page' : undefined}
+              aria-current={!l.newTab && isActive(path, l.href) ? 'page' : undefined}
               class:list={[
                 'flex min-h-[52px] items-center text-base',
                 l.cta ? 'font-medium text-stone-900' : 'text-stone-700',
-                !l.cta && isActive(l.href) && 'font-medium text-stone-900',
+                !l.cta && isActive(path, l.href) && 'font-medium text-stone-900',
               ]}
             >
               {l.label}

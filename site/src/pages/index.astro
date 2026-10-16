@@ -2,6 +2,7 @@
 import { Image, Picture, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import NavBar from '../components/NavBar.astro';
 import { SITE } from '../config/site';
 
 // Home "Selected work" shows the photos featured in /admin; falls back to the
@@ -31,7 +32,7 @@ const heroMods = import.meta.glob<{ default: ImageMetadata }>(
 const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 
 // Hero carousel — trying out an auto-rotating hero: the default shot plus two
-// portfolio picks, cross-fading every 5s. Picked by filename; falls back to
+// portfolio picks, cross-fading every 6s. Picked by filename; falls back to
 // just the single default hero if a pick isn't found.
 // Each slide carries its own crop anchor (Tailwind object-position classes) so
 // the subject stays in frame at every viewport width instead of a blind
@@ -39,21 +40,19 @@ const hero = Object.values(heroMods)[0]?.default ?? portfolio[0]?.meta;
 // into the left third, so it needs a left-biased anchor or a narrow/mobile
 // crop loses the house entirely.
 const findPortfolio = (needle: string) => portfolio.find((p) => p.key.includes(needle))?.meta;
-// On desktop every slide pans top→bottom as you scroll (.hero-pan) so the whole
-// photo is revealed. `position` is the static crop (phones, and browsers without
-// scroll-driven animations); `panX` keeps a slide's horizontal anchor during the pan.
-const heroSlideDefs: { meta: ImageMetadata | undefined; position: string; panX?: string }[] = [
+// On desktop the hero is as tall as the first photo at full width (heroRatio), so
+// ordinary scrolling shows the whole picture. `position` is the crop anchor: the
+// static crop on phones, and on desktop the anchor for any slide shaped unlike the
+// first (the 16:9 59th Pl shot gets cropped at the sides).
+const heroSlideDefs: { meta: ImageMetadata | undefined; position: string }[] = [
   { meta: findPortfolio('00-farmhouse-exterior-twilight') ?? hero, position: 'object-center sm:object-top' },
   { meta: findPortfolio('01z-p3-DSC_8792'), position: 'object-center sm:object-top' },
-  {
-    meta: findPortfolio('59th-pl-exterior'),
-    position: 'object-[20%_45%] sm:object-[35%_0%]',
-    panX: '[--pan-x:35%]',
-  },
+  { meta: findPortfolio('59th-pl-exterior'), position: 'object-[20%_45%] sm:object-[35%_0%]' },
 ];
 const heroSlides = heroSlideDefs.filter(
-  (s): s is { meta: ImageMetadata; position: string; panX?: string } => Boolean(s.meta),
+  (s): s is { meta: ImageMetadata; position: string } => Boolean(s.meta),
 );
+const heroRatio = heroSlides[0] ? `${heroSlides[0].meta.width} / ${heroSlides[0].meta.height}` : '3 / 2';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -115,10 +114,21 @@ const services = SITE.services ?? [
   jsonLd={jsonLd}
 >
   <!-- Hero — LCP image: eager + high priority, AVIF/WebP via <Picture>.
-       Auto-rotating carousel: cross-fades between heroSlides every 5s. -->
+       Auto-rotating carousel: cross-fades between heroSlides every 6s. -->
   <!-- Shorter on phones: a tall, narrow hero forces object-cover to show only a
-       thin middle slice of these landscape photos. -->
-  <section class="hero-shell relative isolate flex min-h-[60svh] items-center overflow-hidden bg-stone-900 py-12 sm:min-h-[88svh] sm:py-24">
+       thin middle slice of these landscape photos. On desktop it's the photo's
+       full height instead (see the hero styles). -->
+  <section
+    style={`--hero-ratio: ${heroRatio}`}
+    class="hero-shell relative isolate flex min-h-[60svh] items-center overflow-hidden bg-stone-900 py-12 sm:min-h-[88svh] sm:py-24"
+  >
+    <!-- See-through copy of the nav over the photo on desktop (.hero-nav styles).
+         Decorative for assistive tech: the real header is the accessible one. -->
+    <div class="hero-nav" aria-hidden="true">
+      <div class="hero-nav-bar">
+        <NavBar variant="clear" />
+      </div>
+    </div>
     {
       heroSlides.map((slide, i) => (
         <Picture
@@ -130,13 +140,13 @@ const services = SITE.services ?? [
           loading="eager"
           decoding="async"
           fetchpriority={i === 0 ? 'high' : 'auto'}
-          class={`hero-pan hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} ${slide.panX ?? ''} ${i === 0 ? 'is-active' : ''}`}
+          class={`hero-slide absolute inset-x-0 top-0 -z-10 h-full w-full object-cover ${slide.position} ${i === 0 ? 'is-active' : ''}`}
         />
       ))
     }
     <div class="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/50 to-black/75"></div>
-    <div class="mx-auto w-full max-w-6xl px-5 sm:px-6">
-      <div class="max-w-3xl text-center text-white sm:text-left">
+    <div class="hero-inner mx-auto w-full max-w-6xl px-5 sm:px-6">
+      <div class="hero-copy max-w-3xl text-center text-white sm:text-left">
         <p class="text-xs uppercase tracking-[0.3em] text-white/80 sm:text-sm">
           {hero_copy.eyebrow}
         </p>
@@ -321,54 +331,177 @@ const services = SITE.services ?? [
     }, { passive: true });
   </script>
 
-  <!-- Hero carousel: cross-fade auto-rotate every 5s. Static (first slide only)
-       for prefers-reduced-motion users. -->
+  <!-- Hero carousel: cross-fade auto-rotate every 6s, scrolled or not. A change
+       that comes due mid-scroll waits until the visitor has paused for a beat, so
+       the photo they're moving across never dissolves under them. Static (first
+       slide only) for prefers-reduced-motion users. -->
   <script>
     const heroSlides = Array.from(document.querySelectorAll<HTMLElement>('.hero-slide'));
     if (heroSlides.length > 1 && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const INTERVAL = 6000;
+      const SCROLL_SETTLE = 800;
       let heroIdx = 0;
-      setInterval(() => {
+      let lastScroll = 0;
+      addEventListener('scroll', () => { lastScroll = performance.now(); }, { passive: true });
+      const advance = () => {
+        if (performance.now() - lastScroll < SCROLL_SETTLE) {
+          setTimeout(advance, 250);
+          return;
+        }
         heroSlides[heroIdx].classList.remove('is-active');
         heroIdx = (heroIdx + 1) % heroSlides.length;
         heroSlides[heroIdx].classList.add('is-active');
-      }, 5000);
+        setTimeout(advance, INTERVAL);
+      };
+      setTimeout(advance, INTERVAL);
+    }
+
+    // The copy's fade ends exactly where the hero's bottom edge meets the copy
+    // (see .hero-copy), so it needs the copy's real height, kept current through
+    // font loads, resizes and copy edits.
+    const heroShell = document.querySelector<HTMLElement>('.hero-shell');
+    const heroInner = document.querySelector<HTMLElement>('.hero-inner');
+    if (heroShell && heroInner) {
+      new ResizeObserver(() => {
+        heroShell.style.setProperty('--copy-h', `${heroInner.offsetHeight}px`);
+      }).observe(heroInner);
     }
   </script>
 
+<!-- In the <head> (BaseLayout's head slot) so the hero layout applies before the
+     first paint; further down the body, the page could paint the plain header
+     and an unstyled nav copy first, then snap into place. -->
+<Fragment slot="head">
 <style is:inline>
   /* Hero carousel — cross-fade between stacked slides; JS toggles .is-active. */
   .hero-slide {
     opacity: 0;
-    transition: opacity 1.2s ease;
+    transition: opacity 1.5s ease;
   }
   .hero-slide.is-active {
     opacity: 1;
   }
 
-  /* Hero pan — pure CSS scroll-driven animation: each photo slides from its top
-     to its bottom over the first half-screen of scrolling, revealing the whole
-     subject. Progressive enhancement: only where supported and when the user
-     hasn't asked for reduced motion; otherwise the slide keeps its static crop.
-     is:inline so Astro's CSS minifier doesn't prune `animation-timeline: scroll()`. */
-  @keyframes hero-pan {
-    /* Start a touch into the photo (sky trimmed so the farmhouse peak just
-       meets the top edge); max() caps it at the photo's overflow so short
-       crops never show a gap. */
-    from {
-      object-position: var(--pan-x, 50%) max(-1.5vw, 100%);
-    }
-    to {
-      object-position: var(--pan-x, 50%) 100%;
+  /* Desktop hero — as tall as the first photo at full width (--hero-ratio, from
+     its real dimensions), so ordinary scrolling shows the whole picture, at the
+     same speed as the rest of the page, before the next section arrives. Nothing
+     is pinned or slowed; it's plain layout, so every desktop visitor gets it.
+     --copy-top places the copy roughly centred in the first screen below the
+     header (assuming ~24rem of copy). */
+  :root {
+    --header-h: 77px; /* desktop Header.astro height */
+    --copy-top: max(2rem, (100svh - var(--header-h) - 24rem) / 2);
+  }
+  @media (min-width: 640px) {
+    .hero-shell {
+      display: block;
+      /* Definite width: with width auto, min-height gets carried through the
+         aspect ratio into a min-width, and on tall windows the hero grew wider
+         than the screen. */
+      width: 100%;
+      aspect-ratio: var(--hero-ratio);
+      min-height: calc(100svh - var(--header-h));
+      padding: var(--copy-top) 0 0;
     }
   }
-  @media (min-width: 640px) and (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: scroll()) {
-      .hero-pan {
-        animation: hero-pan linear both;
+  /* The copy holds in place while the photo scrolls under it, fading out by the
+     time the next section's heading comes up, so it never runs up under the
+     see-through header. Opacity only, so it suits reduced-motion users too.
+     is:inline so Astro's CSS minifier doesn't prune the scroll-timeline rules. */
+  @keyframes hero-copy-fade {
+    /* pointer-events animates discretely (flips halfway between keyframes), so
+       hold it until the copy is nearly gone: its buttons stay clickable while
+       they can be seen, and faded ones never catch a click. */
+    95% {
+      pointer-events: auto;
+    }
+    to {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+  @media (min-width: 640px) {
+    @supports (animation-timeline: view()) {
+      .hero-shell {
+        view-timeline: --hero block;
+        /* clip, not hidden: hidden makes the hero a scroll container, so the
+           sticky copy would stick to the hero instead of the screen. */
+        overflow: clip;
+      }
+      .hero-inner {
+        position: sticky;
+        top: calc(var(--header-h) + var(--copy-top));
+      }
+      /* Starts a little way into the photo (contain 25%) and is fully gone just
+         before the hero's bottom edge reaches the bottom of the copy (2rem short
+         of where that edge would start pushing it up): "exit" + the gap between
+         the screen's bottom and the copy's bottom, less that margin.
+         --copy-h is the copy's measured height (script above), 24rem until it's
+         known. */
+      .hero-copy {
+        animation: hero-copy-fade linear both;
+        animation-timeline: --hero;
+        animation-range: contain 25%
+          exit max(0px, 100svh - var(--header-h) - var(--copy-top) - var(--copy-h, 24rem) - 2rem);
+      }
+      /* Keyboard focus brings it back, so a focused button is never invisible. */
+      .hero-copy:has(:focus-visible) {
+        animation: none;
+      }
+    }
+  }
+  /* See-through nav (md+, where the desktop links show). The hero slides up over
+     the real header (z-index) and carries its own white-on-photo copy of the nav
+     (.hero-nav-bar), pinned to the top of the screen. Its track runs one bar's
+     height past the hero's bottom, so the bar is never pushed; instead the hero's
+     own clipping cuts it off at the hero's bottom edge. As that edge rises
+     through the bar, the solid header beneath shows through with its items in
+     exactly the same spots, so each item seems to turn from white to dark as the
+     white section passes it, with no doubled items and no scroll handlers. Same
+     support gate as the copy fade, which keeps the hero's copy from running up
+     under the bar. */
+  .hero-nav {
+    display: none;
+  }
+  /* Overscroll at the top (the Mac trackpad bounce) shows the page's canvas
+     above the hero: keep it dark there so it doesn't flash a white band over the
+     photo, then light again once past the first screen, for the light footer. */
+  @keyframes hero-canvas {
+    from {
+      background-color: #1c1917; /* stone-900, the hero's backing colour */
+    }
+    to {
+      background-color: #fafaf9; /* stone-50, the page background */
+    }
+  }
+  @media (min-width: 768px) {
+    @supports (animation-timeline: view()) {
+      html {
+        animation: hero-canvas steps(1, jump-end) both;
         animation-timeline: scroll(root block);
-        animation-range: 0 50vh;
+        animation-range: 0 100svh;
+      }
+      .hero-shell {
+        z-index: 41; /* over the site header (z-40) */
+        margin-top: calc(-1 * var(--header-h));
+        min-height: 100svh;
+        padding-top: calc(var(--header-h) + var(--copy-top));
+      }
+      .hero-nav {
+        display: block;
+        position: absolute;
+        inset: 0 0 calc(-1 * var(--header-h));
+        z-index: 1; /* over the photo and tint */
+        pointer-events: none; /* the track spans the hero; only the bar takes clicks */
+      }
+      .hero-nav-bar {
+        position: sticky;
+        top: 0;
+        height: var(--header-h); /* matches the header, border included */
+        pointer-events: auto;
       }
     }
   }
 </style>
+</Fragment>
 </BaseLayout>
